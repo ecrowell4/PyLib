@@ -6,7 +6,7 @@ sys.path.append(r'C:\Users\Owner\Documents\PyLib')
 
 from PyLib.schrodinger_solvers import solver_utils
 
-def solve_1D(x, V, units, num_states=15):
+def solver_1D(x, V, units, num_states=15):
     """Uses finite difference to discretize and solve for the eigenstates and 
     energy eigenvalues one dimensional potentials.
     
