@@ -47,8 +47,8 @@ def kinetic_energy(dx, N, units, boundary):
 
     if boundary is 'periodic':
         # This condition forces the derivative of the function to be periodic as well.
-        H[0, N_tilde-1] = -1 / 2 / dx**2
-        H[N_tilde-1, 0] = -1 / 2 / dx**2 
+        d2_psi[0, N_tilde-1] = -1 / 2 / dx**2
+        d2_psi[N_tilde-1, 0] = -1 / 2 / dx**2 
      
     # Convert the second derivative to units of energy:
     Top = -(units.hbar**2 / 2 / units.m) * d2_psi
