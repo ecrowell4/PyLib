@@ -11,12 +11,12 @@ import numpy as np
 import scipy as sp
 from numba import jit
 
-def kinetic_energy(dx, N, units):
+def kinetic_energy(x, N, units):
     """Construct finite difference approximation for kinetic energy operator.
     
     Input
-        dx : float
-            grid spacing
+        x : np.array([x_i])
+            spatial grid including endpoints
         N : int
             number of points representing posiition space
         units : class
@@ -29,9 +29,13 @@ def kinetic_energy(dx, N, units):
             by the boundary conditions.
     """
     
+    # Determine the grid spacing. Note that this may be nonuniform.
+    h = x[1:]-x[:-1]
+    
     # Create finite difference approximation of second derivative operator
-    d2_psi = -2 * np.eye(N-2) / dx**2 + np.eye(N-2, k=1) / dx**2
-            + np.eye(N-2, k=-1) / dx**2
+    d2_psi = (np.diag(-2 / (h[1:]*h[:-1])) +
+        np.diag(1 / (h[1:-1]*(h[1:-1] / 2. + h[:-2] / 2.)), k=1) +
+        np.diag(1 / (h[1:-1]*(h[2:] / 2. + h[1:-1] / 2.)), k=-1))
      
     # The kinetic energy is the second derivative times some consants
     Top = -(units.hbar**2 / 2 / units.m) * d2_psi
