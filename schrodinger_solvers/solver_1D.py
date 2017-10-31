@@ -46,7 +46,7 @@ def solve_1D(x, V, units, num_states=15):
         num_states = N-1
     
     # Construct the Hamiltonian in position space
-    H = solver_utils.hamiltonian(dx, V, units, boundary='hard_wall')
+    H = solver_utils.make_hamiltonian(dx, V, units, boundary='hard_wall')
     
     # Compute eigenvalues and eigenfunctions:
     E, psi = np.linalg.eigh(H)

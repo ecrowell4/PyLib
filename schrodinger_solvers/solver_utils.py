@@ -11,7 +11,7 @@ import numpy as np
 import scipy as sp
 from numba import jit
 
-def kinetic_energy(dx, N, units, boundary):
+def _make_kinetic_energy(dx, N, units, boundary):
     """Construct finite difference approximation for kinetic energy operator.
     
     Input
@@ -56,7 +56,7 @@ def kinetic_energy(dx, N, units, boundary):
     return Top
 
 
-def potential_energy(V, boundary):
+def _make_potential_energy(V, boundary):
     """Construct finite difference approximation for kinetic energy operator.
     
     Input
@@ -82,7 +82,7 @@ def potential_energy(V, boundary):
     return Vop
 
     
-def hamiltonian(dx, V, units, boundary='hard_wall'):
+def make_hamiltonian(dx, V, units, boundary='hard_wall'):
     """Construct Hamiltonian matrix using a finite difference scheme.
     
     Input
@@ -108,13 +108,13 @@ def hamiltonian(dx, V, units, boundary='hard_wall'):
     N = len(V)
     
     # Construct operator representations in position space:
-    Top = kinetic_energy(dx, N, units, boundary)
-    Vop = potential_energy(V, boundary)
+    Top = _make_kinetic_energy(dx, N, units, boundary)
+    Vop = _make_potential_energy(V, boundary)
 
     return Top + Vop
  
 
-def position_matrix(x, psi):
+def make_position_matrix(x, psi):
     """Construct the matrix elements of the position operator:
     
     Input

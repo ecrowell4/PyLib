@@ -13,3 +13,4 @@
 # from PyLib import sum_rules
 # from PyLib.scan_plot import amp_plot
 # from PyLib.scan_plot import pos_width_plot
+# from PyLib.schrodinger_solvers import 

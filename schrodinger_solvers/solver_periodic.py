@@ -41,7 +41,7 @@ def PeriodicSEsolve(x, V, units, num_states=15):
         num_states = N-1
     
     # Construct the Hamiltonian
-    H = solver_utils.hamiltonian(dx, V, units, boundary='periodic')
+    H = solver_utils.make_hamiltonian(dx, V, units, boundary='periodic')
     
     #Enforce periodic boundary conditions (this is one of two conditions):
     H[0,N-2] = -1 / (2*dx**2) 
