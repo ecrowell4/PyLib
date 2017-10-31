@@ -1,6 +1,7 @@
 import numpy as np
+import PyLib as pl
 
-def PeriodicSEsolve(x, V, NumStates = 15, nounits=True):
+def PeriodicSEsolve(x, V, units, NumStates = 15):
     """Uses finite difference to discretize and solve for the eigenstates and 
     energy eigenvalues of one dimensional periodic potentials.
         
@@ -21,12 +22,6 @@ def PeriodicSEsolve(x, V, NumStates = 15, nounits=True):
         NumStates = 15; Dictates the number of states to solve for.
     """
     
-    hbar = 6.58211928E-16 #eV.s
-    m = 0.51099891E6 / (2.99792458E10)**2 #eV.s^2/cm^2
-    if nounits == True:
-        hbar = 1.
-        m = 1.
-        
     #The first entry in the x array is the regularization length, which should
     #not be explicitly included in the potential to arrive at the appropriate 
     #boundary condition. The last entry is used in the definition of the 
@@ -40,19 +35,8 @@ def PeriodicSEsolve(x, V, NumStates = 15, nounits=True):
                 "states returned.")
         NumStates = N-1
     
-    #Form the matrix representation of the potential in the x basis
-    V = np.diag(V[1:])
-    
-    x = np.array(x)
-    dx = x[1]-x[0]  
-    
-    #The kinetic energy matrix 
-    T = ((-2 / (dx**2))*np.eye(N-1) +
-        (1 / (dx**2))*np.eye(N-1,k=1) +
-        (1 / (dx**2))*np.eye(N-1,k=-1))
-        
-    H = -hbar**2 / ( 2 * m ) * T + V
-    
+    # Construct the Hamiltonian
+    H = pl.schrodinger_solvers.solver_utility.hamiltonian(x, V, units, boundary='periodic')
     
     #Enforce periodic boundary conditions (this is one of two conditions):
     H[0,N-2] = -1 / (2*dx**2) 
