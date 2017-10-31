@@ -2,7 +2,7 @@
 import numpy as np
 import PyLib as pl
 
-def solve_1D(x, V, units, NumStates = 15):
+def solve_1D(x, V, units, NumStates=15):
     """Uses finite difference to discretize and solve for the eigenstates and 
     energy eigenvalues one dimensional potentials.
     

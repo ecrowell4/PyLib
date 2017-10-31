@@ -1,7 +1,7 @@
 import numpy as np
 import PyLib as pl
 
-def PeriodicSEsolve(x, V, units, NumStates = 15):
+def PeriodicSEsolve(x, V, units, NumStates=15):
     """Uses finite difference to discretize and solve for the eigenstates and 
     energy eigenvalues of one dimensional periodic potentials.
         
@@ -57,11 +57,5 @@ def PeriodicSEsolve(x, V, units, NumStates = 15):
     #Normalize to unity
     for i in range(NumStates):
         Psi[i] = Psi[i] / np.sqrt(np.trapz( Psi[i]*np.conjugate(Psi[i]), x))
-    
 
-    L = np.zeros((NumStates,NumStates))+0j
-    for n in range(NumStates):
-        for m in range(NumStates):
-            L[n,m] = -1j * hbar * np.trapz( np.conjugate(Psi[n]) * (np.gradient(Psi[m])/dx), x)
-
-    return Psi, E, L
+    return Psi, E
