@@ -42,8 +42,8 @@ def kinetic_energy(dx, N, units, boundary):
         N_tilde = N-1
 
     # Create finite difference approximation of second derivative operator
-    d2_psi = -2 * np.eye(N_tilde) / dx**2 + np.eye(N_tilde, k=1) / dx**2
-            + np.eye(N_tilde, k=-1) / dx**2
+    d2_psi = (-2 * np.eye(N_tilde) / dx**2 + np.eye(N_tilde, k=1) / dx**2 
+              + np.eye(N_tilde, k=-1) / dx**2)
 
     if boundary is 'periodic':
         # This condition forces the derivative of the function to be periodic as well.
@@ -103,12 +103,13 @@ def hamiltonian(dx, V, units, boundary='hard_wall'):
     
     # Assert that 'boundary' is one of the two valid options
     assert boundary is 'hard_wall' or boundary is 'periodic', "Invalid boundary condition specified."
+    
     # Determine number of points representing position space:
     N = len(V)
     
     # Construct operator representations in position space:
-    Top = kinetic_energy(dx, N, units, periodic)
-    Vop = potential_energy(V, periodic)
+    Top = kinetic_energy(dx, N, units, boundary)
+    Vop = potential_energy(V, boundary)
 
     return Top + Vop
  

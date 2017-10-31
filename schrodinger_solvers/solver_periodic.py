@@ -1,7 +1,11 @@
 import numpy as np
-import PyLib as pl
 
-def PeriodicSEsolve(x, V, units, NumStates=15):
+import sys
+sys.path.append(r'C:\Users\Owner\Documents\PyLib')
+
+from PyLib.schrodinger_solvers import solver_utils
+
+def PeriodicSEsolve(x, V, units, num_states=15):
     """Uses finite difference to discretize and solve for the eigenstates and 
     energy eigenvalues of one dimensional periodic potentials.
         
@@ -27,16 +31,17 @@ def PeriodicSEsolve(x, V, units, NumStates=15):
     #boundary condition. The last entry is used in the definition of the 
     #derivative but does not hold a function value.
     N = len(x)
+    dx = x[1]-x[0]
     
     #Reset NumStates if the resolution of the space is less than the called for
     #  numer of states
-    if NumStates >= N:
+    if num_states >= N-2:
         print("Resolution too poor for requested number of states."+str(N-1)+
                 "states returned.")
-        NumStates = N-1
+        num_states = N-1
     
     # Construct the Hamiltonian
-    H = pl.schrodinger_solvers.solver_utility.hamiltonian(x, V, units, boundary='periodic')
+    H = solver_utils.hamiltonian(dx, V, units, boundary='periodic')
     
     #Enforce periodic boundary conditions (this is one of two conditions):
     H[0,N-2] = -1 / (2*dx**2) 
@@ -44,18 +49,19 @@ def PeriodicSEsolve(x, V, units, NumStates=15):
     
     #Diagonalize
     E, psi = np.linalg.eigh(H)
-    E = E[:NumStates]
-    psi = psi[:,:NumStates]
+
+    E = E[:num_states]
+    psi = psi[:,:num_states]
     
     psi = psi.transpose()
     
     #Append the last term in wave function (second periodic condition)   
-    Psi = np.zeros((NumStates, N)) + 0j
-    for i in range(NumStates):
+    Psi = np.zeros((num_states, N)) + 0j
+    for i in range(num_states):
         Psi[i] = np.insert(psi[i], N-1, psi[i][0])
     
     #Normalize to unity
-    for i in range(NumStates):
+    for i in range(num_states):
         Psi[i] = Psi[i] / np.sqrt(np.trapz( Psi[i]*np.conjugate(Psi[i]), x))
 
     return Psi, E

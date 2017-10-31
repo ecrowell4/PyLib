@@ -1,8 +1,12 @@
 
 import numpy as np
-import PyLib as pl
 
-def solve_1D(x, V, units, NumStates=15):
+import sys
+sys.path.append(r'C:\Users\Owner\Documents\PyLib')
+
+from PyLib.schrodinger_solvers import solver_utils
+
+def solve_1D(x, V, units, num_states=15):
     """Uses finite difference to discretize and solve for the eigenstates and 
     energy eigenvalues one dimensional potentials.
     
@@ -32,6 +36,7 @@ def solve_1D(x, V, units, NumStates=15):
         
     # Determine number of points in spacial grid
     N = len(x)
+    dx = x[1]-x[0]
     
     #Reset num_states if the resolution of the space is less than the called for
     #  numer of states
@@ -41,22 +46,22 @@ def solve_1D(x, V, units, NumStates=15):
         num_states = N-1
     
     # Construct the Hamiltonian in position space
-    H = pl.schrodinger_solvers.solver_utility.hamiltonian(x, V, units, boundary='hard_wall')
+    H = solver_utils.hamiltonian(dx, V, units, boundary='hard_wall')
     
     # Compute eigenvalues and eigenfunctions:
     E, psi = np.linalg.eigh(H)
     
     # Truncate to the desired number of states
-    E = E[:NumStates]
-    psi = psi[:,:NumStates]
+    E = E[:num_states]
+    psi = psi[:,:num_states]
     
     # Hard walls are assumed at the boundary, so the wavefunction at the boundary
     #   must be zero. We enforce this boundary condition:
-    psi = np.insert(psi, 0, np.zeros(NumStates), axis = 0)
-    psi = np.insert(psi, len(x)-1, np.zeros(NumStates), axis = 0)
+    psi = np.insert(psi, 0, np.zeros(num_states), axis = 0)
+    psi = np.insert(psi, len(x)-1, np.zeros(num_states), axis = 0)
     
     # Normalize to unity:
-    for i in range(NumStates):
+    for i in range(num_states):
         psi[:,i] = psi[:,i] / np.sqrt(np.trapz( psi[:,i]*psi[:,i], x))
     
     # Take the transpose so that psi[i] is the ith eigenfunction:
