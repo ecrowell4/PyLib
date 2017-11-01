@@ -1,9 +1,5 @@
 import numpy as np
-
-import sys
-sys.path.append(r'C:\Users\Owner\Documents\PyLib')
-
-from PyLib.schrodinger_solvers import solver_utils
+from nlopy.quantum_solvers import solver_utils
 
 def PeriodicSEsolve(x, V, units, num_states=15):
     """Uses finite difference to discretize and solve for the eigenstates and 

@@ -8,8 +8,6 @@ Contains utility functions for solving the Schrodinger equation.
 """
 
 import numpy as np
-import scipy as sp
-from numba import jit
 
 def _make_kinetic_energy(dx, N, units, boundary):
     """Construct finite difference approximation for kinetic energy operator.
@@ -182,7 +180,6 @@ def block_diag(v, k=0):
             a block diagonal marix whose blocks are the elements of v.
 
     """
-    import numpy as np
     
     shapes = np.array([a.shape for a in v])
     out = np.zeros(np.sum(shapes, axis=0) + abs(k)*shapes[0], dtype=v[0].dtype)
