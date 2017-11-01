@@ -130,7 +130,7 @@ def make_position_matrix(x, psi):
     # Determine number of states that are being used:
     num_states = len(psi[:])
     
-    # Allocate memeory to store the values:
+    # Allocate memory to store the values:
     xx = np.zeros((num_states, num_states))
     
     # Compute the matrix elements: 
@@ -139,3 +139,30 @@ def make_position_matrix(x, psi):
             xx[i,j] = np.trapz(psi[i].conjugate() * x *psi[j], x)
             
     return xx
+
+def make_angular_momentum(x, Psi)
+    """Construct the matrix elements of the position operator:
+
+    Input
+        x : np.array
+            array represential position space
+        Psi : np.array((num_states, len(x)))
+            array containing wavefunctions
+
+    Output:
+        L : np.array((num_states, num_states))
+            matrix elements of angular momentum
+    """
+
+    # Determine number of states that are being used
+    num_states = len(Psi[:])
+
+    # Allocate memory for the matrix
+    L = np.zeros((num_states, num_states))+0j
+
+    # Compute the matrix elements
+    for n in range(num_states):
+        for m in range(num_states):
+            L[n,m] = -1j * hbar * np.trapz( np.conjugate(Psi[n]) * (np.gradient(Psi[m])/dx), x)
+
+    return L
