@@ -33,5 +33,5 @@ def alpha_ee(E, xx, units, omega=0):
             polarizability describing the linear response of the polarization
             to an electric field.
     """
-    return units.e**2 * (xx[0,1:].dot(xx[1:,0] * sos.D1(E, omega)) 
-        + xx[0,1:].dot(xx[1:,0] * sos.D1(E.conjugate(), -omega)))
+    return units.e**2 * (xx[0,1:].dot(xx[1:,0] * sos.D1(E, omega, units)) 
+        + xx[0,1:].dot(xx[1:,0] * sos.D1(E.conjugate(), -omega, units)))
