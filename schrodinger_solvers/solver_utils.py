@@ -140,7 +140,7 @@ def make_position_matrix(x, psi):
             
     return xx
 
-def make_angular_momentum(x, Psi)
+def make_angular_momentum(x, Psi):
     """Construct the matrix elements of the position operator:
 
     Input
