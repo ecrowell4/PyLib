@@ -166,3 +166,34 @@ def make_angular_momentum(x, Psi):
             L[n,m] = -1j * hbar * np.trapz( np.conjugate(Psi[n]) * (np.gradient(Psi[m])/dx), x)
 
     return L
+
+def block_diag(v, k=0):
+    """ Creates a block diagonal matrix, with the elements of v
+    as the diagonals.
+
+    Input
+        v : np.array(dtype=np.array)
+            An array whose elements are matrices. v[i] will be the ith diagonal of the matrix
+        k : float
+            diagonal along which to cast v. 
+
+    Output
+        out : np.array
+            a block diagonal marix whose blocks are the elements of v.
+
+    """
+    import numpy as np
+    
+    shapes = np.array([a.shape for a in v])
+    out = np.zeros(np.sum(shapes, axis=0) + abs(k)*shapes[0], dtype=v[0].dtype)
+
+    if k >= 0:
+        r, c = 0, abs(k)*shapes[0][0]
+    else:
+        r, c = abs(k)*shapes[0][0], 0
+    for i, (rr, cc) in enumerate(shapes):
+        out[r:r + rr, c:c + cc] = v[i]
+        r += rr
+        c += cc
+    
+    return out
