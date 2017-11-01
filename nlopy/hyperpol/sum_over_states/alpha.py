@@ -6,7 +6,7 @@ Created on Mon Jul 31 12:38:46 2017
 """
 
 import numpy as np
-from nlopy.sum_over_states import sos_utils as sos
+from nlopy.hyperpol.sum_over_states import sos_utils as sos
 
     
 def alpha_ee(E, xx, units, omega=0):

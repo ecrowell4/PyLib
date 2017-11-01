@@ -43,3 +43,26 @@ def D2(E, omega1, omega2, units):
     """
     E = E - E[0]
     return 1 / (E[1:] - units.hbar*omega1 - units.hbar*omega2)
+
+
+def damping_coeffs(E, xx, units):
+    """Returns and array with the damping terms derived from Fermi's
+    Golden Rule (see M Kuzyk, J Chem Phys 125, 2006).
+
+    Input
+        E : np.array
+            Eigenenergies
+        xx : np.array
+            Position matrix
+        units : class
+            Class whose attributes are the fundamental constants
+
+    Output
+        Gamma : np.array
+            Array with same shape as E representing the damping term for each state.
+    """
+
+    Gamma =  (2 / 3) * ((E - E[0]) / units.hbar / units.c)**3 * units.e**2 * abs(xx[0])**2
+
+    return Gamma
+
