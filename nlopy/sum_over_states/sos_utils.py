@@ -1,6 +1,6 @@
 import numpy as np
 
-def D1(E, omega):
+def D1(E, omega, units):
     """Returns the propogator for a first order process.
     
     Input
@@ -10,6 +10,8 @@ def D1(E, omega):
         	should pass E.conjugate() instead of E.
     omega : float
         input frequency
+    units : class
+        class whose attributes are the fundamental constants hbar, e, m, c, etc
 
     Output
     	D1 : np.array
@@ -20,9 +22,9 @@ def D1(E, omega):
     E = E - E[0]
     
     # Compute and return the propogator
-    return 1 / (E[1:] - omega)
+    return 1 / (E[1:] - units.hbar*omega)
 
-def D2(E, omega1, omega2):
+def D2(E, omega1, omega2, units):
     """Returns propogator for a second order process.
     
     Input
@@ -32,10 +34,12 @@ def D2(E, omega1, omega2):
         	should pass E.conjugate() instead of E.
     omega1, omega2 : float
         input frequencies
+    units : class
+        class whose attributes are the fundamental constants hbar, e, m, c, etc
 
     Output
     	D2 : np.array
     		propogator for second order process
     """
     E = E - E[0]
-    return 1 / (E[1:] - omega1 - omega2)
+    return 1 / (E[1:] - units.hbar*omega1 - units.hbar*omega2)
