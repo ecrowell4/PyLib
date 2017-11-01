@@ -4,7 +4,11 @@ Created on Wed Nov  1 11:21:17 2017
 
 @author: Ethan Crowell
 """
-def beta_tst(E, xx, ein=[0,0]):
+
+import numpy as np
+from nlopy.sum_over_states import sos_utils as sos
+
+def beta_tst(E, xx, omega1, omega2):
     """Calculates the first hyperpolarizability, beta, as a function of two 
     input photon energies and complex molecular transition and energy 
     information. Calculates the one tensor component specified.
@@ -53,12 +57,12 @@ def beta_tst(E, xx, ein=[0,0]):
             xx[i,i] = 0
             
     #Calculate beta
-    beta = 0.5 * e**2 * ((xx[0,1:]/(E[1:] - ein[0] - ein[1])).dot(xx[1:,1:].dot(xx[1:,0]/(E[1:] - ein[0])))
-    + (xx[0,1:]/(E[1:] - ein[1] - ein[0])).dot(xx[1:,1:].dot(xx[1:,0]/(E[1:] - ein[1])))
-    + (xx[0,1:]/(E[1:] - ein[1])).dot(xx[1:,1:].dot(xx[1:,0]/(E[1:].conjugate() + ein[0])))
-    + (xx[0,1:]/(E[1:] - ein[0])).dot(xx[1:,1:].dot(xx[1:,0]/(E[1:].conjugate() + ein[1])))
-    + (xx[0,1:]/(E[1:].conjugate() + ein[0] + ein[1])).dot(xx[1:,1:].dot(xx[1:,0]/(E[1:].conjugate() + ein[0])))
-    + (xx[0,1:]/(E[1:].conjugate() + ein[1] + ein[0])).dot(xx[1:,1:].dot(xx[1:,0]/(E[1:].conjugate() + ein[1]))))
+    beta = 0.5 * e**2 * ((xx[0,1:] * sos.D2(E, omega1, omega2, units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E, omega1, units)))
+    + (xx[0,1:] * sos.D2(E, omega2, omega1, units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E, omega2, units)))
+    + (xx[0,1:] * sos.D1(E, omega2, units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E.conjugate(), -omega1, units)))
+    + (xx[0,1:] * sos.D1(E, omega1, units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E.conjugate(), -omega2, units)))
+    + (xx[0,1:] * sos.D2(E.conjugate, -omega1, -omega2, units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E.conjugate, -omega1, units)))
+    + (xx[0,1:] * sos.D2(E.conjugate, -omega2, -omega1, units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E.conjugate, -omega2, units))))
             
     return beta
 
