@@ -35,9 +35,10 @@ def alpha_ee(E, xx, units, omega=0):
     
     # We assume that transition moments that are np.allclose to zero actually vanish,
     #   and are only nonzero due to numerical errors:
-    for i in range(30):
-        if np.allclose(xx_prime[i,0], 0):
-            vanishing = np.append(vanishing, i)
+    if np.allclose(xx[1,0], 0):
+        start = 2
+    else:
+        start = 1
             
-    return units.e**2 * (xx[0,1:].dot(xx[1:,0] * sos.D1(E, omega, units)) 
-        + xx[0,1:].dot(xx[1:,0] * sos.D1(E.conjugate(), -omega, units)))
+    return units.e**2 * (xx[0,start:].dot(xx[start:,0] * sos.D1(E, omega, units)) 
+        + xx[0,start:].dot(xx[start:,0] * sos.D1(E.conjugate(), -omega, units)))
