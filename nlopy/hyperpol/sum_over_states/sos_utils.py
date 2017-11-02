@@ -66,27 +66,27 @@ def damping_coeffs(E, xx, units):
 
     return Gamma
 
-def project(x, psi, phi_n):
-    """Evaluates an arbitrary wavefunction psi onto an eigenstate psi_n.
+def project(x, f, g):
+    """Evaluates the projection of function f onto function g, c_n = <f | g>.
     
     Input
         x : np.array
             Spatial grid
-        psi : np.array
-            Wavefunction to be projected
-        phi_n : np.array
-            Eigenstate on which to project
+        f : np.array
+            Function to be projected
+        g : np.array
+            Function on which to project
         
     Output
-        psi_n : np.array
+        c_n : complex
             Component of psi along phi_n
     """
     
-    psi_n = phi_n * np.trapz(phi_n.conjugate() * psi, x)
+    c_n = np.trapz(f.conjugate() * g, x)
     
-    return psi_n
+    return c_n
 
-def lift_degen(V_prime, x):
+def lift_degen(V_prime, x, psi0, psi1):
     """Returns a linear combinations of two degnerate states that diagonalizes
     the modified perturbation. V
     
@@ -96,22 +96,29 @@ def lift_degen(V_prime, x):
             degenerate subspace.
         x : np.array
             Spatial grid
+        psi0, psi1 : np.array
+            Quasi degenerate unperturbed eigenfunctions
         
     Output
-        psi1, psi2 : np.array
-            Linear combinations of psia, psib that diagonlizes the perturbation.
+        psi_prime : np.array
+            Linear combinations of psi0, psi1 that diagonlizes the perturbation.
         E1 : np.array(2) 
             the first order energy corrections to the two states psi1, psi2.
     """
 
     # The eigenfunctions of modified perturbation will diagonalize it:
-    E1, psi_prime = np.linalg.eig(V_prime)
+    E1, coeffs = np.linalg.eig(V_prime)
     
-    # Normalize the eigenfunctions
+    coeffs = coeffs.transpose()
+    
+    psi_prime = np.zeros((2, len(x)))
     for i in range(2):
-        psi_prime[i] = psi_prime[i] / np.sqrt(np.trapz(psi_prime[i].conjugate() * psi_prime[i], x))
+        # Create linear combinations
+        psi_prime[i] = coeffs[i,0]*psi0 + coeffs[i,1]*psi1
+        # Normalize the resulting wavefunctions
+        psi_prime[i] /= np.sqrt(np.trapz(psi_prime[i].conjugate() * psi_prime[i], x))
     
-    return E1, psi_prime
+    return psi_prime, E1
     
     
     
