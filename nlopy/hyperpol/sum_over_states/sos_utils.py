@@ -66,20 +66,52 @@ def damping_coeffs(E, xx, units):
 
     return Gamma
 
-def lift_degen(V, psia, psib):
-    """Returns a linear combinations of two degnerate states that diagonalizes
-    the perturbation.
+def project(x, psi, phi_n):
+    """Evaluates an arbitrary wavefunction psi onto an eigenstate psi_n.
     
     Input
-        V : np.array
-            The perturbation
-        psia, psib : np.array
-            Degenerate wavefunctions
+        x : np.array
+            Spatial grid
+        psi : np.array
+            Wavefunction to be projected
+        phi_n : np.array
+            Eigenstate on which to project
+        
+    Output
+        psi_n : np.array
+            Component of psi along phi_n
+    """
+    
+    psi_n = phi_n * np.trapz(phi_n.conjugate() * psi, x)
+    
+    return psi_n
+
+def lift_degen(V_prime, x):
+    """Returns a linear combinations of two degnerate states that diagonalizes
+    the modified perturbation. V
+    
+    Input
+        V_prime : np.array
+            Matrix representation of modified perturbation in unperturbed 
+            degenerate subspace.
+        x : np.array
+            Spatial grid
         
     Output
         psi1, psi2 : np.array
             Linear combinations of psia, psib that diagonlizes the perturbation.
-        E1, E2 : the first order energy corrections to the two states psi1, psi2.
+        E1 : np.array(2) 
+            the first order energy corrections to the two states psi1, psi2.
     """
+
+    # The eigenfunctions of modified perturbation will diagonalize it:
+    E1, psi_prime = np.linalg.eig(V_prime)
+    
+    # Normalize the eigenfunctions
+    for i in range(2):
+        psi_prime[i] = psi_prime[i] / np.sqrt(np.trapz(psi_prime[i].conjugate() * psi_prime[i], x))
+    
+    return E1, psi_prime
+    
     
     
