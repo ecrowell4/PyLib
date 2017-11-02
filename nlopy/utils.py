@@ -1,5 +1,8 @@
+
 """This file containts funtions and classes that should be of general use in Nonlinear optics, regardless
 of application."""
+
+import numpy as np
 
 def position_space(L, dx, L_min=0):
 	"""Returns an array that represents a discretized representation of
