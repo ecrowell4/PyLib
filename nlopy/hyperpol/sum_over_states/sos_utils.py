@@ -66,3 +66,20 @@ def damping_coeffs(E, xx, units):
 
     return Gamma
 
+def lift_degen(V, psia, psib):
+    """Returns a linear combinations of two degnerate states that diagonalizes
+    the perturbation.
+    
+    Input
+        V : np.array
+            The perturbation
+        psia, psib : np.array
+            Degenerate wavefunctions
+        
+    Output
+        psi1, psi2 : np.array
+            Linear combinations of psia, psib that diagonlizes the perturbation.
+        E1, E2 : the first order energy corrections to the two states psi1, psi2.
+    """
+    
+    
