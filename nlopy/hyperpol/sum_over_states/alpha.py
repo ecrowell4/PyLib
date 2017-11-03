@@ -40,5 +40,5 @@ def alpha_ee(E, xx, units, omega=0):
     else:
         start = 1
             
-    return units.e**2 * (xx[0,start:].dot(xx[start:,0] * sos.D1(E, omega, units)) 
-        + xx[0,start:].dot(xx[start:,0] * sos.D1(E.conjugate(), -omega, units)))
+    return units.e**2 * (xx[0,start:].dot(xx[start:,0] * sos.D1(E, omega, units, start)) 
+        + xx[0,start:].dot(xx[start:,0] * sos.D1(E.conjugate(), -omega, units, start)))

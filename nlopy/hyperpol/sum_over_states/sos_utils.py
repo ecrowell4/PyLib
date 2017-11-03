@@ -1,6 +1,6 @@
 import numpy as np
 
-def D1(E, omega, units):
+def D1(E, omega, units, start):
     """Returns the propogator for a first order process.
     
     Input
@@ -12,7 +12,9 @@ def D1(E, omega, units):
         input frequency
     units : class
         class whose attributes are the fundamental constants hbar, e, m, c, etc
-
+    start : int
+        first state included in SOS expression
+        
     Output
     	D1 : np.array
     		propogator for first order process
@@ -22,9 +24,9 @@ def D1(E, omega, units):
     E = E - E[0]
     
     # Compute and return the propogator
-    return 1 / (E[1:] - units.hbar*omega)
+    return 1 / (E[start:] - units.hbar*omega)
 
-def D2(E, omega1, omega2, units):
+def D2(E, omega1, omega2, units, start):
     """Returns propogator for a second order process.
     
     Input
@@ -36,13 +38,15 @@ def D2(E, omega1, omega2, units):
         input frequencies
     units : class
         class whose attributes are the fundamental constants hbar, e, m, c, etc
-
+    start : int
+        first state included in SOS expression
+        
     Output
     	D2 : np.array
     		propogator for second order process
     """
     E = E - E[0]
-    return 1 / (E[1:] - units.hbar*omega1 - units.hbar*omega2)
+    return 1 / (E[start:] - units.hbar*omega1 - units.hbar*omega2)
 
 
 def damping_coeffs(E, xx, units):
