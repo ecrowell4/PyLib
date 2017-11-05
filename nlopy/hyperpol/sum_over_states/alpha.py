@@ -38,7 +38,7 @@ def alpha_ee(E, XX, units, omega=0):
     
     # We assume that transition moments that are np.allclose to zero actually vanish,
     #   and are only nonzero due to numerical errors:
-    if np.allclose(xx_exp[1,0], 0):
+    if np.allclose(XX[1][1,0], 0):
         start = 2
     else:
         start = 1

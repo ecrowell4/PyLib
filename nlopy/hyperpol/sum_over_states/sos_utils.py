@@ -70,6 +70,23 @@ def damping_coeffs(E, xx, units):
 
     return Gamma
 
+def modified_perturbation(xx, E10):
+    """Returns the modified perturbationto be used in quasi degenerate perturbation
+    theory. The returned array is only the representation of the modified perturbation
+    in the subspace spanned by the two quasi degenerate states.
+    
+    Input
+        xx : np.array
+            Transition matrix
+        E10 : np.float
+            Energy difference between ground and first excited state.
+        
+    Output 
+        xx_prime : np.array
+            The modified perturbation
+    """
+    return np.array([[xx[0,0] - 0.5*E10, xx[0,1]],[xx[1,0], xx[1,1]+0.5*E10]])
+
 def project(x, f, g):
     """Evaluates the projection of function f onto function g, c_n = <f | g>.
     
