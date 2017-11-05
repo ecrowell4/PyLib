@@ -9,7 +9,7 @@ import numpy as np
 from nlopy.hyperpol.sum_over_states import sos_utils as sos
 
     
-def alpha_ee(E, xx, units, omega=0):
+def alpha_ee(E, xx_exp, xx_pert, units, omega=0):
     """Calculates the polarizability alpha as a function of the energy spectrum
     and transition matrix. The SOS expression derived from time-dependent
     perturbation theory is evaluated using the first num_states states.
@@ -17,11 +17,13 @@ def alpha_ee(E, xx, units, omega=0):
     Input
         E : np.array(N)
             energy spectrum
-        xx : np.array((N,N))
-            transition matrix
+        xx_exp, xx_pert : np.array((N,N))
+            Transition matrix that enters into SOS due to expection value and 
+            perturbation, respectively. These are typically the same except for
+            when quasi degenerate methods are implemented.
         units : class
             class whose attributes are the fundamental constants hbar, e, m, c, etc.
-        omega : float
+        omega : float, default value of zero
             frequency of incident electric field
         
     Output
@@ -40,5 +42,5 @@ def alpha_ee(E, xx, units, omega=0):
     else:
         start = 1
             
-    return units.e**2 * (xx[0,start:].dot(xx[start:,0] * sos.D1(E, omega, units, start)) 
-        + xx[0,start:].dot(xx[start:,0] * sos.D1(E.conjugate(), -omega, units, start)))
+    return units.e**2 * (xx_exp[0,start:].dot(xx_pert[start:,0] * sos.D1(E, omega, units, start)) 
+        + xx_pert[0,start:].dot(xx_exp[start:,0] * sos.D1(E.conjugate(), -omega, units, start)))
