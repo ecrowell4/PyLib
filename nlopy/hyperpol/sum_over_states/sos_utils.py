@@ -140,6 +140,26 @@ def lift_degen(V_prime, x, psi0, psi1):
         psi_prime[i] /= np.sqrt(np.trapz(psi_prime[i].conjugate() * psi_prime[i], x))
     
     return psi_prime, E1
+
+def modified_energies(E):
+    """Returns the eigenenergies of the modified unperturbed Hamiltonian. In this
+    modified Hamiltonian, the quasi degenerate states (ground and first states)
+    are truly degnerate, with value midway between the two energies.
     
+    Input
+        E : np.array
+            Eigenenergies of original unperturbed Hamiltonian.
+        
+    Output
+        E_prime : np.array
+            Eigenergies of modified unperturbed Hamiltonian.
+    """
+    
+    E_prime = E
+    
+    # Replace quasi degenerate values with degenerate value midway between
+    E_prime[0] = E_prime[1] = 0.5*(E[0]+E[1])
+    
+    return E_prime
     
     
