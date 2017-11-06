@@ -108,7 +108,7 @@ def project(x, f, g):
     
     return c_n
 
-def lift_degen(V_prime, x, psi0, psi1):
+def lift_degen(V_prime, x, psi):
     """Returns a linear combinations of two degnerate states that diagonalizes
     the modified perturbation. V
     
@@ -118,8 +118,9 @@ def lift_degen(V_prime, x, psi0, psi1):
             degenerate subspace.
         x : np.array
             Spatial grid
-        psi0, psi1 : np.array
-            Quasi degenerate unperturbed eigenfunctions
+        psi : np.array
+            Original unperturbed eigenfunctions with quasi degeneracy between
+            ground and first excited state.
         
     Output
         psi_prime : np.array
@@ -133,10 +134,14 @@ def lift_degen(V_prime, x, psi0, psi1):
     
     coeffs = coeffs.transpose()
     
-    psi_prime = np.zeros((2, len(x)))
+    # Most of the states will be unaffected, so we initially copy the entire array
+    psi_prime = copy.copy(psi)
+    
+    # The ground and first excited states must be modified in order to diagonalize
+    #   the modified perturbation:
     for i in range(2):
         # Create linear combinations
-        psi_prime[i] = coeffs[i,0]*psi0 + coeffs[i,1]*psi1
+        psi_prime[i] = coeffs[i,0]*psi[0] + coeffs[i,1]*psi[1]
         # Normalize the resulting wavefunctions
         psi_prime[i] /= np.sqrt(np.trapz(psi_prime[i].conjugate() * psi_prime[i], x))
     
