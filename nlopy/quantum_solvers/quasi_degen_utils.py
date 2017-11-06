@@ -20,6 +20,7 @@ def modified_perturbation_matrix(V, E10):
     
     return np.array([[V[0,0] - 0.5*E10, V[0,1]],[V[1,0], V[1,1]+0.5*E10]])
 
+
 def project(x, f, g):
     """Evaluates the projection of function f onto function g, c_n = <f | g>.
     
@@ -39,6 +40,7 @@ def project(x, f, g):
     c_n = np.trapz(f.conjugate() * g, x)
     
     return c_n
+
 
 def lift_degen(V_prime, x, psi):
     """Returns a linear combinations of two degnerate states that diagonalizes
@@ -79,6 +81,7 @@ def lift_degen(V_prime, x, psi):
     
     return psi_prime, E1
 
+
 def modified_energies(E):
     """Returns the eigenenergies of the modified unperturbed Hamiltonian. In this
     modified Hamiltonian, the quasi degenerate states (ground and first states)
@@ -99,6 +102,7 @@ def modified_energies(E):
     E_prime[0] = E_prime[1] = 0.5*(E[0]+E[1])
     
     return E_prime
+
 
 def modified_position_matrix(xx, x, psi_prime, E10):
     """Returns position matrix elements using the modified wavefunctions from
@@ -142,6 +146,7 @@ def modified_position_matrix(xx, x, psi_prime, E10):
     xx_prime[1,:] = xx_prime[:,1].conjugate()
     
     return xx_prime
+
 
 def modified_perturbation(xx_prime, x, psi, psi_prime, E10):
     """Returns the modified perturbation in the modified basis. In this basis
