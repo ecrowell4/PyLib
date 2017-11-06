@@ -42,12 +42,12 @@ def project(x, f, g):
     return c_n
 
 
-def lift_degen(V_prime, x, psi):
+def lift_degen(V_tilde, x, psi):
     """Returns a linear combinations of two degnerate states that diagonalizes
     the modified perturbation. V
     
     Input
-        V_prime : np.array
+        V_tilde : np.array
             Matrix representation of modified perturbation in unperturbed 
             degenerate subspace.
         x : np.array
@@ -64,7 +64,7 @@ def lift_degen(V_prime, x, psi):
     """
 
     # The eigenfunctions of modified perturbation will diagonalize it:
-    E1, coeffs = np.linalg.eig(V_prime)
+    E1, coeffs = np.linalg.eig(V_tilde)
     
     coeffs = coeffs.transpose()
     
