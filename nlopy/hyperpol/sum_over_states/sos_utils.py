@@ -71,7 +71,7 @@ def damping_coeffs(E, xx, units):
 
     return Gamma
 
-def modified_perturbation(V, E10):
+def modified_perturbation_matrix(V, E10):
     """Returns the modified perturbationto be used in quasi degenerate perturbation
     theory. The returned array is only the representation of the modified perturbation
     in the subspace spanned by the two quasi degenerate states.
@@ -168,7 +168,7 @@ def modified_energies(E):
     
     return E_prime
 
-def modified_position_matrix(xx, x, psi, psi_prime, E10):
+def modified_position_matrix(xx, x, psi_prime, E10):
     """Returns position matrix elements using the modified wavefunctions from
     quasi degenerate perturbation theory. Note: uses the project function
     defined above.
@@ -194,9 +194,9 @@ def modified_position_matrix(xx, x, psi, psi_prime, E10):
     # The only elements that are affected are those that couple states to the 
     #   ground or first excited states. The perturbation is the same when one of
     #   the involved states is not one of the quasi degenerate states.
-    for i in range(2,num_states):
-        xx_prime[i,0] = np.trapz(psi[i].conjugate() * x * psi_prime[0], x)
-        xx_prime[i,1] = np.trapz(psi[i].conjugate() * x * psi_prime[1], x)
+    for i in range(num_states):
+        xx_prime[i,0] = np.trapz(psi_prime[i].conjugate() * x * psi_prime[0], x)
+        xx_prime[i,1] = np.trapz(psi_prime[i].conjugate() * x * psi_prime[1], x)
     
     # When both states are from the quasi degenerate subspace, we have to use the
     #   modified perturbation. The diagonal elements:
@@ -204,14 +204,34 @@ def modified_position_matrix(xx, x, psi, psi_prime, E10):
         xx_prime[i,i] = (np.trapz(psi_prime[0].conjugate() * x * psi_prime[0], x)
         - (-1)**i * 0.5*E10)    
     
-    # The transition moment between the quasi degenerate states:
-    xx_prime[1,0] = np.trapz(psi_prime[1]*x*psi_prime[0], x) + 0.5*E10*project(x, psi_prime[1], psi[1])*project(x,psi[1], psi_prime[0]) - 0.5*E10*project(x,psi_prime[1], psi[0])*project(x,psi[0], psi_prime[0])
-    
     # The matrix must still be hermitian, so we accordingly assign the transpose
     #   elements
     xx_prime[0,:] = xx_prime[:,0].conjugate()
     xx_prime[1,:] = xx_prime[:,1].conjugate()
     
     return xx_prime
+
+def modified_perturbation(xx_prime, x, psi, psi_prime, E10):
+    """Returns the modified perturbation to be used in the SOS expressions for
+    alpha, beta, gamma.
+    
+    Input
+        xx_prime : np.array
+            Modified position matrix
+        psi_prime : np.array
+            Unperturbed wavefunctions that diagonalize the modified perturbation.
+        E10 : float
+            Energy difference between quasi degenerate states (ground and first).
+    
+    Output :
+        xx_prime_pert : np.array
+            Modified position matrix
+    """
+    xx_prime_pert = copy.copy(xx_prime)
+    # The transition moment between the quasi degenerate states:
+    xx_prime_pert[1,0] = xx_prime_pert[0,1] = np.trapz(psi_prime[1]*x*psi_prime[0], x) + 0.5*E10*project(x, psi_prime[1], psi[1])*project(x,psi[1], psi_prime[0]) - 0.5*E10*project(x,psi_prime[1], psi[0])*project(x,psi[0], psi_prime[0])
+    
+    return xx_prime_pert
+    
     
     
