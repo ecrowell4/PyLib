@@ -68,19 +68,17 @@ def lift_degen(V_tilde, x, psi):
     
     coeffs = coeffs.transpose()
     
-    
-    
     # Most of the states will be unaffected, so we initially copy the entire array
     psi_prime = copy.copy(psi)
     
     # The ground and first excited states must be modified in order to diagonalize
     #   the modified perturbation:
     for i in range(2):
+        # Normalize coefficients. This prevents us from having to normalize the
+        #   wavefunctions.
         coeffs[i] /= np.sqrt(abs(coeffs[i,0])**2 + abs(coeffs[i,1])**2)
         # Create linear combinations
-        psi_prime[i] = coeffs[i,0]*psi[0] + coeffs[i,1]*psi[1]
-        # Normalize the resulting wavefunctions
-        #psi_prime[i] /= np.sqrt(np.trapz(psi_prime[i].conjugate() * psi_prime[i], x))
+        psi_prime[i] = (coeffs[i,0]*psi[0] + coeffs[i,1]*psi[1])/np.sqrt(2)
     
     return psi_prime, E1
 
