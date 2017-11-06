@@ -2,7 +2,7 @@
 import numpy as np
 import copy
 
-def modified_perturbation_matrix(V, E10):
+def modified_perturbation_unprimed(V, E10):
     """Returns the modified perturbation in the unmodified basis that spans the
     quasi degenerate subspace, which is presumed to be the ground and first 
     excited states.
@@ -107,51 +107,7 @@ def modified_energies(E):
     return E_prime
 
 
-def modified_position_matrix(xx, x, psi_prime, E10):
-    """Returns position matrix elements using the modified wavefunctions from
-    quasi degenerate perturbation theory. Note: uses the project function
-    defined above.
-    
-    Input
-        xx : np.array
-            origin position matrix
-        psi : np.array
-            original unperturbed wavefunctions
-        psi_prime : np.array
-            Unperturbed wavefunctions that diagonalize the modified perturbation.
-        E10 : float
-            Energy difference between quasi degenerate states (ground and first).
-    
-    Output :
-        xx_prime : np.array
-            Modified position matrix
-    """
-
-    num_states = len(xx[0,:])
-    xx_prime = copy.copy(xx)
-    
-    # The only elements that are affected are those that couple states to the 
-    #   ground or first excited states. The perturbation is the same when one of
-    #   the involved states is not one of the quasi degenerate states.
-    for i in range(num_states):
-        xx_prime[i,0] = np.trapz(psi_prime[i].conjugate() * x * psi_prime[0], x)
-        xx_prime[i,1] = np.trapz(psi_prime[i].conjugate() * x * psi_prime[1], x)
-    
-    # When both states are from the quasi degenerate subspace, we have to use the
-    #   modified perturbation. The diagonal elements:
-    for i in range(2):
-        xx_prime[i,i] = (np.trapz(psi_prime[0].conjugate() * x * psi_prime[0], x)
-        - (-1)**i * 0.5*E10)    
-    
-    # The matrix must still be hermitian, so we accordingly assign the transpose
-    #   elements
-    xx_prime[0,:] = xx_prime[:,0].conjugate()
-    xx_prime[1,:] = xx_prime[:,1].conjugate()
-    
-    return xx_prime
-
-
-def modified_perturbation(xx_prime, x, psi, psi_prime, E10):
+def modified_perturbation_primed(xx_prime, x, psi, psi_prime, E10):
     """Returns the modified perturbation in the modified basis. In this basis
     the ground and first excited states are fully degenerate but have no overlap
     via the perturbation.
