@@ -1,3 +1,7 @@
+
+import numpy as np
+import copy
+
 def modified_perturbation_matrix(V, E10):
     """Returns the modified perturbation in the unmodified basis that spans the
     quasi degenerate subspace, which is presumed to be the ground and first 
