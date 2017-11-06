@@ -72,9 +72,9 @@ def damping_coeffs(E, xx, units):
     return Gamma
 
 def modified_perturbation_matrix(V, E10):
-    """Returns the modified perturbationto be used in quasi degenerate perturbation
-    theory. The returned array is only the representation of the modified perturbation
-    in the subspace spanned by the two quasi degenerate states.
+    """Returns the modified perturbation in the unmodified basis that spans the
+    quasi degenerate subspace, which is presumed to be the ground and first 
+    excited states.
     
     Input
         V : np.array
@@ -86,6 +86,7 @@ def modified_perturbation_matrix(V, E10):
         xx_prime : np.array
             The modified perturbation
     """
+    
     return np.array([[V[0,0] - 0.5*E10, V[0,1]],[V[1,0], V[1,1]+0.5*E10]])
 
 def project(x, f, g):
@@ -212,8 +213,9 @@ def modified_position_matrix(xx, x, psi_prime, E10):
     return xx_prime
 
 def modified_perturbation(xx_prime, x, psi, psi_prime, E10):
-    """Returns the modified perturbation to be used in the SOS expressions for
-    alpha, beta, gamma.
+    """Returns the modified perturbation in the modified basis. In this basis
+    the ground and first excited states are fully degenerate but have no overlap
+    via the perturbation.
     
     Input
         xx_prime : np.array
