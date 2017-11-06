@@ -180,7 +180,9 @@ def modified_perturbation(xx_prime, x, psi, psi_prime, E10):
     xx_prime_pert[1,0] = (xx_prime[1,0] 
     + 0.5*E10*project(x, psi_prime[1], psi[1])*project(x, psi[1], psi_prime[0]) 
     - 0.5*E10*project(x,psi_prime[1], psi[0])*project(x,psi[0], psi_prime[0]))
-    
-    xx_prime_pert[0,1] = xx_prime_pert[1,0].conjugate()
+
+    xx_prime_pert[0,1] = (xx_prime[0,1] 
+    + 0.5*E10*project(x, psi_prime[0], psi[1])*project(x, psi[1], psi_prime[1]) 
+    - 0.5*E10*project(x,psi_prime[0], psi[0])*project(x,psi[0], psi_prime[1]))    
     
     return xx_prime_pert
