@@ -23,12 +23,12 @@ def project(x, f, g):
     return c_n
 
 
-def lift_degen(V_tilde, x, psi):
+def lift_degen(H1_tilde, x, psi):
     """Returns a linear combinations of two degnerate states that diagonalizes
     the modified perturbation. V
     
     Input
-        V_tilde : np.array
+        H1_tilde : np.array
             Matrix representation of modified perturbation in unperturbed 
             degenerate subspace.
         x : np.array
@@ -45,7 +45,7 @@ def lift_degen(V_tilde, x, psi):
     """
 
     # The eigenfunctions of modified perturbation will diagonalize it:
-    E1, coeffs = np.linalg.eig(V_tilde)
+    E1, coeffs = np.linalg.eig(H1_tilde)
     
     coeffs = coeffs.transpose()
     
@@ -86,14 +86,14 @@ def modified_energies(E):
     return E_prime
 
 
-def modified_perturbation_unprimed(V, E10):
+def modified_perturbation_unprimed(H1, E10):
     """Returns the modified perturbation in the unmodified basis that spans the
     quasi degenerate subspace, which is presumed to be the ground and first 
     excited states.
     
     Input
-        V : np.array
-            Original perturbation. Should be of the form V = e * E_field * xx
+        H1 : np.array
+            Original perturbation. Should be of the form H1 = -e * E_field * xx
         E10 : np.float
             Energy difference between ground and first excited state.
         
@@ -102,7 +102,7 @@ def modified_perturbation_unprimed(V, E10):
             The modified perturbation
     """
     
-    return np.array([[V[0,0] - 0.5*E10, V[0,1]],[V[1,0], V[1,1]+0.5*E10]])
+    return np.array([[H1[0,0] - 0.5*E10, H1[0,1]],[H1[1,0], H1[1,1]+0.5*E10]])
 
 
 def modified_perturbation_primed(xx_prime, x, psi, psi_prime, E10):
@@ -122,7 +122,7 @@ def modified_perturbation_primed(xx_prime, x, psi, psi_prime, E10):
         xx_prime_pert : np.array
             Modified position matrix
     """
-    xx_prime_pert = copy.copy(xx_prime)
+    V_mod_primed = copy.copy(xx_prime)
     
     # The diagonal elements:
     for i in range(2):
