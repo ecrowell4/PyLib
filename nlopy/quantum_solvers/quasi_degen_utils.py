@@ -2,25 +2,6 @@
 import numpy as np
 import copy
 
-def modified_perturbation_unprimed(V, E10):
-    """Returns the modified perturbation in the unmodified basis that spans the
-    quasi degenerate subspace, which is presumed to be the ground and first 
-    excited states.
-    
-    Input
-        V : np.array
-            Original perturbation. Should be of the form V = e * E_field * xx
-        E10 : np.float
-            Energy difference between ground and first excited state.
-        
-    Output 
-        xx_prime : np.array
-            The modified perturbation
-    """
-    
-    return np.array([[V[0,0] - 0.5*E10, V[0,1]],[V[1,0], V[1,1]+0.5*E10]])
-
-
 def project(x, f, g):
     """Evaluates the projection of function f onto function g, c_n = <f | g>.
     
@@ -78,7 +59,7 @@ def lift_degen(V_tilde, x, psi):
         #   wavefunctions.
         coeffs[i] /= np.sqrt(abs(coeffs[i,0])**2 + abs(coeffs[i,1])**2)
         # Create linear combinations
-        psi_prime[i] = (coeffs[i,0]*psi[0] + coeffs[i,1]*psi[1])/np.sqrt(2)
+        psi_prime[i] = (coeffs[i,0]*psi[0] + coeffs[i,1]*psi[1])
     
     return psi_prime, E1
 
@@ -103,6 +84,25 @@ def modified_energies(E):
     E_prime[0] = E_prime[1] = 0.5*(E[0]+E[1])
     
     return E_prime
+
+
+def modified_perturbation_unprimed(V, E10):
+    """Returns the modified perturbation in the unmodified basis that spans the
+    quasi degenerate subspace, which is presumed to be the ground and first 
+    excited states.
+    
+    Input
+        V : np.array
+            Original perturbation. Should be of the form V = e * E_field * xx
+        E10 : np.float
+            Energy difference between ground and first excited state.
+        
+    Output 
+        xx_prime : np.array
+            The modified perturbation
+    """
+    
+    return np.array([[V[0,0] - 0.5*E10, V[0,1]],[V[1,0], V[1,1]+0.5*E10]])
 
 
 def modified_perturbation_primed(xx_prime, x, psi, psi_prime, E10):
@@ -135,6 +135,10 @@ def modified_perturbation_primed(xx_prime, x, psi, psi_prime, E10):
     + 0.5*E10*project(x, psi_prime[1], psi[1])*project(x, psi[1], psi_prime[0]) 
     - 0.5*E10*project(x,psi_prime[1], psi[0])*project(x,psi[0], psi_prime[0]))
 
+    # We assert that the primed basis diagonalizes the modified perturbation
+    #   in the quasi degenerate subspace
+    assert np.allclose(xx_prime_pert[1,0], 0), "Primed states do not diagonalize modified perturbation."
+    
     xx_prime_pert[0,1] = (xx_prime[0,1] 
     + 0.5*E10*project(x, psi_prime[0], psi[1])*project(x, psi[1], psi_prime[1]) 
     - 0.5*E10*project(x,psi_prime[0], psi[0])*project(x,psi[0], psi_prime[1]))    
