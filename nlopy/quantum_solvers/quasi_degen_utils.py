@@ -23,12 +23,12 @@ def project(x, f, g):
     return c_n
 
 
-def lift_degen(H1_tilde, x, psi):
+def lift_degen(H1_tilde_unprimed, x, psi):
     """Returns a linear combinations of two degnerate states that diagonalizes
     the modified perturbation. V
     
     Input
-        H1_tilde : np.array
+        H1_tilde_unprimed : np.array
             Matrix representation of modified perturbation in unperturbed 
             degenerate subspace.
         x : np.array
@@ -45,7 +45,7 @@ def lift_degen(H1_tilde, x, psi):
     """
 
     # The eigenfunctions of modified perturbation will diagonalize it:
-    E1, coeffs = np.linalg.eig(H1_tilde)
+    E1, coeffs = np.linalg.eig(H1_tilde_unprimed)
     
     coeffs = coeffs.transpose()
     
@@ -105,7 +105,7 @@ def modified_perturbation_unprimed(H1, E10):
     return np.array([[H1[0,0] - 0.5*E10, H1[0,1]],[H1[1,0], H1[1,1]+0.5*E10]])
 
 
-def modified_perturbation_primed(xx_prime, x, psi, psi_prime, E10):
+def modified_perturbation_primed(xx_prime, x, psi, psi_prime, E10, units):
     """Returns the modified perturbation in the modified basis. In this basis
     the ground and first excited states are fully degenerate but have no overlap
     via the perturbation.
@@ -113,34 +113,40 @@ def modified_perturbation_primed(xx_prime, x, psi, psi_prime, E10):
     Input
         xx_prime : np.array
             Modified position matrix
+        x : np.array
+            Spatial grid
+        psi : np.array
+            Original unperturbed wavefunctions.
         psi_prime : np.array
             Unperturbed wavefunctions that diagonalize the modified perturbation.
         E10 : float
             Energy difference between quasi degenerate states (ground and first).
-    
+        units: class
+            class whose attributes are the fundamental constants e, m, c, etc.
+            
     Output :
-        xx_prime_pert : np.array
-            Modified position matrix
+        H1_tilde_primed : np.array
+            Modified perturbation in primed basis.
     """
-    V_mod_primed = copy.copy(xx_prime)
+    H1_tilde_primed = copy.copy(xx_prime)
     
     # The diagonal elements:
     for i in range(2):
-        xx_prime_pert[i,i] = (xx_prime[i,i] 
+        H1_tilde_primed[i,i] = (-units.e * xx_prime[i,i] 
         + 0.5*E10*project(x, psi_prime[i], psi[1])*project(x, psi[1], psi_prime[i]) 
         - 0.5*E10*project(x,psi_prime[i], psi[0])*project(x,psi[0], psi_prime[i]))
         
     # The transition moment between the quasi degenerate states:
-    xx_prime_pert[1,0] = (xx_prime[1,0] 
+    H1_tilde_primed[1,0] = (-units.e * xx_prime[1,0] 
     + 0.5*E10*project(x, psi_prime[1], psi[1])*project(x, psi[1], psi_prime[0]) 
     - 0.5*E10*project(x,psi_prime[1], psi[0])*project(x,psi[0], psi_prime[0]))
 
+    H1_tilde_primed[0,1] = (-units.e * xx_prime[0,1] 
+    + 0.5*E10*project(x, psi_prime[0], psi[1])*project(x, psi[1], psi_prime[1]) 
+    - 0.5*E10*project(x,psi_prime[0], psi[0])*project(x,psi[0], psi_prime[1]))
+
     # We assert that the primed basis diagonalizes the modified perturbation
     #   in the quasi degenerate subspace
-    assert np.allclose(xx_prime_pert[1,0], 0), "Primed states do not diagonalize modified perturbation."
+    assert np.allclose([H1_tilde_primed[1,0], H1_tilde_primed[0,1]], [0,0]), "Primed states do not diagonalize modified perturbation."    
     
-    xx_prime_pert[0,1] = (xx_prime[0,1] 
-    + 0.5*E10*project(x, psi_prime[0], psi[1])*project(x, psi[1], psi_prime[1]) 
-    - 0.5*E10*project(x,psi_prime[0], psi[0])*project(x,psi[0], psi_prime[1]))    
-    
-    return xx_prime_pert
+    return H1_tilde_primed
