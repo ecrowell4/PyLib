@@ -61,7 +61,7 @@ def lift_degen(H1_tilde_unprimed, x, psi):
         # Create linear combinations
         psi_prime[i] = (coeffs[i,0]*psi[0] + coeffs[i,1]*psi[1])
     
-    return psi_prime, E1
+    return psi_prime, E1, coeffs
 
 
 def modified_energies(E):
@@ -102,7 +102,7 @@ def modified_perturbation_unprimed(H1, E10):
             The modified perturbation
     """
     
-    return np.array([[H1[0,0] - 0.5*E10, H1[0,1]],[H1[1,0], H1[1,1]+0.5*E10]])
+    return np.array([[H1[0,0] - 0.5*E10, H1[0,1]],[H1[1,0], H1[1,1] + 0.5*E10]])
 
 
 def modified_perturbation_primed(xx_prime, x, psi, psi_prime, E10, units):

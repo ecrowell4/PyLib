@@ -45,3 +45,8 @@ def alpha_ee(E, XX, units, omega=0):
             
     return units.e**2 * (XX[0][0,start:].dot(XX[1][start:,0] * sos.D1(E, omega, units, start)) 
         + XX[1][0,start:].dot(XX[0][start:,0] * sos.D1(E.conjugate(), -omega, units, start)))
+    
+def alpha_quasi_degen(E_prime, xx_prime, E10, coeff_diff):
+    E_denom = 2*(E_prime[2:] - E_prime[0]) - E10*coeff_diff
+    
+    return 4 * xx_prime[0,2:].dot(xx_prime[2:,0] / E_denom)
