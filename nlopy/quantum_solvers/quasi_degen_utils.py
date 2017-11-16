@@ -1,5 +1,6 @@
 
 import numpy as np
+from nlopy.quantum_solvers import solver_utils
 import copy
 
 def project(x, f, g):
@@ -150,3 +151,40 @@ def modified_perturbation_primed(xx_prime, x, psi, psi_prime, E10, units):
     assert np.allclose([H1_tilde_primed[1,0], H1_tilde_primed[0,1]], [0,0]), "Primed states do not diagonalize modified perturbation."    
     
     return H1_tilde_primed
+
+def lift_degen(E, x, xx, psi, units):
+    """Returns the set of eigenstates that diagonalize the modified perturbation, 
+    the corresponding coefficients of the linear combination, the first order 
+    energy corrections to the modified states, and the position matrix in the
+    modified basis.
+    
+    Input
+        E : np.array
+            unperturbed eigenenergies. E0 and E1 are treated as quasidegenerate.
+        x : np.array
+            spatial grid
+        xx : np.array
+            posiiton matrix in original unperturbed basis
+        units : class
+            fundamental constants
+        
+    Output
+        alpha : complex
+            polarizability
+    """
+    # The first two states are degenerate for the 
+    #   modified unperturbed Hamiltonian, so we modify the first two elements of E
+    #   to get the modified unperturbed energies E_prime:
+    E_prime = modified_energies(E)
+    
+    # Compute modified perturbation in original basis.
+    V_tilde_unprimed = modified_perturbation_unprimed(-units.e * xx, E[1]-E[0])
+    
+    # Compute the linear combination of degenerate states that diagonalize the modified
+    #   perturbation V_tilde_unprimed
+    psi_prime, E1, coeffs = lin_comb(V_tilde_unprimed, x, psi)
+    
+    # Compute transition matrix in primed basis
+    xx_prime = solver_utils.make_position_matrix(x, psi_prime)
+    
+    return psi_prime, coeffs, E_prime, xx_prime
