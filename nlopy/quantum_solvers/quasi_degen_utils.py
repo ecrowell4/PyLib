@@ -23,7 +23,7 @@ def project(x, f, g):
     return c_n
 
 
-def lift_degen(H1_tilde_unprimed, x, psi):
+def lin_comb(H1_tilde_unprimed, x, psi):
     """Returns a linear combinations of two degnerate states that diagonalizes
     the modified perturbation. V
     
