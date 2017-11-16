@@ -47,6 +47,28 @@ def alpha_ee(E, XX, units, omega=0):
         + XX[1][0,start:].dot(XX[0][start:,0] * sos.D1(E.conjugate(), -omega, units, start)))
     
 def alpha_quasi_degen(E_prime, xx_prime, E10, coeff_diff, units):
-    E_denom = 2*(E_prime[2:] - E_prime[0]) - E10*coeff_diff
+    """Returns the linear polarizability for a system in the primed basis. In this
+    basis, polarizations of all orders have terms that are linear in the applied
+    field, so we take these terms into account.
     
-    return 4 * xx_prime[0,2:].dot(xx_prime[2:,0] / E_denom)
+    Input
+        E_prime : np.array
+            modified eigenergies, first two states are degenerate
+        xx_prime : np.array
+            position matrix in primed basis
+        E10 : float
+            first ground excited state energy difference, unprimed basis
+        coeff_diff : float
+            |alpha_0|^2 - |beta_0|^2, where |0'> = alpha_0 |0> + beta_0 |1>
+        units : class
+            fundamental constants
+            
+    Output
+        alpha : complex
+            linear polarizability
+    """
+    
+    E_denom = (E_prime[2:] - E_prime[0]) -  E10 * coeff_diff
+    
+    return 2 * (xx_prime[0,2:].dot(xx_prime[2:,0] / E_denom)
+                + xx_prime[1,2:].dot(xx_prime[2:,1] / E_denom)) 
