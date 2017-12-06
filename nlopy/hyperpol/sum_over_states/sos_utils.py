@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+import sys
 
 def D1(E, omega, units, start):
     """Returns the propogator for a first order process.
@@ -70,6 +71,43 @@ def damping_coeffs(E, xx, units):
     Gamma =  (2 / 3) * ((E - E[0]) / units.hbar / units.c)**3 * units.e**2 * abs(xx[0])**2
 
     return Gamma
+
+def alpha_term(E, delta, xx, ij, xi, omega):
+    """Returns an individual alpha_n from the sum alpha = Sum_n[alpha_n].
+    
+    Input
+        E_prime : np.array
+            modified eigenstates
+        E10 : float
+            energy difference between first excited and ground state
+        xx_prime : np.array
+            modified position matrix
+        [i,j] : list
+            start and end indices for the term, must be either 0 or 1.
+        xi : array
+            coefficients that diagonalize the modified perturbation
+        omega : float
+            input frequency
+        units : class
+            fundamental constants
+            
+    Output
+        alpha_n : complex
+            individual term from SOS expression for alpha
+    """
+    
+    if ij[0] == 0:
+        sgn1 = 1
+    elif ij[0] == 1:
+        sgn1 = -1
+        
+    if ij[1] == ij[1]:
+        sgn2 = sgn1
+    else:
+        sgn2 = -sgn1
+        
+    return 4 * xi[ij[0]].conjugate() * xi[ij[1]] * (xx[ij[0],2:].dot(xx[2:,ij[1]] / (2*(E[2:] - E[0]) + sgn1*delta))
+             + xx[ij[0],2:].dot(xx[2:,ij[1]] / (2*(E[2:] - E[0]) + sgn2*delta)))
 
 
     

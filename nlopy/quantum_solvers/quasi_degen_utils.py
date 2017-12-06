@@ -87,7 +87,7 @@ def modified_energies(E):
     return E_prime
 
 
-def modified_perturbation_unprimed(H1, E10):
+def modified_perturbation_unprimed(H1, E_prime, E10, order):
     """Returns the modified perturbation in the unmodified basis that spans the
     quasi degenerate subspace, which is presumed to be the ground and first 
     excited states.
@@ -97,14 +97,18 @@ def modified_perturbation_unprimed(H1, E10):
             Original perturbation. Should be of the form H1 = -e * E_field * xx
         E10 : np.float
             Energy difference between ground and first excited state.
-        
+        order : int
+            desired order of perturbation theory. Only goes up to 2 at the moment.
     Output 
         xx_prime : np.array
             The modified perturbation
     """
-    
-    return np.array([[H1[0,0] - 0.5*E10, H1[0,1]],[H1[1,0], H1[1,1] + 0.5*E10]])
-
+    if order > 2:
+        assert False; "This order of perturbation theory is not implemented."
+    if order == 1:
+        return np.array([[H1[0,0] - 0.5*E10, H1[0,1]],[H1[1,0], H1[1,1] + 0.5*E10]])
+    elif order == 2:
+        return np.array([[H1[0,0] - 0.5 * E10 - H1[0,2:].dot(H1[2:,0] / (E_prime[2:] - E_prime[0])), H1[0,1]- H1[0,2:].dot(H1[2:,1] / (E_prime[2:] - E_prime[0]))],[H1[1,0]- H1[1,2:].dot(H1[2:,0] / (E_prime[2:] - E_prime[0])), H1[1,1] + 0.5*E10- H1[1,2:].dot(H1[2:,1] / (E_prime[2:] - E_prime[0]))]])
 
 def modified_perturbation_primed(xx_prime, x, psi, psi_prime, E10, units):
     """Returns the modified perturbation in the modified basis. In this basis
@@ -152,7 +156,7 @@ def modified_perturbation_primed(xx_prime, x, psi, psi_prime, E10, units):
     
     return H1_tilde_primed
 
-def lift_degen(E, x, xx, psi, units):
+def lift_degen(E, x, xx, psi, units, order):
     """Returns the set of eigenstates that diagonalize the modified perturbation, 
     the corresponding coefficients of the linear combination, the first order 
     energy corrections to the modified states, and the position matrix in the
@@ -178,7 +182,7 @@ def lift_degen(E, x, xx, psi, units):
     E_prime = modified_energies(E)
     
     # Compute modified perturbation in original basis.
-    V_tilde_unprimed = modified_perturbation_unprimed(-units.e * xx, E[1]-E[0])
+    V_tilde_unprimed = modified_perturbation_unprimed(-units.e * xx, E_prime, E[1]-E[0], order)
     
     # Compute the linear combination of degenerate states that diagonalize the modified
     #   perturbation V_tilde_unprimed

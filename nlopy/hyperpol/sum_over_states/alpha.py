@@ -68,11 +68,11 @@ def alpha_quasi_degen(E_prime, xx_prime, E10, coeff_diff, units):
             linear polarizability
     """
     
-    E_denom = (E_prime[2:] - E_prime[0]) -  E10 * coeff_diff   
-    return 2 * (xx_prime[0,2:].dot(xx_prime[2:,0] / E_denom)
+    E_denom = 2*(E_prime[2:] - E_prime[0]) -  E10 * coeff_diff   
+    return 4 * (xx_prime[0,2:].dot(xx_prime[2:,0] / E_denom)
                 + xx_prime[1,2:].dot(xx_prime[2:,1] / E_denom))
     
-def alpha_quasi_degen2(E_prime, xx_prime, xi, units, omega=0):
+def alpha_quasi_degen2(E_prime, E10, xx_prime, xi, units, omega=0):
     """Returns the linear polarizability for a system in the primed basis. In this
     basis, polarizations of all orders have terms that are linear in the applied
     field, so we take these terms into account.
@@ -93,16 +93,25 @@ def alpha_quasi_degen2(E_prime, xx_prime, xi, units, omega=0):
         alpha : complex
             linear polarizability
     """
-    return units.e**2 * (xi[0].conjugate() 
-                         * (xi[0] * xx_prime[0,2:].dot(xx_prime[2:,0] / (E_prime[2:]-E_prime[0] - omega))
-                         + xi[1] * xx_prime[0,2:].dot(xx_prime[2:,1] / (E_prime[2:]-E_prime[0]-omega)))
-                         + xi[0] 
-                         * (xi[0].conjugate() * xx_prime[0,2:].dot(xx_prime[2:,0] / (E_prime[2:]-E_prime[0]+omega))
-                         + xi[1].conjugate() * xx_prime[1,2:].dot(xx_prime[2:,0] / (E_prime[2:]-E_prime[0]+omega)))
-                         + xi[1].conjugate() 
-                         * (xi[0] * xx_prime[1,2:].dot(xx_prime[2:,0] / (E_prime[2:]-E_prime[0] - omega))
-                         + xi[1] * xx_prime[1,2:].dot(xx_prime[2:,1] / (E_prime[2:]-E_prime[0]-omega)))
-                         + xi[1] 
-                         * (xi[0].conjugate() * xx_prime[0,2:].dot(xx_prime[2:,1] / (E_prime[2:]-E_prime[0] + omega))
-                         + xi[1].conjugate() * xx_prime[1,2:].dot(xx_prime[2:,1] / (E_prime[2:]-E_prime[0] + omega)))
-                         )
+    
+    alpha = units.e**2 * (sos.alpha_term(E_prime, E10, xx_prime, [0,0], xi, omega)
+                               + sos.alpha_term(E_prime, E10, xx_prime, [1,1], xi, omega)
+                               + sos.alpha_term(E_prime, E10, xx_prime, [0,1], xi, omega)
+                               + sos.alpha_term(E_prime, E10, xx_prime, [1,0], xi, omega))
+    
+    return alpha
+#==============================================================================
+#     return units.e**2 * (xi[0].conjugate() 
+#                          * (xi[0] * xx_prime[0,2:].dot(xx_prime[2:,0] / (E_prime[2:]-E_prime[0] - omega))
+#                          + xi[1] * xx_prime[0,2:].dot(xx_prime[2:,1] / (E_prime[2:]-E_prime[0]-omega)))
+#                          + xi[0] 
+#                          * (xi[0].conjugate() * xx_prime[0,2:].dot(xx_prime[2:,0] / (E_prime[2:]-E_prime[0]+omega))
+#                          + xi[1].conjugate() * xx_prime[1,2:].dot(xx_prime[2:,0] / (E_prime[2:]-E_prime[0]+omega)))
+#                          + xi[1].conjugate() 
+#                          * (xi[0] * xx_prime[1,2:].dot(xx_prime[2:,0] / (E_prime[2:]-E_prime[0] - omega))
+#                          + xi[1] * xx_prime[1,2:].dot(xx_prime[2:,1] / (E_prime[2:]-E_prime[0]-omega)))
+#                          + xi[1] 
+#                          * (xi[0].conjugate() * xx_prime[0,2:].dot(xx_prime[2:,1] / (E_prime[2:]-E_prime[0] + omega))
+#                          + xi[1].conjugate() * xx_prime[1,2:].dot(xx_prime[2:,1] / (E_prime[2:]-E_prime[0] + omega)))
+#                          )
+#==============================================================================
