@@ -1,4 +1,4 @@
-
+import scipy as sp
 import numpy as np
 from nlopy.quantum_solvers import solver_utils
 
@@ -45,7 +45,7 @@ def solver_1D(x, V, units, num_states=15):
     H = solver_utils.make_hamiltonian(dx, V, units, boundary='hard_wall')
     
     # Compute eigenvalues and eigenfunctions:
-    E, psi = np.linalg.eigh(H)
+    E, psi = sp.linalg.eigh(H)
     
     # Truncate to the desired number of states
     E = E[:num_states]
@@ -53,12 +53,12 @@ def solver_1D(x, V, units, num_states=15):
     
     # Hard walls are assumed at the boundary, so the wavefunction at the boundary
     #   must be zero. We enforce this boundary condition:
-    psi = np.insert(psi, 0, np.zeros(num_states), axis = 0)
-    psi = np.insert(psi, len(x)-1, np.zeros(num_states), axis = 0)
+    psi = sp.insert(psi, 0, sp.zeros(num_states), axis = 0)
+    psi = sp.insert(psi, len(x)-1, sp.zeros(num_states), axis = 0)
     
     # Normalize to unity:
     for i in range(num_states):
-        psi[:,i] = psi[:,i] / np.sqrt(np.trapz( psi[:,i]*psi[:,i], x))
+        psi[:,i] = psi[:,i] / sp.sqrt(sp.trapz( psi[:,i]*psi[:,i], x))
     
     # Take the transpose so that psi[i] is the ith eigenfunction:
     psi = psi.transpose()
