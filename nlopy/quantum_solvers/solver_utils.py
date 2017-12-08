@@ -7,6 +7,7 @@ Contains utility functions for solving the Schrodinger equation.
 """
 
 import numpy as np
+import scipy as sp
 
 def _make_kinetic_energy(dx, N, units, boundary):
     """Construct finite difference approximation for kinetic energy operator.
@@ -39,8 +40,8 @@ def _make_kinetic_energy(dx, N, units, boundary):
         N_tilde = N-1
 
     # Create finite difference approximation of second derivative operator
-    d2_psi = (-2 * np.eye(N_tilde) / dx**2 + np.eye(N_tilde, k=1) / dx**2 
-              + np.eye(N_tilde, k=-1) / dx**2)
+    d2_psi = (-2 * sp.eye(N_tilde) / dx**2 + sp.eye(N_tilde, k=1) / dx**2 
+              + sp.eye(N_tilde, k=-1) / dx**2)
 
     if boundary is 'periodic':
         # This condition forces the derivative of the function to be periodic as well.
@@ -72,9 +73,9 @@ def _make_potential_energy(V, boundary):
     
     # Matrix representing potential energy is diagonal in position space
     if boundary=='hard_wall':
-        Vop = np.diag(V[1:-1])
+        Vop = sp.diag(V[1:-1])
     elif boundary=='periodic':
-        Vop = np.diag(V[1:])
+        Vop = sp.diag(V[1:])
     
     return Vop
 
