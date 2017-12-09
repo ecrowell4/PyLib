@@ -80,7 +80,7 @@ def _make_potential_energy(V, boundary):
     return Vop
 
     
-def make_hamiltonian(dx, V, units, boundary='hard_wall'):
+def make_hamiltonian(dx, V, units, boundary='hard_wall',prec=None):
     """Construct Hamiltonian matrix using a finite difference scheme.
     
     Input
@@ -94,6 +94,8 @@ def make_hamiltonian(dx, V, units, boundary='hard_wall'):
             describes boundary conditions. Options are
                 hard_wall
                 periodic
+        prec : int
+            desired decimal precision.
             
     Output
         H : np.array((len(x), len(x)))
@@ -108,8 +110,16 @@ def make_hamiltonian(dx, V, units, boundary='hard_wall'):
     # Construct operator representations in position space:
     Top = _make_kinetic_energy(dx, N, units, boundary)
     Vop = _make_potential_energy(V, boundary)
-
-    return Top + Vop
+    
+    if prec != None:
+        from mpmath import mp
+        from sympy import sympify
+        mp.dps = prec
+        H_ = mp.matrix(Top)+mp.matrix(Vop)
+        H = np.array(sympify(H_.tolist()))
+        return H_
+    else:
+        return Top + Vop
  
 
 def make_position_matrix(x, psi):
