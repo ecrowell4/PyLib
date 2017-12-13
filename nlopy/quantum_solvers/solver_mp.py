@@ -3,7 +3,7 @@ import numpy as np
 from mpmath import mp
 from nlopy.quantum_solvers import solver_utils
 
-mp.dps = 15
+mp.dps = 30
 def solver_mp(x, V, units, num_states=15):
     """Uses finite difference to discretize and solve for the eigenstates and 
     energy eigenvalues one dimensional potentials.
