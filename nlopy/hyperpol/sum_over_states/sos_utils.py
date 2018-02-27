@@ -25,27 +25,7 @@ def D1(E, omega, units):
     # Compute and return the propogator
     return 1 / (E - units.hbar*omega)
 
-def D2(E, omega1, omega2, units, start=1):
-    """Returns propogator for a second order process.
-    
-    Input
-    	E : np.array
-        	array of eigenergies.
-        	Note: if omega is take as negative, then user 
-        	should pass E.conjugate() instead of E.
-    omega1, omega2 : float
-        input frequencies
-    units : class
-        class whose attributes are the fundamental constants hbar, e, m, c, etc
-    start : int
-        first state included in SOS expression
-        
-    Output
-    	D2 : np.array
-    		propogator for second order process
-    """
 
-    return 1 / (E[start:] - units.hbar*omega1 - units.hbar*omega2)
 
 
 def damping_coeffs(E, xx, units):

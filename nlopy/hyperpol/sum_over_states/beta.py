@@ -8,118 +8,50 @@ Created on Wed Nov  1 11:21:17 2017
 import numpy as np
 from nlopy.sum_over_states import sos_utils as sos
 
-def beta_tst(E, xx, omega1, omega2):
-    """Calculates the first hyperpolarizability, beta, as a function of two 
-    input photon energies and complex molecular transition and energy 
-    information. Calculates the one tensor component specified.
-    Input: 
-        xx = [ mu_x, mu_y, mu_z ] the dipole moment matrices in cartesian
-            coordinates normalized to the maximum transition strength x_10(max)
-            where mu_x = [<i|e x|j>]
-        E = [E_nm - i/2 Gamma_nm] the electronic eigen frequencies 
-            corresponding to the transitions from the ith eigen state to the
-            ground state 
-            OR
-            [E_n0] as a vector
-        *The sizes of xx and E represent the number of states considered in
-            this calculation and therefore must be consistant.*
-        ijk = [0,1,2] the tensor components of beta where x=0, y=1, z=2
-    Option:
-        Calculate dispersion:
-        ein = hbar*[w_j, w_k] input photon energies, which implies output 
-            energy of (ein[0] + ein[1])
-        Start and end in a given quantum state
-        start = int some integer state which is represented by the xi and E info
-    Output:
-        beta = beta_ijk(-w_sigma; w[0], w[1])
-    """
-    import numpy as np
-    e=1
 
-    #Find the number of electronic states supplied
-    NumStates = len(xx[0])
-    
-    #Check for consistancy between transitions and energies
-    if NumStates != len(E):
-        print('Err: Inconsistant electronic state information.')
-        return 0
-    
- 
+def beta_eee(E, xx, omega, intrinsic=False):
+	"""Returns the diagonal element of the first hyperpolarizability.
+
+	Input
+		E : np.array
+			array of ordered eigenenergies. Damping is included by letting this array
+			have complex entries.
+		xx : np.array
+			transition matrix
+		omega : list
+			incident field frequencies [omega1, omega2]
+		intrinsic : bool
+			if True, then xx must be normalized by xmax before input
+			and E must be normalized by E[1] before input.
+
+	Output
+		beta : complex
+			the first hyperpolarizability.
+	"""
+
+	# assert consistent dimensions
+	assert((len(E)==len(xx[0])), "dimensions of E and xx do not match."
+
+	# determine number of eigenstates to be used in computing beta
+	num_states = len(E)
+
     #Take all mu -> bar{mu}
-    xx = xx - xx[0,0] * np.eye(NumStates)
+    xx = xx - xx[0,0] * np.eye(num_states)
     
     #Take all E -> E - E[0]
     E = E - E[0]
-    
-    # get rid of elements that should be zero
-    for i in range(NumStates):
-        if np.allclose(xx[i,i], 0)==True:
-            xx[i,i] = 0
             
     #Calculate beta
-    beta = 0.5 * e**2 * ((xx[0,1:] * sos.D2(E, omega1, omega2, units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E, omega1, units)))
-    + (xx[0,1:] * sos.D2(E, omega2, omega1, units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E, omega2, units)))
-    + (xx[0,1:] * sos.D1(E, omega2, units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E.conjugate(), -omega1, units)))
-    + (xx[0,1:] * sos.D1(E, omega1, units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E.conjugate(), -omega2, units)))
-    + (xx[0,1:] * sos.D2(E.conjugate, -omega1, -omega2, units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E.conjugate, -omega1, units)))
-    + (xx[0,1:] * sos.D2(E.conjugate, -omega2, -omega1, units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E.conjugate, -omega2, units))))
-            
-    return beta
-
-def beta_eee(E, xx, ein=[0,0]):
-    """Calculates the first hyperpolarizability, beta, as a function of two 
-    input photon energies and complex molecular transition and energy 
-    information. Calculates the one tensor component specified.
-    Input: 
-        xx = [ mu_x, mu_y, mu_z ] the dipole moment matrices in cartesian
-            coordinates normalized to the maximum transition strength x_10(max)
-            where mu_x = [<i|e x|j>]
-        E = [E_nm - i/2 Gamma_nm] the electronic eigen frequencies 
-            corresponding to the transitions from the ith eigen state to the
-            ground state 
-            OR
-            [E_n0] as a vector
-        *The sizes of xx and E represent the number of states considered in
-            this calculation and therefore must be consistant.*
-        ijk = [0,1,2] the tensor components of beta where x=0, y=1, z=2
-    Option:
-        Calculate dispersion:
-        ein = hbar*[w_j, w_k] input photon energies, which implies output 
-            energy of (ein[0] + ein[1])
-        Start and end in a given quantum state
-        start = int some integer state which is represented by the xi and E info
-    Output:
-        beta = beta_ijk(-w_sigma; w[0], w[1])
-    """
-    import numpy as np
-    e=1
-
-    #Find the number of electronic states supplied
-    NumStates = len(xx[0])
+    beta = 0.5 * e**3 * ((xx[0,1:] * sos_utils.D2(E[1:], omega[0], omega[1], units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E[1:], omega[0], units)))
+    + (xx[0,1:] * sos.D2(E[1:], omega[1], omega[0], units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E[1:], omega[1], units)))
+    + (xx[0,1:] * sos.D1(E[1:], omega[1], units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E[1:].conjugate(), -omega[0], units)))
+    + (xx[0,1:] * sos.D1(E[1:], omega[0], units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E[1:].conjugate(), -omega[1], units)))
+    + (xx[0,1:] * sos.D2(E[1:].conjugate(), -omega[0], -omega[1], units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E[1:].conjugate(), -omega[0], units)))
+    + (xx[0,1:] * sos.D2(E[1:].conjugate(), -omega[1], -omega[0], units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E[1:].conjugate(), -omega[1], units))))
     
-    #Check for consistancy between transitions and energies
-    if NumStates != len(E):
-        print('Err: Inconsistant electronic state information.')
-        return 0
-    
- 
-    #Take all mu -> bar{mu}
-    xx = xx - xx[0,0] * np.eye(NumStates)
-    
-    #Take all E -> E - E[0]
-    E = E - E[0]
-    
-    # get rid of elements that should be zero
-    for i in range(NumStates):
-        if np.allclose(xx[i,i], 0)==True:
-            xx[i,i] = 0
-            
-    #Calculate beta
-    beta = 0.5 * e**2 * ((xx[0,1:]/(E[1:] - ein[0] - ein[1])).dot(xx[1:,1:].dot(xx[1:,0]/(E[1:] - ein[0])))
-    + (xx[0,1:]/(E[1:] - ein[1] - ein[0])).dot(xx[1:,1:].dot(xx[1:,0]/(E[1:] - ein[1])))
-    + (xx[0,1:]/(E[1:] - ein[1])).dot(xx[1:,1:].dot(xx[1:,0]/(E[1:].conjugate() + ein[0])))
-    + (xx[0,1:]/(E[1:] - ein[0])).dot(xx[1:,1:].dot(xx[1:,0]/(E[1:].conjugate() + ein[1])))
-    + (xx[0,1:]/(E[1:].conjugate() + ein[0] + ein[1])).dot(xx[1:,1:].dot(xx[1:,0]/(E[1:].conjugate() + ein[0])))
-    + (xx[0,1:]/(E[1:].conjugate() + ein[1] + ein[0])).dot(xx[1:,1:].dot(xx[1:,0]/(E[1:].conjugate() + ein[1]))))
-            
-    return beta
+    if intrinsic is True:
+    	# normalize by constant (this assumes E and xx have been entered as E/E[1] and xx/xmax)
+        return beta * (3/4)**(3/4) / 3
+    else:
+    	# return the actual value of beta.
+        return beta
