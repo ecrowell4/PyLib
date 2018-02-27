@@ -2,7 +2,7 @@ import numpy as np
 import copy
 import sys
 
-def D1(E, omega, units, start):
+def D1(E, omega, units):
     """Returns the propogator for a first order process.
     
     Input
@@ -22,13 +22,10 @@ def D1(E, omega, units, start):
     		propogator for first order process
     """
     
-    # Take E -> E - E0
-    E = E - E[0]
-    
     # Compute and return the propogator
-    return 1 / (E[start:] - units.hbar*omega)
+    return 1 / (E - units.hbar*omega)
 
-def D2(E, omega1, omega2, units, start):
+def D2(E, omega1, omega2, units, start=1):
     """Returns propogator for a second order process.
     
     Input
@@ -47,7 +44,7 @@ def D2(E, omega1, omega2, units, start):
     	D2 : np.array
     		propogator for second order process
     """
-    E = E - E[0]
+
     return 1 / (E[start:] - units.hbar*omega1 - units.hbar*omega2)
 
 

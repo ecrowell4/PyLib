@@ -6,10 +6,43 @@ Created on Mon Jul 31 12:38:46 2017
 """
 
 import numpy as np
-from nlopy.hyperpol.sum_over_states import sos_utils as sos
+x
 
+def alpha_ee(E, xx, units, omega=0, n=0):
+    """Calculates the polarizability alpha for a system in the ground
     
-def alpha_ee(E, XX, units, omega=0):
+    Input
+        E : np.array(N)
+            energy spectrum
+        xx : np.array((N,N))
+            transition matrix
+        units : class
+            class object containing fundamental constants
+        omega : float
+            frequency of incident electric field
+        n : int
+            state system is assumes to be in (i.e. state=0 -> ground state)
+            
+        
+    Output
+        alpha : complex
+            electric polarizability
+    """
+
+    E = E - E[n]
+    
+    alpha =  units.e**2 * (xx[n,:n].dot(xx[:n,n] * sos_utils.D1(E[:n], omega, units))
+                           + xx[n,(n+1):].dot(xx[(n+1):,n] * sos_utils.D1(E[(n+1):], omega, units))
+                          + xx[n,:n].dot(xx[:n,n] * sos_utils.D1(E[:n].conjugate(), -omega, units))
+                          + xx[n,(n+1):].dot(xx[(n+1):,n] * sos_utils.D1(E[(n+1):].conjugate(), -omega, units))
+                          )
+    return alpha
+
+#==============================================================================
+# The following functions were written for use in quasi-degnerate systems.
+# However, I don't think they are pertinent to anything we're doing.
+    
+def alpha_ee_DontUse(E, XX, units, omega=0):   # I believe this function is out of date
     """Calculates the polarizability alpha as a function of the energy spectrum
     and transition matrix. The SOS expression derived from time-dependent
     perturbation theory is evaluated using the first num_states states.
