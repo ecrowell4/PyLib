@@ -31,12 +31,11 @@ def alpha_ee(E, xx, units, omega=0, n=0):
 
     E = E - E[n]
     
-    alpha =  units.e**2 * (xx[n,:n].dot(xx[:n,n] * sos_utils.D1(E[:n], omega, units))
-                           + xx[n,(n+1):].dot(xx[(n+1):,n] * sos_utils.D1(E[(n+1):], omega, units))
-                          + xx[n,:n].dot(xx[:n,n] * sos_utils.D1(E[:n].conjugate(), -omega, units))
-                          + xx[n,(n+1):].dot(xx[(n+1):,n] * sos_utils.D1(E[(n+1):].conjugate(), -omega, units))
+    alpha =  units.e**2 * (np.delete(xx[n,:], n).dot(np.delete(xx[:,n], n) * sos_utils.D1(np.delete(E, n), omega, units))
+                           + np.delete(xx[n,:], n).dot(np.delete(xx[:,n], n) * sos_utils.D1(np.delete(E.conjugate(), n), -omega, units))
                           )
     return alpha
+
 
 #==============================================================================
 # The following functions were written for use in quasi-degnerate systems.
