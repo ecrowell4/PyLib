@@ -9,7 +9,7 @@ import numpy as np
 from nlopy.sum_over_states import sos_utils as sos
 
 
-def beta_eee(E, xx, omega, intrinsic=False):
+def beta_eee(E, xx, omega, intrinsic=False, n=0):
 	"""Returns the diagonal element of the first hyperpolarizability.
 
 	Input
@@ -23,6 +23,8 @@ def beta_eee(E, xx, omega, intrinsic=False):
 		intrinsic : bool
 			if True, then xx must be normalized by xmax before input
 			and E must be normalized by E[1] before input.
+		n : int
+			state system is assumed to be in (i.e. n=0 -> ground state)
 
 	Output
 		beta : complex
@@ -42,12 +44,16 @@ def beta_eee(E, xx, omega, intrinsic=False):
     E = E - E[0]
             
     #Calculate beta
-    beta = 0.5 * e**3 * ((xx[0,1:] * sos_utils.D2(E[1:], omega[0], omega[1], units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E[1:], omega[0], units)))
-    + (xx[0,1:] * sos.D2(E[1:], omega[1], omega[0], units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E[1:], omega[1], units)))
-    + (xx[0,1:] * sos.D1(E[1:], omega[1], units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E[1:].conjugate(), -omega[0], units)))
-    + (xx[0,1:] * sos.D1(E[1:], omega[0], units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E[1:].conjugate(), -omega[1], units)))
-    + (xx[0,1:] * sos.D2(E[1:].conjugate(), -omega[0], -omega[1], units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E[1:].conjugate(), -omega[0], units)))
-    + (xx[0,1:] * sos.D2(E[1:].conjugate(), -omega[1], -omega[0], units)).dot(xx[1:,1:].dot(xx[1:,0] * sos.D1(E[1:].conjugate(), -omega[1], units))))
+    #Calculate beta
+    beta = 0.5 * e**3 * (
+        (np.delete(xx[n,:], n) * sos_utils.D2(np.delete(E, n), omega[0], omega[1], units)).dot(np.delete(np.delete(xx, n, 0), n, 1).dot(np.delete(xx[:,n], n) 
+    * sos_utils.D1(np.delete(E, n), omega[0], units)))
+    + (np.delete(xx[n,:], n) * sos_utils.D2(np.delete(E, n), omega[1], omega[0], units)).dot(np.delete(np.delete(xx, n, 0), n, 1).dot(xx[1:,0] * sos_utils.D1(np.delete(E, n), omega[1], units)))
+    + (np.delete(xx[n,:], n) * sos_utils.D1(np.delete(E, n), omega[1], units)).dot(np.delete(np.delete(xx, n, 0), n, 1).dot(xx[1:,0] * sos_utils.D1(np.delete(E, n).conjugate(), -omega[0], units)))
+    + (np.delete(xx[n,:], n) * sos_utils.D1(np.delete(E, n), omega[0], units)).dot(np.delete(np.delete(xx, n, 0), n, 1).dot(xx[1:,0] * sos_utils.D1(np.delete(E, n).conjugate(), -omega[1], units)))
+    + (np.delete(xx[n,:], n) * sos_utils.D2(np.delete(E, n).conjugate(), -omega[0], -omega[1], units)).dot(np.delete(np.delete(xx, n, 0), n, 1).dot(xx[1:,0] * sos_utils.D1(np.delete(E, n).conjugate(), -omega[0], units)))
+    + (np.delete(xx[n,:], n) * sos_utils.D2(np.delete(E, n).conjugate(), -omega[1], -omega[0], units)).dot(np.delete(np.delete(xx, n, 0), n, 1).dot(xx[1:,0] * sos_utils.D1(np.delete(E, n).conjugate(), -omega[1], units)))
+    )
     
     if intrinsic is True:
     	# normalize by constant (this assumes E and xx have been entered as E/E[1] and xx/xmax)

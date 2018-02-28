@@ -21,7 +21,7 @@ def alpha_ee(E, xx, units, omega=0, n=0):
         omega : float
             frequency of incident electric field
         n : int
-            state system is assumes to be in (i.e. state=0 -> ground state)
+            state system is assumes to be in (i.e. n=0 -> ground state)
             
         
     Output
