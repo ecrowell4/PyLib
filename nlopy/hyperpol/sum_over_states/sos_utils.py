@@ -14,8 +14,6 @@ def D1(E, omega, units):
         input frequency
     units : class
         class whose attributes are the fundamental constants hbar, e, m, c, etc
-    start : int
-        first state included in SOS expression
         
     Output
     	D1 : np.array
