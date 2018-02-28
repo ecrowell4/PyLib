@@ -41,9 +41,8 @@ def beta_eee(E, xx, units, omega=[0,0], intrinsic=False, n=0):
     xx = xx - xx[0,0] * np.eye(num_states)
 
     #Take all Em -> Emn
-    E = E - E[0]
+    E = E - E[n]
             
-    #Calculate beta
     #Calculate beta
     beta = 0.5 * units.e**3 * (
         (np.delete(xx[n,:], n) * sos_utils.D2(np.delete(E, n), omega[0], omega[1], units)).dot(np.delete(np.delete(xx, n, 0), n, 1).dot(np.delete(xx[:,n], n) 
