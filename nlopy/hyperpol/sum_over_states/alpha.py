@@ -6,7 +6,7 @@ Created on Mon Jul 31 12:38:46 2017
 """
 
 import numpy as np
-x
+from nlopy.hyperpol.sum_over_states import sos_utils
 
 def alpha_ee(E, xx, units, omega=0, n=0):
     """Calculates the polarizability alpha for a system in the ground
@@ -29,6 +29,10 @@ def alpha_ee(E, xx, units, omega=0, n=0):
             electric polarizability
     """
 
+    # assert consistent dimensions
+    assert len(E)==len(xx[0]), "dimensions of E and xx do not match."
+    
+    # Take all Em -> Emn
     E = E - E[n]
     
     alpha =  units.e**2 * (np.delete(xx[n,:], n).dot(np.delete(xx[:,n], n) * sos_utils.D1(np.delete(E, n), omega, units))

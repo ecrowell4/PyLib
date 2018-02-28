@@ -25,6 +25,24 @@ def D1(E, omega, units):
     # Compute and return the propogator
     return 1 / (E - units.hbar*omega)
 
+def D2(E, omega1, omega2, units):
+    """Returns the propogator for a second order process.
+
+    Input
+        E : np.array
+            array of eigenenergies
+        omega : np.array
+            [omega1, omega2] array of incident field frequencies
+        units : class
+            class whose attributes are the fundamental constants
+
+    Output
+        D2 : np.array
+            propogator for second order process.
+    """
+
+    # Compute and return the propogator
+    return 1 / (E - units.hbar*omega1 - units.hbar*omega2)
 
 
 
