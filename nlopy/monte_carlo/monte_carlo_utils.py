@@ -33,7 +33,7 @@ def sum_rules(E, x):
     return SR
 
 
-def get_S(N, seed=None):
+def get_S(N):
     """Returns a random, anti-symmetric array such that each row sums to 1.
     
     Input 
