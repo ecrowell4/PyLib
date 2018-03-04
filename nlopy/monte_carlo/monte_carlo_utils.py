@@ -92,7 +92,7 @@ def get_Enm_Xnm(S):
         Xnm : np.array
             array of transition moments
     """
-
+    normalize = S[0]
     N = len(S[1][0])
     E = np.random.random((N))       # pick randome energies
     E_ordered = hq.nsmallest(N,E)     # order the energies
@@ -103,10 +103,10 @@ def get_Enm_Xnm(S):
     else:
         Enorm = 1
 
-    E_ordered = (EnOrder - EnOrder[0])/Enorm
+    E_ordered = (E_ordered - E_ordered[0]) / Enorm
                                     # normalize energies
                                     
-    Enm = np.outer(Enorm,np.ones(N)) - np.outer(np.ones(N),Enorm)
+    Enm = np.outer(E_ordered,np.ones(N)) - np.outer(np.ones(N),E_ordered)
                                     # Calculate energy matrix E_nm = E_n - E_m
                                     
     Enm = Enm + np.diag(np.ones(N))
@@ -119,19 +119,19 @@ def get_Enm_Xnm(S):
     + np.transpose(sp.linalg.triu(RandomSign, k=1)) )                        
                                     # Enforce symmetry
     
-    x =  RandomSign*np.sqrt(abs(S/Enm))
+    x =  RandomSign*np.sqrt(abs(S[1] / Enm))
                                     # Determine trasition moment matrix
     
-    H = np.diag(Enorm)              # Hamltonian matrix is diagonal
+    H = np.diag(E_ordered)              # Hamltonian matrix is diagonal
     
-    xnn = np.dot(2.*np.dot(x,H)-np.dot(H,x),x[:,0])[1:] / x[1:,0] / Enorm[1:]
+    xnn = np.dot(2.*np.dot(x,H)-np.dot(H,x),x[:,0])[1:] / x[1:,0] / E_ordered[1:]
                                     # Use sum rules to get dipole moments
                                     
     x = x - np.diag(np.append(0, xnn))
                                     # Add dipole moments to diagonal part of x 
                                     # By convention we let x[0,0] = 0.
     
-    return Enorm, x
+    return E_ordered, x
 
 def sigma(SR, N):
     """Returns standard deviation of the sum rules. The standard deviation
