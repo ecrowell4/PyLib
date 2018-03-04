@@ -10,7 +10,7 @@ import scipy as sp
 import scipy.linalg
 import heapq as hq
 
-def sum_rules(E, x):
+def sum_rules(E, x, normalize=False):
     """Return sum rule matrix, given eigenenergies and transition moments.
     It's assumed that the dipole moments have been assigned.
     
@@ -33,16 +33,22 @@ def sum_rules(E, x):
     return SR
 
 
-def get_S(N):
+def get_S(N, normalize=False):
     """Returns a random, anti-symmetric array such that each row sums to 1.
     
     Input 
         N : int
             desired number of states
+        normalize : bool
+            if True, then use scaled quantities xi_nm = x_nm / x_max 
+            and e_nm = E_nm / E_10
         
     Output
         S : array
             sum rule matrix
+        normalzie : bool
+            same as input normalize. Will be used in later functions,
+            ensuring consistency regardless of users stupidity.
     """
 
     T = np.random.random((N, N))  # get random array
@@ -54,13 +60,20 @@ def get_S(N):
     
     M = np.diag(r) - T[:-1, :-1]
     # Keeping M upper triangular is faster.
-    d = sp.linalg.solve_triangular(M, trans=True, b=np.ones(N-1
-    ), overwrite_b=True, check_finite=False)
+
+    if normalize is True:
+        b_vec = np.ones(N-1)
+    else:
+        b_vec = 0.5 * np.ones(N-1)
+
+    # find vector d such that (T*d) - (T*d).transpose() obeys sum rules
+    d = sp.linalg.solve_triangular(M, trans=True, b=b_vec, overwrite_b=True,
+        check_finite=False)
 
     T[:-1,:] *= d[:,None]
     A = T - T.T
     
-    return A
+    return normalize, A
 
 
 def get_Enm_Xnm(S):
@@ -68,18 +81,29 @@ def get_Enm_Xnm(S):
     
     Input
         S : np.array
-            sum rule matrix
-        Enorm : np.array
-            normalized eigenenergies.
+            S[0] = normalize: if true, then dealing
+            with normalized intrinsic values.
+            S[1] : sum rule matrix
             
     Output
+        E_ordered : np.array
+            ordered array of eigenenergies (if normalize is True, then
+            these are normalize by E_10)
         Xnm : np.array
             array of transition moments
     """
-    N = len(S[0])
+
+    N = len(S[1][0])
     E = np.random.random((N))       # pick randome energies
-    EnOrder = hq.nsmallest(N,E)     # order the energies
-    Enorm = (EnOrder - EnOrder[0])/(EnOrder[1] - EnOrder[0])
+    E_ordered = hq.nsmallest(N,E)     # order the energies
+
+    if normalize is True:
+        Enorm = E_ordered[1] - E_ordered[0]
+
+    else:
+        Enorm = 1
+
+    E_ordered = (EnOrder - EnOrder[0])/Enorm
                                     # normalize energies
                                     
     Enm = np.outer(Enorm,np.ones(N)) - np.outer(np.ones(N),Enorm)
