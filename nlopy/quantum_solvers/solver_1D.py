@@ -1,4 +1,5 @@
-import scipy.linalg
+import scipy
+from scipy import linalg
 import numpy as np
 from nlopy.quantum_solvers import solver_utils
 
@@ -45,7 +46,7 @@ def solver_1D(x, V, units, num_states=15):
     H = solver_utils.make_hamiltonian(dx, V, units, boundary='hard_wall')
     
     # Compute eigenvalues and eigenfunctions:
-    E, psi = sp.linalg.eigh(H)
+    E, psi = linalg.eigh(H)
     
     # Truncate to the desired number of states
     E = E[:num_states]
