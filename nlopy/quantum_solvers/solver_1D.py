@@ -1,4 +1,4 @@
-import scipy as sp
+import scipy.linalg
 import numpy as np
 from nlopy.quantum_solvers import solver_utils
 
