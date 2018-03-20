@@ -1,7 +1,7 @@
 import numpy as np
 from nlopy.quantum_solvers import solver_utils
 
-def PeriodicSEsolve(x, V, units, num_states=15):
+def solver_periodic(x, V, units, num_states=15):
     """Uses finite difference to discretize and solve for the eigenstates and 
     energy eigenvalues of one dimensional periodic potentials.
         

@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 import os
 from scipy.integrate import simps
 
-fsize = 5.
+fsize = 10.
 
 params = {
     #'figure.figsize': [3.35,2.5],
