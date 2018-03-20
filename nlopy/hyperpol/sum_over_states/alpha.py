@@ -45,6 +45,43 @@ def alpha_ee(E, xx, units, omega=0, intrinsic=False, n=0):
         return alpha
 
 
+def alpha_mm(E, L, I, units, omega=0, canonical=False):
+    """Returns the canonical, linear, magnetic polarizability alpha at input frequency
+    omega:
+        m = alpha * B(oemga)
+    
+    INPUT
+        E : np.array
+            eigenenergies
+        L : np.array
+            angular momentum matrix
+        I : np.complex
+            ground state expectation value of moment of inertia operator: <0|I|0>
+        units : Class
+            class object containing fundamental constants
+        omega : float
+            frequency of incident magnetic perturbation
+        canonical : bool
+            if True, return alpha using canonical angular momentum, not mechanical
+        
+    OUTPUT
+        alpha : complex
+            magnetic polarizability
+    """
+    
+        
+    # Evaluate the SOS term in equation for alpha^{mm}
+    alpha = units.g**2 * (L[0,1:].dot((L[1:,0] * sos_utils(np.delete(E, 1), omega, units)))
+                       + L[0,1:].dot((L[1:,0] * sos_utils(np.delete(E.conjugate(), 1), omega, units))))
+    
+    # Include the diamagnetic term (i.e. Faraday term) if the user doesn't
+    # specify not to
+    if canonical is True:
+        return alpha
+    else:
+        return alpha - g**2 * I
+
+
 #==============================================================================
 # The following functions were written for use in quasi-degnerate systems.
 # However, I don't think they are pertinent to anything we're doing.
