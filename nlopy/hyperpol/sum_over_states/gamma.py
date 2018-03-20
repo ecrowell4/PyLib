@@ -25,6 +25,8 @@ def gamma_mmmm(E, L, I, units, canonical=False):
             first magnetic hyperpolarizability
     """
     
+    N = len(E)
+    Gamma = 0
     i = 1
     j = 1
     l = 1
