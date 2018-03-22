@@ -79,8 +79,8 @@ def smooth_func(x, n, periodic=False):
     c2 = np.random.randn(n)
     m = np.random.uniform(-10, 10)
     
-    for n in range(n):
-        f += c1[n] * np.sin(2*n*np.pi*x / L) + c2[n] * np.cos(2*n*np.pi*x / L)
+    for i in range(n):
+        f += c1[i] * np.sin(2*i*np.pi*x / L) + c2[i] * np.cos(2*i*np.pi*x / L)
     
     # We add a linear portion to break the symmetry
     if periodic == False:

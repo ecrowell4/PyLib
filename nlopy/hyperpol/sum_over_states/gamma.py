@@ -1,8 +1,8 @@
 import numpy as np
 from nlopy.hyperpol.sum_over_states import sos_utils
-from numba import jit
+#from numba import jit
 
-@jit    
+    
 def gamma_mmmm(E, L, I, units, canonical=False):
     """Returns the canonical, diagonal tensor component of the quadratic mangetic polarizability 
     beta at imput frequencies omega1 and omega2:
