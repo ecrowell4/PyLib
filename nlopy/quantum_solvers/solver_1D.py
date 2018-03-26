@@ -1,9 +1,6 @@
-<<<<<<< HEAD
 import scipy as sp
 from scipy import linalg
-=======
 import scipy.linalg
->>>>>>> 78d9464ef861f91a76047dd8523cd06fee719e02
 import numpy as np
 from nlopy.quantum_solvers import solver_utils
 
