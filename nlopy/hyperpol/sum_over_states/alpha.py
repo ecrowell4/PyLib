@@ -36,6 +36,10 @@ def alpha_ee(E, xx, units, omega=0, intrinsic=False, n=0, damping=False):
     
     # Take all Em -> Emn
     E = E - E[n]
+
+    if damping == True:
+        E = E - 1j * (2 / 3 / units.hbar) * (E / units.hbar / units.c)**3 * units.e**2 * abs(xx[:,0])**2
+
     
     alpha =  units.e**2 * (np.delete(xx[n,:], n).dot(np.delete(xx[:,n], n) * sos_utils.D1(np.delete(E, n), omega, units))
                            + np.delete(xx[n,:], n).dot(np.delete(xx[:,n], n) * sos_utils.D1(np.delete(E.conjugate(), n), -omega, units))
