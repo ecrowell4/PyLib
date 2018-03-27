@@ -8,7 +8,7 @@ Created on Mon Jul 31 12:38:46 2017
 import numpy as np
 from nlopy.hyperpol.sum_over_states import sos_utils
 
-def alpha_ee(E, xx, units, omega=0, intrinsic=False, n=0):
+def alpha_ee(E, xx, units, omega=0, intrinsic=False, n=0, damping=False):
     """Calculates the polarizability alpha for a system in the ground
     
     Input
@@ -22,6 +22,8 @@ def alpha_ee(E, xx, units, omega=0, intrinsic=False, n=0):
             frequency of incident electric field
         n : int
             state system is assumes to be in (i.e. n=0 -> ground state)
+        damping : bool
+            If true, then include natural linewidth as damping term
             
         
     Output
