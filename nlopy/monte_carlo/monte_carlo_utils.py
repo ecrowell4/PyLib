@@ -160,3 +160,26 @@ def sigma(SR, N):
     
     return sigma
 
+def get_rand_unitary(N):
+    """Returns a random unitary matrix of the desired size.
+    The matrix is of the form exp(iA), where A is a hermitian
+    matrix.
+
+    Input
+        N : int
+            dimension of matrix
+
+    Output
+        U : np.array
+            unitary matrix
+    """
+
+    # Generate random matrix and make it hermitian
+    A = np.random.randn(N, N) + 1j * np.random.randn(N, N)
+    A = -.5 * (A + A.transpose().conjugate())
+
+    # Create unitary matrix from A
+    U = sp.linalg.expm(1j * A)
+
+    return U
+
