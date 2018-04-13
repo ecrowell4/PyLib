@@ -209,3 +209,19 @@ def block_diag(v, k=0):
         c += cc
     
     return out
+
+def make_hamiltonian_2D(x, y, V):
+    """Returns the 2D hamiltonian in the finite difference scheme.
+
+    Input
+        x, y : np.array
+            spatial arrays, unmeshed
+        V : np.array
+            2D potential function
+
+    Output
+        H : np.array
+            finite difference representation of Hamiltonian
+    """
+
+    

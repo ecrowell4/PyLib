@@ -8,9 +8,7 @@ def solver_1D(x, V, units, num_states=15):
     """Uses finite difference to discretize and solve for the eigenstates and 
     energy eigenvalues one dimensional potentials.
     
-    The domain fed to this routine defines the problem space allowing
-    non-uniform point density to pay close attention to particular parts of the
-    potential. Assumes infinite walls at both ends of the problem space.
+    Assumes infinite walls at both ends of the problem space.
     
     Input
         x : np.array([x_i]) 

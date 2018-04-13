@@ -20,6 +20,9 @@ def alpha_ee(E, xx, units, omega=0, intrinsic=False, n=0, damping=False):
             class object containing fundamental constants
         omega : float
             frequency of incident electric field
+        intrinsic : bool
+            if True, then intrinsic alpha is returned. In this case
+            it is assumed the scaled xx and E are given as input
         n : int
             state system is assumes to be in (i.e. n=0 -> ground state)
         damping : bool
