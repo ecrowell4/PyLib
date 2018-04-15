@@ -8,6 +8,7 @@ Contains utility functions for solving the Schrodinger equation.
 
 import numpy as np
 import scipy as sp
+from concurrent import futures
 
 def _make_kinetic_energy(dx, N, units, boundary):
     """Construct finite difference approximation for kinetic energy operator.
@@ -210,18 +211,3 @@ def block_diag(v, k=0):
     
     return out
 
-def make_hamiltonian_2D(x, y, V):
-    """Returns the 2D hamiltonian in the finite difference scheme.
-
-    Input
-        x, y : np.array
-            spatial arrays, unmeshed
-        V : np.array
-            2D potential function
-
-    Output
-        H : np.array
-            finite difference representation of Hamiltonian
-    """
-
-    

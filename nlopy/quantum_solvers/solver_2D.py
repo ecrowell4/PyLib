@@ -12,8 +12,8 @@ def solver_2D(x, y, V, units, num_states=15):
     Assumes infinite walls at both ends of the problem space.
     
     Input
-        x : np.array([x_i]) 
-            The spacial grid points including the endpoints
+        x, y : np.array([x_i]) 
+            The spacial grid points including the endpoints, not meshed
         V : np.array([V(x_i)]) 
             The potential function defined on the grid
         units : class
