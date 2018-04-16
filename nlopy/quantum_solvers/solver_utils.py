@@ -181,6 +181,70 @@ def make_angular_momentum(x, Psi, units):
 
     return L
 
+
+def laplacian(f, x):
+    N = len(x)
+    dx = x[1]-x[0]
+    D = np.eye(N, k=1) / dx**2 - 2*np.eye(N) / dx**2 + np.eye(N, k=-1) / dx**2
+    # Ignore end points of second derivative: these will be evaluated via forward/backward difference
+    df = D.dot(f)[1:-1]
+    df = np.append(np.append((f[2] - 2*f[1] + f[0]) / dx**2, df), (f[N-3] - 2*f[N-2] + f[N-1])/dx**2)
+    return df
+
+def laplacian_numpy(f, x):
+    """Compute the laplacian of function.
+
+    Input
+        f : np.array
+            function to take gradient of
+        x : np.array
+            spatial array
+
+    Output
+        f_xx : np.array
+             laplacian of psi
+    """
+
+    # Find number of points in problem space
+    N = len(x)
+    dx = x[1] - x[0]
+
+    # We first linearly interpolate the state and position space
+    #    a single step outside the boundaries. This is to rectify
+    #    the error introduced at boundaries by np.gradient.
+    f_ = np.append(np.append(2 * f[0] - f[1], f), 2 * f[N-1] - f[N-2])
+    x_ = np.append(np.append(x[0] - dx, x), x[N-1] + dx)
+
+    # Return laplacian along x_ axis, where we omit the interpolated
+    #    points.
+    return np.gradient(np.gradient(f_, x_), x_)[1:-1]
+
+
+def apply_H(psi, x, V_arr, units):
+    """Returns the effect of Hamiltonian's action on the state at time t.
+
+    Input
+        psi : np.array
+            state vector at time t
+        x : np.array
+            position space
+        V_arr : np.array
+            potential at time t
+        units : class
+            object containing fundamental constants
+
+    Output
+        Hpsi : np.array
+            action of Hamiltonian on state vector at time t.
+    """
+
+
+
+    # Apply H to state
+    Hpsi = -(units.hbar**2 / 2 / units.m) * laplacian(psi, x) + V_arr * psi
+
+    return Hpsi
+
 def block_diag(v, k=0):
     """ Creates a block diagonal matrix, with the elements of v
     as the diagonals.
