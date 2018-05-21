@@ -33,8 +33,8 @@ params = {
     'figure.subplot.top'     : 0.95,    
     'figure.subplot.wspace'  : 0.3,    # the amount of width reserved for blank space between subplots
     'figure.subplot.hspace'  : 0.3,   # the amount of height reserved for white space between subplots
-    'savefig.dpi' : 600,
-    'savefig.format' : 'eps',
+    'savefig.dpi' : 200,
+    'savefig.format' : 'pdf',
     'text.usetex': True
 }
 plt.rcParams.update(params)

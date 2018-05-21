@@ -57,3 +57,27 @@ def gamma_mmmm(E, L, I, units, canonical=False):
                 j += 1
             i += 1
         return Gamma
+
+def gamma_term(E, L, indices):
+    """Returns the term of gamma corresponding to
+    n, m, l = indices[0], indices[1], indices[2].
+
+    Input
+        E : np.array
+            eigenenergies
+        L : np.array
+            angular momentum matrix
+        indices : array [i,j,l]
+            array of indices
+
+    Output
+        gamma_nml : np.array
+            a single term of the SOS expression for gamma
+    """
+    i,j,l = indices
+    Lbar = L - L[0,0]
+
+    return 4*units.g**4 / units.hbar**3 * (
+        L[0,i]*Lbar[i,j]*Lbar[j,l]*L[l,0] / ((E[i]-E[0])*(E[j]-E[0])*(E[l]-E[0]))
+        -L[0,i]*L[i,0]*L[0,j]*L[j,0] / ((E[j]-E[0])**2 * (E[i]-E[0]))
+        )

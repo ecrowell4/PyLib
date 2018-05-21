@@ -185,10 +185,12 @@ def make_angular_momentum(x, Psi, units):
 def laplacian(f, x):
     N = len(x)
     dx = x[1]-x[0]
-    D = np.eye(N, k=1) / dx**2 - 2*np.eye(N) / dx**2 + np.eye(N, k=-1) / dx**2
+    D = np.eye(N+2, k=1) / dx**2 - 2*np.eye(N+2) / dx**2 + np.eye(N+2, k=-1) / dx**2
     # Ignore end points of second derivative: these will be evaluated via forward/backward difference
-    df = D.dot(f)[1:-1]
-    df = np.append(np.append((f[2] - 2*f[1] + f[0]) / dx**2, df), (f[N-3] - 2*f[N-2] + f[N-1])/dx**2)
+    #df = D.dot(f)[1:-1]
+    f_ = np.append(np.append(2 * f[0] - f[1], f), 2 * f[N-1] - f[N-2])
+    df = D.dot(f_)[1:-1]
+    #df = np.append(np.append((f[2] - 2*f[1] + f[0]) / dx**2, df), (f[N-3] - 2*f[N-2] + f[N-1])/dx**2)
     return df
 
 def laplacian_numpy(f, x):

@@ -35,7 +35,8 @@ def take_time_step(psi, V_func, x, t, dt, units):
 
 
 def evolve(psi0, V_func, x, T, units):
-    """Evolves the state psi0 over the time domain T.
+    """Evolves the state psi0 over the time doma
+    in T.
 
     Input
         psi0 : np.array
