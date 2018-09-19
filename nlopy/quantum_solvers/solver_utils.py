@@ -80,7 +80,47 @@ def _make_potential_energy(V, boundary):
     
     return Vop
 
-    
+def _make_magnetic_dipole_energy(B, dx, N, units, boundary):
+    """Construct finit difference approximation for magnetic dipole interaction.
+    Only works for periodic boundaries.
+
+    Input
+        B : np.float
+            magnetic field strength
+        dx : np.float
+            spatial grid spacing
+        N : np.int
+            number of point representing position space
+        units : class
+            fundamental constants
+        boundary : bool
+            describes boundary conditions. Options are
+                periodic
+
+    Output
+        Uop : np.array((N-2, N-2))
+            finite difference representation of magnetic dipole energy. Endpoints
+            are left off because they are defined by the boundary conditions.
+    """
+
+    # Define N_tilde, which will be the dimension of our operator. 
+    assert boundary is 'periodic', "Invalid boundary condition. Only available for periodic boundaries" 
+
+    # Define size of matrix
+    N_tilde = N - 1
+
+    # First derivative of psi
+    d_psi = np.eye(N_tilde, k=1) / 2 / dx - np.eye(N_tilde, k=-1) / 2 / dx
+
+    # Ensure derivative of psi is periodic
+    d_psi[0, N_tilde-1] = 
+
+    # The magnetic dipole energy
+    U_magnetic = 1j * units.g * units.hbar * B * d_psi
+
+    return U_magnetic
+
+
 def make_hamiltonian(dx, V, units, boundary='hard_wall',prec=None):
     """Construct Hamiltonian matrix using a finite difference scheme.
     
