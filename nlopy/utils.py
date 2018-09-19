@@ -21,7 +21,7 @@ def position_space(L, dx, L_min=0):
 			Spatial grid
 	"""
 
-	x = np.arange((L + dx) / dx) * dx
+	x = np.arange((L + dx) / dx) * dx - L_min
 
 	return x
 	

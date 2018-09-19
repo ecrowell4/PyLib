@@ -78,17 +78,18 @@ def alpha_mm(E, L, I, units, omega=0, canonical=False):
             magnetic polarizability
     """
     
+    g = units.e / 2 / units.m / units.c
         
     # Evaluate the SOS term in equation for alpha^{mm}
-    alpha = units.g**2 * (L[0,1:].dot((L[1:,0] * sos_utils(np.delete(E, 1), omega, units)))
-                       + L[0,1:].dot((L[1:,0] * sos_utils(np.delete(E.conjugate(), 1), omega, units))))
+    alpha_mag = units.g**2 * (L[0,1:].dot((L[1:,0] * sos_utils.D1(np.delete(E, 1), omega, units)))
+                       + L[0,1:].dot((L[1:,0] * sos_utils.D1(np.delete(E.conjugate(), 1), omega, units))))
     
     # Include the diamagnetic term (i.e. Faraday term) if the user doesn't
     # specify not to
     if canonical is True:
-        return alpha
+        return alpha_mag
     else:
-        return alpha - g**2 * I
+        return alpha_mag - g**2 * I
 
 
 #==============================================================================

@@ -11,7 +11,7 @@ import os
 from scipy.integrate import simps
 
 fsize = 10.
-
+#fsize = 24
 params = {
     #'figure.figsize': [3.35,2.5],
     'figure.figsize': [4.0,3.0],
@@ -34,7 +34,8 @@ params = {
     'figure.subplot.wspace'  : 0.3,    # the amount of width reserved for blank space between subplots
     'figure.subplot.hspace'  : 0.3,   # the amount of height reserved for white space between subplots
     'savefig.dpi' : 200,
-    'savefig.format' : 'pdf',
+    #'savefig.format' : 'pdf',
+    'savefig.format' : 'png',
     'text.usetex': True
 }
 plt.rcParams.update(params)
