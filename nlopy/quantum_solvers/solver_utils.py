@@ -80,12 +80,12 @@ def _make_potential_energy(V, boundary):
     
     return Vop
 
-def _make_magnetic_dipole_energy(B, dx, N, units, boundary):
+def _make_magnetic_dipole_energy(Bfield, dx, N, units):
     """Construct finit difference approximation for magnetic dipole interaction.
     Only works for periodic boundaries.
 
     Input
-        B : np.float
+        Bfield : np.float
             magnetic field strength
         dx : np.float
             spatial grid spacing
@@ -116,12 +116,12 @@ def _make_magnetic_dipole_energy(B, dx, N, units, boundary):
     d_psi[0, N_tilde-1] = 
 
     # The magnetic dipole energy
-    U_magnetic = 1j * units.g * units.hbar * B * d_psi
+    U_magnetic = 1j * units.g * units.hbar * Bfield * d_psi
 
     return U_magnetic
 
 
-def make_hamiltonian(dx, V, units, boundary='hard_wall',prec=None):
+def make_hamiltonian(dx, V, units, boundary='hard_wall', Bfield=None, prec=None):
     """Construct Hamiltonian matrix using a finite difference scheme.
     
     Input
@@ -135,6 +135,8 @@ def make_hamiltonian(dx, V, units, boundary='hard_wall',prec=None):
             describes boundary conditions. Options are
                 hard_wall
                 periodic
+        Bfield : np.float
+            magnetic field strength
         prec : int
             desired decimal precision.
             
@@ -151,6 +153,9 @@ def make_hamiltonian(dx, V, units, boundary='hard_wall',prec=None):
     # Construct operator representations in position space:
     Top = _make_kinetic_energy(dx, N, units, boundary)
     Vop = _make_potential_energy(V, boundary)
+
+    if Bfield != None:
+        U_magnetic = _make_magnetic_dipole_energy(Bfield, dx, N, units)
     
     if prec != None:
         from mpmath import mp
@@ -160,7 +165,7 @@ def make_hamiltonian(dx, V, units, boundary='hard_wall',prec=None):
         H = np.array(sympify(H_.tolist()))
         return H_
     else:
-        return Top + Vop
+        return Top + Vop + U_magnetic 
  
 
 def make_position_matrix(x, psi):

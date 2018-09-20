@@ -1,13 +1,19 @@
 import numpy as np
 from nlopy.quantum_solvers import solver_utils
 
-def solver_periodic(x, V, units, num_states=15):
+def solver_periodic(x, V, units, num_states=15, Bfield=None):
     """Uses finite difference to discretize and solve for the eigenstates and 
     energy eigenvalues of one dimensional periodic potentials.
         
     Input:
-        x = np.array([x_i]) the spacial grid points including the endpoints
-        V = np.array([V(x_i)]) the potential function defined on the grid
+        x : np.array([x_i]) 
+            the spacial grid points including the endpoints
+        V : np.array([V(x_i)]) 
+            the potential function defined on the grid
+        units : Bool
+            fundamental constants
+        Bfield : np.float
+            magnetic field strength
         
     Units:
         [x] = cm
@@ -37,12 +43,12 @@ def solver_periodic(x, V, units, num_states=15):
         num_states = N-1
     
     # Construct the Hamiltonian
-    H = solver_utils.make_hamiltonian(dx, V, units, boundary='periodic')
+    H = solver_utils.make_hamiltonian(dx, V, units, boundary='periodic', Bfield=Bfield)
     
     #Enforce periodic boundary conditions (this is one of two conditions):
-    H[0,N-2] = -1 / (2*dx**2) 
-    H[N-2,0] = -1 / (2*dx**2) 
-    
+    #H[0,N-2] = -1 / (2*dx**2) 
+    #H[N-2,0] = -1 / (2*dx**2) 
+
     #Diagonalize
     E, psi = np.linalg.eigh(H)
 
