@@ -46,8 +46,8 @@ def _make_kinetic_energy(dx, N, units, boundary):
 
     if boundary is 'periodic':
         # This condition forces the derivative of the function to be periodic as well.
-        d2_psi[0, N_tilde-1] = -1 / 2 / dx**2
-        d2_psi[N_tilde-1, 0] = -1 / 2 / dx**2 
+        d2_psi[0, N_tilde-1] = 1 / dx**2
+        d2_psi[N_tilde-1, 0] = 1 / dx**2 
      
     # Convert the second derivative to units of energy:
     Top = -(units.hbar**2 / 2 / units.m) * d2_psi
@@ -103,9 +103,6 @@ def _make_magnetic_dipole_energy(Bfield, dx, N, units):
             are left off because they are defined by the boundary conditions.
     """
 
-    # Define N_tilde, which will be the dimension of our operator. 
-    assert boundary is 'periodic', "Invalid boundary condition. Only available for periodic boundaries" 
-
     # Define size of matrix
     N_tilde = N - 1
 
@@ -113,7 +110,8 @@ def _make_magnetic_dipole_energy(Bfield, dx, N, units):
     d_psi = np.eye(N_tilde, k=1) / 2 / dx - np.eye(N_tilde, k=-1) / 2 / dx
 
     # Ensure derivative of psi is periodic
-    d_psi[0, N_tilde-1] = 
+    d_psi[0, N_tilde-1] = -1 / 2 / dx
+    d_psi[N_tilde-1, 0] = 1 / 2 / dx
 
     # The magnetic dipole energy
     U_magnetic = 1j * units.g * units.hbar * Bfield * d_psi
@@ -156,6 +154,8 @@ def make_hamiltonian(dx, V, units, boundary='hard_wall', Bfield=None, prec=None)
 
     if Bfield != None:
         U_magnetic = _make_magnetic_dipole_energy(Bfield, dx, N, units)
+    else:
+        U_magnetic = np.zeros(Top.shape)
     
     if prec != None:
         from mpmath import mp
