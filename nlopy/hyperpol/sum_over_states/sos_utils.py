@@ -21,7 +21,7 @@ def D1(E, omega, units):
     """
     
     # Compute and return the propogator
-    return 1 / (E - units.hbar*omega)
+    return 1 / (E - units.hbar * omega)
 
 def D2(E, omega1, omega2, units):
     """Returns the propogator for a second order process.
@@ -40,7 +40,27 @@ def D2(E, omega1, omega2, units):
     """
 
     # Compute and return the propogator
-    return 1 / (E - units.hbar*omega1 - units.hbar*omega2)
+    return 1 / (E - units.hbar * omega1 - units.hbar * omega2)
+
+def D3(E, omega1, omega2, omega3, units):
+    """Returns the propogator for a third order process.
+
+    Input
+        E : np.array
+            array of eigenenergies
+        omega : float
+            incident field intensities
+        units : class
+            class whose attributes are the fundamental constants
+    
+    Output
+        D3 : np.array
+            propogator for third order process.
+    """
+
+    # Compute and return the propogator
+    return 1 / (E - units.hbar * omega1 - units.hbar * omega2 - units.hbar * omega3)
+
 
 
 
