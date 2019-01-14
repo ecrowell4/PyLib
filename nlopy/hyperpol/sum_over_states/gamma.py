@@ -2,7 +2,36 @@ import numpy as np
 from nlopy.hyperpol.sum_over_states import sos_utils
 #from numba import jit
 
-def gamma_mmmm(E, L, I units):
+def gamma_eeee(E, xx, units, n=0):
+    """Compute diagonal component of gamma_eeee with or without A^2 term. 
+    
+    Input
+        E : np.array
+            eigenenergies of unperturbed system
+        xx : np.array
+            transition matrix of unperturbed system
+        units : class
+            fundamental constants
+        sq_term : bool
+            If true, then return gamma with A^2 term included in perturbation.
+    
+    Output
+        gamma_eeee : complex
+            second hyperpolarizability
+    """
+
+    # assert consisten dimensions
+    assert len(E) == len(xx[0])
+    
+    # determine number of eigenstates fo be used in computing beta
+    num_states = len(E)
+    
+    # Take all mu -> bar{mu}
+    xx = xx - xx[0,0]
+    
+    # Take all Em -> Enm
+    E = E - E[n]
+    
     
     
 def _gamma_mmmm(E, L, I, units, canonical=False):
