@@ -47,7 +47,7 @@ def beta_eee(E, xx, units, omega=[0,0], intrinsic=False, n=0):
     beta = 0.5 * units.e**3 * (
         (np.delete(xx[n,:], n) * sos_utils.D2(np.delete(E, n), omega[0], omega[1], units)).dot(np.delete(np.delete(xx, n, 0), n, 1).dot(np.delete(xx[:,n], n) 
     * sos_utils.D1(np.delete(E, n), omega[0], units)))
-    + (np.delete(xx[n,:], n) * sos_utils.D2(np.delete(E, n), omega[1], omega[0], units)).dot(np.delete(np.delete(xx, n, 0), n, 1).dot(xx[1:,0] * sos_utils.D1(np.delete(E, n), omega[1], units)))
+    + (np.delete(xx[n,:], n) * sos_utils.D2(np.delete(E, n), omega[1], omega[0], units)).dot(np.delete(np.delete(xx, n, 0), n, 1).dot(np.delete(xx[:,n], n) * sos_utils.D1(np.delete(E, n), omega[1], units)))
     + (np.delete(xx[n,:], n) * sos_utils.D1(np.delete(E, n), omega[1], units)).dot(np.delete(np.delete(xx, n, 0), n, 1).dot(xx[1:,0] * sos_utils.D1(np.delete(E, n).conjugate(), -omega[0], units)))
     + (np.delete(xx[n,:], n) * sos_utils.D1(np.delete(E, n), omega[0], units)).dot(np.delete(np.delete(xx, n, 0), n, 1).dot(xx[1:,0] * sos_utils.D1(np.delete(E, n).conjugate(), -omega[1], units)))
     + (np.delete(xx[n,:], n) * sos_utils.D2(np.delete(E, n).conjugate(), -omega[0], -omega[1], units)).dot(np.delete(np.delete(xx, n, 0), n, 1).dot(xx[1:,0] * sos_utils.D1(np.delete(E, n).conjugate(), -omega[0], units)))
