@@ -2,6 +2,9 @@ import numpy as np
 import copy
 import sys
 
+# shorthand definition for np.delete
+Del = np.delete
+
 def D1(E, omega, units):
     """Returns the propogator for a first order process.
     
@@ -123,6 +126,44 @@ def alpha_term(E, delta, xx, ij, xi, omega):
              + xx[ij[0],2:].dot(xx[2:,ij[1]] / (2*(E[2:] - E[0]) + sgn2*delta)))
 
 
+   
+def gamma_term11(xx, E, omega, units, n=0):
+    """Returns the first term of the first summand in SOS expression
+    for gamma_eee, as written [FILL IN LOCATION]"""
+    term11 = units.e**4 * Del(xx[n,:], n).dot(
+        (Del(Del(xx, n, 0), n, 1) * D3(Del(E, n), omega[0], omega[1], omega[2], units)).dot(
+            (Del(Del(xx, n, 0), n, 1) * D2(Del(E, n), omega[0], omega[1], units)).dot(
+                (Del(xx[:,n], n) * D1(Del(E, n), omega[0], units)))))
     
+    return term11
+
+def gamma_term12(xx, E, omega, units, n=0):
+    """Returns the second term of the first summand in SOS expression
+    for gamma_eee, as written [FILL IN LOCATION]"""
+    term12 = units.e**4 * Del(xx[n,:], n).dot(
+        (Del(Del(xx, n, 0), n, 1) * D1(Del(E.conjugate(), n), -omega[0], units)).dot(
+            (Del(Del(xx, n, 0), n, 1) * D2(Del(E, n), omega[2], omega[1], units)).dot(
+                (Del(xx[:,n], n) * D1(Del(E, n), omega[0], units)))))
     
+    return term12
+
+def gamma_term13(xx, E, omega, units, n=0):
+    """Returns the thrid term of the first summand in SOS expression
+    for gamma_eee, as written [FILL IN LOCATION]"""
+    term13 =  units.e**4 * Del(xx[n,:], n).dot(
+        (Del(Del(xx, n, 0), n, 1) * D1(Del(E, n), omega[0], units)).dot(
+            (Del(Del(xx, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega[2], -omega[1], units)).dot(
+                (Del(xx[:,n], n) * D1(Del(E.conjugate(), n), -omega[2], units)))))
     
+    return term13
+
+def gamma_term14(xx, E, omega, units, n=0):
+    """Returns the fourth term of the first summand in SOS expression
+    for gamma_eee, as written [FILL IN LOCATION]"""
+    term14 = units.e**4 * Del(xx[n,:], n).dot(
+        (Del(Del(xx, n, 0), n, 1) * D3(Del(E.conjugate(), n), -omega[0], -omega[1], -omega[2], units)).dot(
+            (Del(Del(xx, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega[0], -omega[1], units)).dot(
+                (Del(xx[:,n], n) * D1(Del(E.conjugate(), n), -omega[1], units)))))
+    
+    return term14
+
