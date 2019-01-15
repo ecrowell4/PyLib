@@ -19,6 +19,8 @@ def gamma_eeee(E, xx, units, n=0):
         gamma_eeee : complex
             second hyperpolarizability
     """
+    
+    Del = np.delete
 
     # assert consisten dimensions
     assert len(E) == len(xx[0])
@@ -31,6 +33,18 @@ def gamma_eeee(E, xx, units, n=0):
     
     # Take all Em -> Enm
     E = E - E[n]
+    
+    # compute gamma term by term
+    gamma = (1 / 6) * (
+            gamma_term11(xx, E, omega, units, n=n) + gamma_term12(xx, E, omega, units, n=n) 
+            + gamma_term13(xx, E, omega, units, n=n) + gamma_term14(xx, E, omega, units, n=n) 
+            + gamma_term21(xx, E, omega, units, n=n) + gamma_term22(xx, E, omega, units, n=n)
+            + gamma_term23(xx, E, omega, units, n=n) + gamma_term24(xx, E, omega, units, n=n)
+            + gamma_term31(xx, E, omega, units, n=n) + gamma_term32(xx, E, omega, units, n=n)
+            + gamma_term33(xx, E, omega, units, n=n) + gamma_term34(xx, E, omega, units, n=n)
+    )
+    
+    return gamma
     
     
     
