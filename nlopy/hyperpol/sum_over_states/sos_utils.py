@@ -167,3 +167,38 @@ def gamma_term14(xx, E, omega, units, n=0):
     
     return term14
 
+def gamma_term21(xx, E, omega, units, n=0):
+    """Returns the first term of the second summand in sos expression
+    for gamma_eeee"""
+    term21 = units.e**4 * ((Del(xx[n,:], n) * D3(E, omega[0], omega[1], omega[2], units)).dot(
+        (Del(xx[:,n], n) * D1(E, omega[2], units)))) * Del(xx[n,:], n).dot(
+    Del(xx[:,n], n) * D1(E, omega[2]))
+
+    return term21
+
+def gamma_term22(xx, E, omega, units, n=0):
+    """Returns the second term of the second summand in sos expression
+    for gamma_eeee"""
+    term22 = units.e**4 * ((Del(xx[n,:], n) * D1(E.conjugate(), -omega[1], units)).dot(
+        (Del(xx[:,n], n) * D1(E, omega[0], units)))) * Del(xx[n,:], n).dot(
+    Del(xx[:,n], n) * D1(E, omega[2]))
+
+    return term22
+
+def gamma_term23(xx, E, omega, units, n=0):
+    """Returns the third term of the second summand in sos expression
+    for gamma_eeee"""
+    term23 = units.e**4 * ((Del(xx[n,:], n) * D3(E.conjugate(), -omega[0],-omega[1], -omega[2], units)).dot(
+        (Del(xx[:,n], n) * D1(E.conjugate(), -omega[2], units)))) * Del(xx[n,:], n).dot(
+    Del(xx[:,n], n) * D1(E.conjguate(), -omega[0]))
+
+    return term23
+
+def gamma_term24(xx, E, omega, units, n=0):
+    """Returns the fourth term of the second summand in sos expression
+    for gamma_eeee"""
+    term24 = units.e**4 * ((Del(xx[n,:], n) * D1(E.conjugate(), -omega[0], units)).dot(
+        (Del(xx[:,n], n) * D1(E, omega[1], units)))) * Del(xx[n,:], n).dot(
+    Del(xx[:,n], n) * D1(E.conjugate(), -omega[2]))
+
+    return term24
