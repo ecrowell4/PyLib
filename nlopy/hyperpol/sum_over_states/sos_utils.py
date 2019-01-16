@@ -238,3 +238,35 @@ def gamma_term34(xx, E, omega1, omega2, omega3, units, n=0):
         ) / omega1 / omega2
 
     return term34
+
+def permute_gamma_terms(gamma_term, xx, E, omega1, omega2, omega3, units,n=0):
+    """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
+
+    Input
+        gamma_term : function
+            function that returns one of the terms in sos expression for 
+            gamma_eeee
+        xx : np.array
+            transition matrix
+        E : np.array
+            eigenenergies Emn
+        omega1,omega2,omega3 : float
+            incident field frequencies
+        units : class
+            fundamental constants
+        n : int
+            starting state
+
+    Output
+        gamma_term : complex
+            The average over all permutations of the term
+        """
+
+    gamma_term = (1 / 6) * (gamma_term(xx, E, omega1, omega2, omega3, units,n=0)
+        + gamma_term(xx, E, omega1, omega3, omega2, units,n=0)
+        + gamma_term(xx, E, omega2, omega1, omega3, units,n=0)
+        + gamma_term(xx, E, omega2, omega3, omega1, units,n=0)
+        + gamma_term(xx, E, omega3, omega2, omega1, units,n=0)
+        + gamma_term(xx, E, omega3, omega1, omega2, units,n=0)) 
+
+    return gamma_term
