@@ -35,18 +35,18 @@ def gamma_eeee(E, xx, units, omega, n=0):
     E = E - E[n]
     
     # compute gamma term by term
-    gamma = (sos_utils.permute_gamma_terms(gamma_term11, xx, E, omega, units) 
-    + sos_utils.permute_gamma_terms(gamma_term12, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(gamma_term13, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(gamma_term14, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(gamma_term21, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(gamma_term22, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(gamma_term23, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(gamma_term24, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(gamma_term31, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(gamma_term32, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(gamma_term33, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(gamma_term34, xx, E, omega, units))
+    gamma = (sos_utils.permute_gamma_terms(sos_utils.gamma_term11, xx, E, omega, units) 
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term12, xx, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term13, xx, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term14, xx, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term21, xx, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term22, xx, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term23, xx, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term24, xx, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term31, xx, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term32, xx, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term33, xx, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term34, xx, E, omega, units))
     
     return gamma
     
