@@ -172,7 +172,7 @@ def gamma_term21(xx, E, omega1, omega2, omega3, units, n=0):
     for gamma_eeee"""
     term21 = units.e**4 * ((Del(xx[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
         (Del(xx[:,n], n) * D1(Del(E, n), omega3, units)))) * Del(xx[n,:], n).dot(
-    Del(xx[:,n], n) * D1(Del(E, n), omega3))
+    Del(xx[:,n], n) * D1(Del(E, n), omega1, units))
 
     return term21
 
@@ -181,7 +181,7 @@ def gamma_term22(xx, E, omega1, omega2, omega3, units, n=0):
     for gamma_eeee"""
     term22 = units.e**4 * ((Del(xx[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
         (Del(xx[:,n], n) * D1(Del(E, n), omega1, units)))) * Del(xx[n,:], n).dot(
-    Del(xx[:,n], n) * D1(Del(E, n), omega3))
+    Del(xx[:,n], n) * D1(Del(E, n), omega3, units))
 
     return term22
 
@@ -190,7 +190,7 @@ def gamma_term23(xx, E, omega1, omega2, omega3, units, n=0):
     for gamma_eeee"""
     term23 = units.e**4 * ((Del(xx[n,:], n) * D3(Del(E.conjugate(), n), -omega1,-omega2, -omega3, units)).dot(
         (Del(xx[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units)))) * Del(xx[n,:], n).dot(
-    Del(xx[:,n], n) * D1(Del(E.conjguate(), n), -omega1))
+    Del(xx[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
 
     return term23
 
@@ -199,7 +199,7 @@ def gamma_term24(xx, E, omega1, omega2, omega3, units, n=0):
     for gamma_eeee"""
     term24 = units.e**4 * ((Del(xx[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
         (Del(xx[:,n], n) * D1(Del(E, n), omega2, units)))) * Del(xx[n,:], n).dot(
-    Del(xx[:,n], n) * D1(Del(E.conjugate(), n), -omega3))
+    Del(xx[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
 
     return term24
 
@@ -226,7 +226,7 @@ def gamma_term33(xx, E, omega1, omega2, omega3, units, n=0):
     for gamma_eeee"""
     term33 = units.e**4 * (Del(xx[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
         (Del(xx[:,n], n) * D2(Del(E, n), omega2, omega3, units))
-        ) / omega1 / omega2
+        ) / omega2 / omega3
 
     return term33
 
@@ -235,7 +235,7 @@ def gamma_term34(xx, E, omega1, omega2, omega3, units, n=0):
     for gamma_eeee"""
     term34 = units.e**4 * (Del(xx[n,:], n) * D1(Del(E, n), omega1, units)).dot(
         (Del(xx[:,n], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units))
-        ) / omega1 / omega2
+        ) / omega2 / omega3
 
     return term34
 
