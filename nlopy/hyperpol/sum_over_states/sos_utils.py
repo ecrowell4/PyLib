@@ -439,7 +439,7 @@ def gamma_term34(xx, E, omega1, omega2, omega3, units, n=0):
 
     return term34
 
-def permute_gamma_terms(gamma_term, xx, E, omega1, omega2, omega3, units,n=0):
+def permute_gamma_terms(gamma_term, xx, E, omega, units,n=0):
     """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
 
     Input
@@ -450,7 +450,7 @@ def permute_gamma_terms(gamma_term, xx, E, omega1, omega2, omega3, units,n=0):
             transition matrix
         E : np.array
             eigenenergies Emn
-        omega1,omega2,omega3 : float
+        omega : np.array
             incident field frequencies
         units : class
             fundamental constants
@@ -459,14 +459,14 @@ def permute_gamma_terms(gamma_term, xx, E, omega1, omega2, omega3, units,n=0):
 
     Output
         gamma_term : complex
-            The average over all permutations of the term
+            The average of the term over all frequency permutations
         """
 
-    gamma_term = (1 / 6) * (gamma_term(xx, E, omega1, omega2, omega3, units,n=0)
-        + gamma_term(xx, E, omega1, omega3, omega2, units,n=0)
-        + gamma_term(xx, E, omega2, omega1, omega3, units,n=0)
-        + gamma_term(xx, E, omega2, omega3, omega1, units,n=0)
-        + gamma_term(xx, E, omega3, omega2, omega1, units,n=0)
-        + gamma_term(xx, E, omega3, omega1, omega2, units,n=0)) 
+    gamma_term = (1 / 6) * (gamma_term(xx, E, omega[0], omega[1], omega[2], units,n=0)
+        + gamma_term(xx, E, omega[0], omega[2], omega[1], units,n=0)
+        + gamma_term(xx, E, omega[1], omega[0], omega[2], units,n=0)
+        + gamma_term(xx, E, omega[1], omega[2], omega[0], units,n=0)
+        + gamma_term(xx, E, omega[2], omega[1], omega[0], units,n=0)
+        + gamma_term(xx, E, omega[2], omega[0], omega[1], units,n=0)) 
 
     return gamma_term
