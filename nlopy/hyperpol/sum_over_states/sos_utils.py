@@ -129,7 +129,23 @@ def alpha_term(E, delta, xx, ij, xi, omega):
    
 def gamma_term11(xx, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the first summand in SOS expression
-    for gamma_eee, as written [FILL IN LOCATION]"""
+    for gamma_eee, as written [FILL IN LOCATION]
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the first sum in the first set of terms of gamma_eeee
+    """
+
     term11 = units.e**4 * (Del(xx[n,:], n) * D3(Del(E,n), omega1, omega2, omega3, units)).dot(
         (Del(Del(xx, n, 0), n, 1) * D2(Del(E, n), omega1, omega2, units)).dot(
             Del(Del(xx, n, 0), n, 1).dot(
@@ -139,7 +155,23 @@ def gamma_term11(xx, E, omega1, omega2, omega3, units, n=0):
 
 def gamma_term12(xx, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the first summand in SOS expression
-    for gamma_eee, as written [FILL IN LOCATION]"""
+    for gamma_eee, as written [FILL IN LOCATION]
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the second sum in the first set of terms of gamma_eeee
+    """
+
     term12 = units.e**4 * (Del(xx[n,:], n) * D1(Del(E.conjugate(),n), -omega1, units)).dot(
         (Del(Del(xx, n, 0), n, 1) * D2(Del(E, n), omega2, omega3, units)).dot(
             Del(Del(xx, n, 0), n, 1).dot(
@@ -152,7 +184,23 @@ def gamma_term12(xx, E, omega1, omega2, omega3, units, n=0):
 
 def gamma_term13(xx, E, omega1, omega2, omega3, units, n=0):
     """Returns the thrid term of the first summand in SOS expression
-    for gamma_eee, as written [FILL IN LOCATION]"""
+    for gamma_eee, as written [FILL IN LOCATION]
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the third sum in the first set of terms of gamma_eeee
+    """
+
     term13 =  units.e**4 * (Del(xx[n,:], n) * D1(Del(E.conjugate(),n), -omega3, units)).dot(
         (Del(Del(xx, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega3, -omega2, units)).dot(
             Del(Del(xx, n, 0), n, 1).dot(
@@ -165,7 +213,23 @@ def gamma_term13(xx, E, omega1, omega2, omega3, units, n=0):
 
 def gamma_term14(xx, E, omega1, omega2, omega3, units, n=0):
     """Returns the fourth term of the first summand in SOS expression
-    for gamma_eee, as written [FILL IN LOCATION]"""
+    for gamma_eee, as written [FILL IN LOCATION]
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the fourth sum in the first set of terms of gamma_eeee
+    """
+
     term14 = units.e**4 *(Del(xx[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
         (Del(Del(xx, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega1, -omega2, units)).dot(
             Del(Del(xx, n, 0), n, 1).dot(
@@ -178,7 +242,23 @@ def gamma_term14(xx, E, omega1, omega2, omega3, units, n=0):
 
 def gamma_term21(xx, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the second summand in sos expression
-    for gamma_eeee"""
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the first sum in the second set of terms of gamma_eeee
+    """
+
     term21 = units.e**4 * ((Del(xx[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
         (Del(xx[:,n], n) * D1(Del(E, n), omega3, units)))) * Del(xx[n,:], n).dot(
     Del(xx[:,n], n) * D1(Del(E, n), omega1, units))
@@ -187,7 +267,23 @@ def gamma_term21(xx, E, omega1, omega2, omega3, units, n=0):
 
 def gamma_term22(xx, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the second summand in sos expression
-    for gamma_eeee"""
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the second sum in the second set of terms of gamma_eeee
+    """
+
     term22 = units.e**4 * ((Del(xx[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
         (Del(xx[:,n], n) * D1(Del(E, n), omega1, units)))) * Del(xx[n,:], n).dot(
     Del(xx[:,n], n) * D1(Del(E, n), omega3, units))
@@ -196,7 +292,23 @@ def gamma_term22(xx, E, omega1, omega2, omega3, units, n=0):
 
 def gamma_term23(xx, E, omega1, omega2, omega3, units, n=0):
     """Returns the third term of the second summand in sos expression
-    for gamma_eeee"""
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the third sum in the second set of terms of gamma_eeee
+    """
+
     term23 = units.e**4 * ((Del(xx[n,:], n) * D3(Del(E.conjugate(), n), -omega1,-omega2, -omega3, units)).dot(
         (Del(xx[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units)))) * Del(xx[n,:], n).dot(
     Del(xx[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
@@ -205,7 +317,23 @@ def gamma_term23(xx, E, omega1, omega2, omega3, units, n=0):
 
 def gamma_term24(xx, E, omega1, omega2, omega3, units, n=0):
     """Returns the fourth term of the second summand in sos expression
-    for gamma_eeee"""
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the fourth sum in the second set of terms of gamma_eeee
+    """
+
     term24 = units.e**4 * ((Del(xx[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
         (Del(xx[:,n], n) * D1(Del(E, n), omega2, units)))) * Del(xx[n,:], n).dot(
     Del(xx[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
@@ -214,7 +342,23 @@ def gamma_term24(xx, E, omega1, omega2, omega3, units, n=0):
 
 def gamma_term31(xx, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the third summand in sos expression
-    for gamma_eeee"""
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the first sum in the third set of terms of gamma_eeee
+    """
+
     term31 = units.e**4 * (Del(xx[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
         (Del(xx[:,n], n) * D2(Del(E, n), omega1, omega2, units))
         ) / omega1 / omega2
@@ -223,7 +367,23 @@ def gamma_term31(xx, E, omega1, omega2, omega3, units, n=0):
 
 def gamma_term32(xx, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the third summand in sos expression
-    for gamma_eeee"""
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the second sum in the third set of terms of gamma_eeee
+    """
+
     term32 = units.e**4 * (Del(xx[n,:], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units)).dot(
         (Del(xx[:,n], n) * D2(Del(E.conjugate(), n), -omega1, -omega2, units))
         ) / omega1 / omega2
@@ -232,7 +392,23 @@ def gamma_term32(xx, E, omega1, omega2, omega3, units, n=0):
 
 def gamma_term33(xx, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the third summand in sos expression
-    for gamma_eeee"""
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the third sum in the third set of terms of gamma_eeee
+    """
+
     term33 = units.e**4 * (Del(xx[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
         (Del(xx[:,n], n) * D2(Del(E, n), omega2, omega3, units))
         ) / omega2 / omega3
@@ -241,7 +417,22 @@ def gamma_term33(xx, E, omega1, omega2, omega3, units, n=0):
 
 def gamma_term34(xx, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the third summand in sos expression
-    for gamma_eeee"""
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the fourth sum in the third set of terms of gamma_eeee
+    """
     term34 = units.e**4 * (Del(xx[n,:], n) * D1(Del(E, n), omega1, units)).dot(
         (Del(xx[:,n], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units))
         ) / omega2 / omega3
