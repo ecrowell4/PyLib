@@ -2,7 +2,7 @@ import numpy as np
 from nlopy.hyperpol.sum_over_states import sos_utils
 #from numba import jit
 
-def gamma_eeee(E, xx, units, omega, n=0):
+def gamma_eeee(E, xx, omega, units, n=0, includeA2=True):
     """Compute diagonal component of gamma_eeee with or without A^2 term. 
     
     Input
@@ -29,10 +29,10 @@ def gamma_eeee(E, xx, units, omega, n=0):
     num_states = len(E)
     
     # Take all mu -> bar{mu}
-    xx = xx - xx[0,0]
+    xx = xx - xx[0,0]*np.eye(15)
     
     # Take all Em -> Enm
-    E = E - E[n]
+    E = E - E[0]
     
     # compute gamma term by term
     gamma = (sos_utils.permute_gamma_terms(sos_utils.gamma_term11, xx, E, omega, units) 
@@ -42,11 +42,13 @@ def gamma_eeee(E, xx, units, omega, n=0):
     + sos_utils.permute_gamma_terms(sos_utils.gamma_term21, xx, E, omega, units)
     + sos_utils.permute_gamma_terms(sos_utils.gamma_term22, xx, E, omega, units)
     + sos_utils.permute_gamma_terms(sos_utils.gamma_term23, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(sos_utils.gamma_term24, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(sos_utils.gamma_term31, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(sos_utils.gamma_term32, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(sos_utils.gamma_term33, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(sos_utils.gamma_term34, xx, E, omega, units))
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term24, xx, E, omega, units))
+    
+    if includeA2 == True:
+        gamma +=  (sos_utils.permute_gamma_terms(sos_utils.gamma_term31, xx, E, omega, units) 
+        + sos_utils.permute_gamma_terms(sos_utils.gamma_term32, xx, E, omega, units)
+        + sos_utils.permute_gamma_terms(sos_utils.gamma_term33, xx, E, omega, units)
+        + sos_utils.permute_gamma_terms(sos_utils.gamma_term34, xx, E, omega, units))
     
     return gamma
     
