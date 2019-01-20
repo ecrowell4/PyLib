@@ -2,7 +2,7 @@ import numpy as np
 from nlopy.hyperpol.sum_over_states import sos_utils
 #from numba import jit
 
-def gamma_eeee(E, xx, omega, units, n=0, includeA2=True):
+def gamma_eeee(E, xx, omega, units, n=0, includeA2=True, damping=True):
     """Compute diagonal component of gamma_eeee with or without A^2 term. 
     
     Input
@@ -33,6 +33,13 @@ def gamma_eeee(E, xx, omega, units, n=0, includeA2=True):
     
     # Take all Em -> Enm
     E = E - E[0]
+    
+    # Define damping coeffs
+    Gamma = (2 / 3 / units.hbar) * (E / units.c)**3 * units.e**2 * abs(xx[:,0])**2
+    
+    # Include damping if damping is true
+    if damping == True:
+        E -= 1j * Gamma / units.hbar
     
     # compute gamma term by term
     gamma = (sos_utils.permute_gamma_terms(sos_utils.gamma_term11, xx, E, omega, units) 
