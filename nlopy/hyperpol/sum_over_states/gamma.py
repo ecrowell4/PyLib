@@ -34,12 +34,13 @@ def gamma_eeee(E, xx, omega, units, n=0, includeA2=True, damping=True):
     # Take all Em -> Enm
     E = E - E[0]
     
-    # Define damping coeffs
-    Gamma = (2 / 3 / units.hbar) * (E / units.c)**3 * units.e**2 * abs(xx[:,0])**2
-    
     # Include damping if damping is true
     if damping == True:
-        E -= 1j * Gamma / units.hbar
+        # Define damping coeffs
+        Gamma = 100*(2 / 3 / units.hbar) * (E / units.c)**3 * units.e**2 * abs(xx[:,0])**2
+        
+        # Incorporate into energies
+        E = E - 1j * Gamma / units.hbar
     
     # compute gamma term by term
     gamma = (sos_utils.permute_gamma_terms(sos_utils.gamma_term11, xx, E, omega, units) 
