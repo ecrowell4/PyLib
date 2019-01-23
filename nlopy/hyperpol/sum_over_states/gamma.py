@@ -37,7 +37,7 @@ def gamma_eeee(E, xx, omega, units, n=0, includeA2=True, damping=True):
     # Include damping if damping is true
     if damping == True:
         # Define damping coeffs
-        Gamma = 100*(2 / 3 / units.hbar) * (E / units.c)**3 * units.e**2 * abs(xx[:,0])**2
+        Gamma = (units.c**3 /10)*(2 / 3 / units.hbar) * (E / units.c)**3 * units.e**2 * abs(xx[:,0])**2
         
         # Incorporate into energies
         E = E - 1j * Gamma / units.hbar
