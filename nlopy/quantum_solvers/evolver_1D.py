@@ -1,7 +1,31 @@
 import numpy as np
 from nlopy.quantum_solvers import solver_utils
 
-def take_time_step(psi, V_func, x, t, dt, units):
+def take_step_split_op(psi, V_func, x, t, dt, units):
+    """Evolves psi(t) to psi(t+dt) via the split operator method.
+
+    Input
+        psi : np.array
+            state vector at time t
+        V_func(x, t) : function
+            function that returns potential at point x and time t
+        x : np.array
+            spatial array
+        t : float
+            current time
+        dt : float
+            time step size
+        units : Class
+            object containing fundamental constants
+
+    Output
+        psi : np.array
+            state vector at time t+dt
+    """
+    
+    
+
+def take_step_RungeKutta(psi, V_func, x, t, dt, units):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta.
 
     Input
@@ -64,7 +88,7 @@ def evolve(psi0, V_func, x, T, units):
 
     # Propogate in time
     for counter, t in enumerate(T[:-1]):
-        psis[counter+1] = take_time_step(psis[counter], V_func, x, t, dt, units)
+        psis[counter+1] = take_step_RungeKutta(psis[counter], V_func, x, t, dt, units)
 
     return psis
 
