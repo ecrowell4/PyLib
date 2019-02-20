@@ -157,6 +157,39 @@ def get_Kbpsi_1D(x, psia, psib, units):
     
     return Kb_psi
 
+def apply_f(x, psi, V_arr, a, Ne, units):
+    """Returns the action of the Hartree-Fock operator on the state psi[a]. The
+    HF operator is s.t. 
+        F psia = h psia + sum(2Jb - Kb, b not a) psia
+    where h is just the kinetic energy plus external potential.
+    
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            set of states
+        a : np.array
+            state to be acted on
+        Ne : np.int
+            number of electrons
+        units : Class
+            fundamental constants
+    
+    Output
+        f_psi : np.array
+            array resulting from acting on psi[a] with HF operator.
+    """
+    
+    # first compute h psi
+    hpsi = solver_utils.apply_H(psi[a], x, V_arr, units)
+    
+    # Include all of the HF stuff
+    hf_terms = np.zeros(len(x), dtype=complex)
+    for b in range(Ne):
+        if b != a:
+            hf_terms += (2 * get_Jbpsi_1D(x, psi[a], psi[b], units) - get_Kbpsi_1D(x, psi[a], psi[b], units))
+    
+    return hpsi + hf_terms
 
 def get_next_psi(psi_current, x, V, Ne, units):
     """For each state, determine the state corresponding to the next iteration.
