@@ -81,7 +81,82 @@ def get_1D_coulomb_int(x, q, rho_charge):
     # Compute corresponding 1D Coulomb interaction energies
     U_coul = -2 * np.pi * q * np.trapz(rho_charge * abs(Deltax), x, axis=1)
 
-    return U_coul             
+    return U_coul     
+
+def get_Jb_1D(x, psib, units):
+    """Return the direct integral of Hartree-Fock theory. This is basically the
+    Coulomb energy associated with the electron in the bth state. This is 
+    defined as the integral Jb = 2pi * q * Int[|psi_b|^2 r12]
+    
+    Input
+        x : np.array
+            spatial array
+        psib : np.array
+            wavefunction
+        q : np.float
+            charge associated with particle
+        units : Class
+            fundamental constants
+            
+    Output
+        J : np.array
+            the direct integral as defined above.
+    """
+    
+    # Compute matrix whose ij element is xi-xj
+    Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
+    
+    # Compute direct integral
+    Jb = 2 * np.pi * units.e**2 * np.trapz(abs(psib)**2 * abs(Deltax), x, axis=1)
+    
+    return Jb
+
+def get_Jbpsi_1D(x, psia, psib, units):
+    """Returns the action of the direct integral on the state.
+    
+    Input
+        x : np.array
+            spatial array
+        psia : np.array
+            wavefunction. state to be acted on
+        psib : np.array
+            wavefunction. state creating coulomb potential
+    """
+    
+    # Compute direct integral
+    Jb = get_Jb_1D(x, psib, units)
+    
+    return Jb.dot(psia)
+
+def get_Kbpsi_1D(x, psia, psib, units):
+    """Returns the action of the exchange operator on the state.
+    
+    Input
+        x : np.array
+            spatial array
+        psia : np.array
+            wavefunction. state to be acted on
+        psib : np.array
+            wavefunction. state giving rise to exchange operator
+        units : Class
+            fundamental constants
+    
+    Output
+        Kb_psi : np.array
+            action of the exchange operator on the state.
+    """
+    
+    # Compute array who's ij element is xi - xj
+    Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
+    
+    # Evaluate integral
+    Kb = np.trapz(psib.conjugate() * Deltax * psia, x)
+    
+    # Act on state psib
+    Kb_psi = Kb.dot(psib)
+    
+    return Kb_psi
+
 
 def get_next_psi(psi_current, x, V, Ne, units):
     """For each state, determine the state corresponding to the next iteration.
