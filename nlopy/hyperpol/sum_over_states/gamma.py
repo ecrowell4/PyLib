@@ -2,7 +2,7 @@ import numpy as np
 from nlopy.hyperpol.sum_over_states import sos_utils
 #from numba import jit
 
-def gamma_eeee(E, xx, omega, units, n=0, includeA2=True, damping=True):
+def gamma_mmmm(L, I, E, omega, units, n=0, includeA2=True, includeCovar=True, damping=False):
     """Compute diagonal component of gamma_eeee with or without A^2 term. 
     
     Input
@@ -23,13 +23,14 @@ def gamma_eeee(E, xx, omega, units, n=0, includeA2=True, damping=True):
     Del = np.delete
 
     # assert consisten dimensions
-    assert len(E) == len(xx[0])
+    assert len(E) == len(L[0])
     
     # determine number of eigenstates fo be used in computing beta
     num_states = len(E)
     
     # Take all mu -> bar{mu}
-    xx = xx - xx[0,0]*np.eye(15)
+    L = L - L[0,0]*np.eye(15)
+    I = I - I[0,0]*np.eye(15)
     
     # Take all Em -> Enm
     E = E - E[0]
@@ -43,20 +44,31 @@ def gamma_eeee(E, xx, omega, units, n=0, includeA2=True, damping=True):
         E = E - 1j * Gamma / units.hbar
     
     # compute gamma term by term
-    gamma = (sos_utils.permute_gamma_terms(sos_utils.gamma_term11, xx, E, omega, units) 
-    + sos_utils.permute_gamma_terms(sos_utils.gamma_term12, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(sos_utils.gamma_term13, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(sos_utils.gamma_term14, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(sos_utils.gamma_term21, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(sos_utils.gamma_term22, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(sos_utils.gamma_term23, xx, E, omega, units)
-    + sos_utils.permute_gamma_terms(sos_utils.gamma_term24, xx, E, omega, units))
+    gamma = (sos_utils.permute_gamma_terms(sos_utils.gamma_term11, L, I, E, omega, units) 
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term12, L, I, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term13, L, I, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term14, L, I, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term21, L, I, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term22, L, I, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term23, L, I, E, omega, units)
+    + sos_utils.permute_gamma_terms(sos_utils.gamma_term24, L, I, E, omega, units))
     
     if includeA2 == True:
-        gamma +=  (sos_utils.permute_gamma_terms(sos_utils.gamma_term31, xx, E, omega, units) 
-        + sos_utils.permute_gamma_terms(sos_utils.gamma_term32, xx, E, omega, units)
-        + sos_utils.permute_gamma_terms(sos_utils.gamma_term33, xx, E, omega, units)
-        + sos_utils.permute_gamma_terms(sos_utils.gamma_term34, xx, E, omega, units))
+        gamma +=  (sos_utils.permute_gamma_terms(sos_utils.gamma_term31, L, I, E, omega, units) 
+        + sos_utils.permute_gamma_terms(sos_utils.gamma_term32, L, I, E, omega, units)
+        + sos_utils.permute_gamma_terms(sos_utils.gamma_term33, L, I, E, omega, units)
+        + sos_utils.permute_gamma_terms(sos_utils.gamma_term34, L, I, E, omega, units)
+        + sos_utils.permute_gamma_terms(sos_utils.gamma_term35, L, I, E, omega, units)
+        + sos_utils.permute_gamma_terms(sos_utils.gamma_term36, L, I, E, omega, units))
+    
+    if includeCovar == True:
+        gamma += (sos_utils.permute_gamma_terms(sos_utils.gamma_term41, L, I, E, omega, units)
+        + sos_utils.permute_gamma_terms(sos_utils.gamma_term42, L, I, E, omega, units)
+        + sos_utils.permute_gamma_terms(sos_utils.gamma_term43, L, I, E, omega, units))
+        
+    if includeA2==True and includeCovar==True:
+        gamma += (sos_utils.permute_gamma_terms(sos_utils.gamma_term51, L, I, E, omega, units)
+        + sos_utils.permute_gamma_terms(sos_utils.gamma_term52, L, I, E, omega, units))
     
     return gamma
     

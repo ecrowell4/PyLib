@@ -38,22 +38,71 @@ def prob_density(psi, x, Ne, i):
     return rho
 
 def many_electron_dipole(rho, x, units):
-	"""Returns the many electron dipole moment.
+    """Returns the many electron dipole moment.
     
-	Input
-	    rho : np.array
-	    	many electron density
+    Input
+        rho : np.array
+            many electron density
         x : np.array
             position space
         units : Class
             fundamental constants
             
-	Output
-	    mu : float
-	        many electron dipole moment
-	"""
+    Output
+        mu : float
+            many electron dipole moment
+    """
 
-	return -units.e * np.trapz(rho * x, x)
+    return -units.e * np.trapz(rho * x, x)
+
+def braket(x, psia, psib):
+    """Projects psia onto psib: <psia|psib>.
+
+    Input
+        x : np.array
+            spatial array
+        psia : np.array
+            function to be projected
+        psib : np.array
+            function to be projected onto]
+
+    Output
+        proj : np.float
+            projection of psia onto psib
+    """
+
+    return np.trapz(psia.conjugate() * psib, x)
+
+def gram_schmidt(x, psi, units):
+    """Takes in a set of basis functions and returns an orthonormal basis.
+
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            array whose elements are the basis functions
+        units : Class
+            fundamental constants
+
+    Output
+        psi_gm : np.array
+            array of orthonormal basis functions
+    """
+    # Determine number of basis functions
+    N = len(psi)
+
+    # Initialize array to store new vectors
+    psi_gm = np.zeros(psi.shape, dtype=complex)
+
+    # First vector doesn't change
+    psi_gm[0] = psi[0]
+
+    # Loop through each function and orthogonalize
+    for k in range(N):
+        psi_gm[k] = psi[k]
+        for j in range(k):
+            psi_gm[k] -= braket(x, psi[j], psi[k]) * psi[j]
+    return psi_gm
 
 #==============================================================================
 # Utilities specific to Hartree Method
@@ -107,7 +156,7 @@ def get_Jb_1D(x, psib, units):
     Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
     
     # Compute direct integral
-    Jb = 2 * np.pi * units.e**2 * np.trapz(abs(psib)**2 * abs(Deltax), x, axis=1)
+    Jb = -2 * np.pi * units.e**2 * np.trapz(abs(psib)**2 * abs(Deltax), x, axis=1)
     
     return Jb
 
@@ -126,7 +175,7 @@ def get_Jbpsi_1D(x, psia, psib, units):
     # Compute direct integral
     Jb = get_Jb_1D(x, psib, units)
     
-    return Jb.dot(psia)
+    return Jb * psia
 
 def get_Kbpsi_1D(x, psia, psib, units):
     """Returns the action of the exchange operator on the state.
@@ -153,11 +202,11 @@ def get_Kbpsi_1D(x, psia, psib, units):
     Kb = np.trapz(psib.conjugate() * Deltax * psia, x)
     
     # Act on state psib
-    Kb_psi = Kb.dot(psib)
+    Kb_psi = Kb * psib
     
     return Kb_psi
 
-def apply_f(x, psi, V_arr, a, Ne, units):
+def apply_f(x, psia, psi, V_arr, a, Ne, units):
     """Returns the action of the Hartree-Fock operator on the state psi[a]. The
     HF operator is s.t. 
         F psia = h psia + sum(2Jb - Kb, b not a) psia
@@ -166,6 +215,8 @@ def apply_f(x, psi, V_arr, a, Ne, units):
     Input
         x : np.array
             spatial array
+        psia : np.array
+            state to which F is applied. (technically redundant, but makes RK easier)
         psi : np.array
             set of states
         a : np.array
@@ -181,15 +232,43 @@ def apply_f(x, psi, V_arr, a, Ne, units):
     """
     
     # first compute h psi
-    hpsi = solver_utils.apply_H(psi[a], x, V_arr, units)
+    hpsi = solver_utils.apply_H(psia, x, V_arr, units)
     
     # Include all of the HF stuff
     hf_terms = np.zeros(len(x), dtype=complex)
     for b in range(Ne):
         if b != a:
-            hf_terms += (2 * get_Jbpsi_1D(x, psi[a], psi[b], units) - get_Kbpsi_1D(x, psi[a], psi[b], units))
+            hf_terms += (2 * get_Jbpsi_1D(x, psia, psi[b], units) - 0*get_Kbpsi_1D(x, psia, psi[b], units))
     
-    return hpsi + hf_terms
+    return 2*hpsi + hf_terms
+
+def get_HF_energy(x, psi, Varr, Ne, units):
+    """Returns the Hartree Fock energt for Ne electrons.
+    
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            psi[i] is the ith electron orbital
+        Varr : np.array
+            Array of external potential energy
+        Ne : np.int
+            number of electrons
+        units : Class
+            fundamental constants
+    
+    Output
+        E : np.float
+            HF energy
+    """
+    # initialize energy to zero
+    E = 0
+    
+    for a in range(Ne):
+        Fpsi = apply_f(x, psi[a], psi, Varr, a, Ne, units)
+        E += np.trapz(psi[a].conjugate() * Fpsi)
+        
+    return E
 
 def get_next_psi(psi_current, x, V, Ne, units):
     """For each state, determine the state corresponding to the next iteration.
@@ -221,7 +300,7 @@ def get_next_psi(psi_current, x, V, Ne, units):
     # For each electron, solve Hartree SE
     for i in range(Ne):
 
-    	# Generate charge density that electron i sees due to other electrons
+        # Generate charge density that electron i sees due to other electrons
         #rho_i = -units.e * prob_density(psi_current, x, Ne, i)
         rho_i = -units.e * prob_density((psi_next+psi_current)/2, x, Ne, i)
         

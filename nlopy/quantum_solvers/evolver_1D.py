@@ -53,9 +53,11 @@ def take_step_RungeKutta(psi, V_func, x, t, dt, units):
     k3 = (-1j / units.hbar) * solver_utils.apply_H(psi + (dt * k2 / 2), x, V_func(x, t + dt / 2), units)
     k4 = (-1j / units.hbar) * solver_utils.apply_H(psi + (dt * k3), x, V_func(x, t + dt), units)
 
+    # Take step
     psi = psi + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)
 
-    return psi / np.sqrt(np.trapz(abs(psi)**2, x))
+    # normalize
+    psi = psi / np.sqrt(np.trapz(abs(psi)**2, x))
 
 def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta, using
@@ -84,10 +86,10 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units):
 
     for a in range(Ne):
         # Compute Runge-Kutta coefficients
-        k1 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi, V_func(x, t), a, Ne, units)
-        k2 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi + (dt * k1 / 2), V_func(x, t + dt / 2), a, Ne, units)
-        k3 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi + (dt * k2 / 2), V_func(x, t + dt / 2), a, Ne, units)
-        k4 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi + (dt * k3), V_func(x, t + dt), a, Ne, units)
+        k1 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a], psi, V_func(x, t), a, Ne, units)
+        k2 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k1 / 2), psi, V_func(x, t + dt / 2), a, Ne, units)
+        k3 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k2 / 2), psi, V_func(x, t + dt / 2), a, Ne, units)
+        k4 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k3), psi, V_func(x, t + dt), a, Ne, units)
 
         psi[a] = psi[a] + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)
         psi[a] = psi[a] / np.sqrt(np.trapz(abs(psi[a])**2, x))

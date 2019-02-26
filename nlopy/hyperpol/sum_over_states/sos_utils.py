@@ -127,9 +127,9 @@ def alpha_term(E, delta, xx, ij, xi, omega):
 
 
    
-def gamma_term11(xx, E, omega1, omega2, omega3, units, n=0):
+def gamma_term11(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the first summand in SOS expression
-    for gamma_eee, as written [FILL IN LOCATION]
+    for gamma_mmmm, as written [FILL IN LOCATION]
 
     Input
         xx : np.array
@@ -143,17 +143,17 @@ def gamma_term11(xx, E, omega1, omega2, omega3, units, n=0):
 
     Output
         gamma_term : complex
-            the first sum in the first set of terms of gamma_eeee
+            the first sum in the first set of terms of gamma_mmmm
     """
 
-    term11 = units.e**4 * (Del(xx[n,:], n) * D3(Del(E,n), omega1, omega2, omega3, units)).dot(
-        (Del(Del(xx, n, 0), n, 1) * D2(Del(E, n), omega1, omega2, units)).dot(
-            Del(Del(xx, n, 0), n, 1).dot(
-                (Del(xx[:,n], n) * D1(Del(E, n), omega1, units)))))
+    term11 = units.g**4 * (Del(L[n,:], n) * D3(Del(E,n), omega1, omega2, omega3, units)).dot(
+        (Del(Del(L, n, 0), n, 1) * D2(Del(E, n), omega1, omega2, units)).dot(
+            Del(Del(L, n, 0), n, 1).dot(
+                (Del(L[:,n], n) * D1(Del(E, n), omega1, units)))))
     
     return term11
 
-def gamma_term12(xx, E, omega1, omega2, omega3, units, n=0):
+def gamma_term12(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the first summand in SOS expression
     for gamma_eee, as written [FILL IN LOCATION]
 
@@ -172,17 +172,17 @@ def gamma_term12(xx, E, omega1, omega2, omega3, units, n=0):
             the second sum in the first set of terms of gamma_eeee
     """
 
-    term12 = units.e**4 * (Del(xx[n,:], n) * D1(Del(E.conjugate(),n), -omega1, units)).dot(
-        (Del(Del(xx, n, 0), n, 1) * D2(Del(E, n), omega2, omega3, units)).dot(
-            Del(Del(xx, n, 0), n, 1).dot(
-                (Del(xx[:,n], n) * D1(Del(E, n), omega3, units))
+    term12 = units.g**4 * (Del(L[n,:], n) * D1(Del(E.conjugate(),n), -omega1, units)).dot(
+        (Del(Del(L, n, 0), n, 1) * D2(Del(E, n), omega2, omega3, units)).dot(
+            Del(Del(L, n, 0), n, 1).dot(
+                (Del(L[:,n], n) * D1(Del(E, n), omega3, units))
                 )
             )
         )
     
     return term12
 
-def gamma_term13(xx, E, omega1, omega2, omega3, units, n=0):
+def gamma_term13(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the thrid term of the first summand in SOS expression
     for gamma_eee, as written [FILL IN LOCATION]
 
@@ -201,17 +201,17 @@ def gamma_term13(xx, E, omega1, omega2, omega3, units, n=0):
             the third sum in the first set of terms of gamma_eeee
     """
 
-    term13 =  units.e**4 * (Del(xx[n,:], n) * D1(Del(E.conjugate(),n), -omega3, units)).dot(
-        (Del(Del(xx, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega3, -omega2, units)).dot(
-            Del(Del(xx, n, 0), n, 1).dot(
-                (Del(xx[:,n], n) * D1(Del(E, n), omega1, units))
+    term13 =  units.g**4 * (Del(L[n,:], n) * D1(Del(E.conjugate(),n), -omega3, units)).dot(
+        (Del(Del(L, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega3, -omega2, units)).dot(
+            Del(Del(L, n, 0), n, 1).dot(
+                (Del(L[:,n], n) * D1(Del(E, n), omega1, units))
                 )
             )
         )
     
     return term13
 
-def gamma_term14(xx, E, omega1, omega2, omega3, units, n=0):
+def gamma_term14(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the fourth term of the first summand in SOS expression
     for gamma_eee, as written [FILL IN LOCATION]
 
@@ -230,17 +230,17 @@ def gamma_term14(xx, E, omega1, omega2, omega3, units, n=0):
             the fourth sum in the first set of terms of gamma_eeee
     """
 
-    term14 = units.e**4 *(Del(xx[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
-        (Del(Del(xx, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega1, -omega2, units)).dot(
-            Del(Del(xx, n, 0), n, 1).dot(
-                (Del(xx[:,n], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units))
+    term14 = units.g**4 *(Del(L[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
+        (Del(Del(L, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega1, -omega2, units)).dot(
+            Del(Del(L, n, 0), n, 1).dot(
+                (Del(L[:,n], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units))
                 )
             )
         )
     
     return term14
 
-def gamma_term21(xx, E, omega1, omega2, omega3, units, n=0):
+def gamma_term21(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the second summand in sos expression
     for gamma_eeee
 
@@ -259,13 +259,13 @@ def gamma_term21(xx, E, omega1, omega2, omega3, units, n=0):
             the first sum in the second set of terms of gamma_eeee
     """
 
-    term21 = units.e**4 * ((Del(xx[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
-        (Del(xx[:,n], n) * D1(Del(E, n), omega3, units)))) * Del(xx[n,:], n).dot(
-    Del(xx[:,n], n) * D1(Del(E, n), omega1, units))
+    term21 = units.g**4 * ((Del(L[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
+        (Del(L[:,n], n) * D1(Del(E, n), omega3, units)))) * Del(L[n,:], n).dot(
+    Del(L[:,n], n) * D1(Del(E, n), omega1, units))
 
     return term21
 
-def gamma_term22(xx, E, omega1, omega2, omega3, units, n=0):
+def gamma_term22(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the second summand in sos expression
     for gamma_eeee
 
@@ -284,13 +284,13 @@ def gamma_term22(xx, E, omega1, omega2, omega3, units, n=0):
             the second sum in the second set of terms of gamma_eeee
     """
 
-    term22 = units.e**4 * ((Del(xx[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
-        (Del(xx[:,n], n) * D1(Del(E, n), omega1, units)))) * Del(xx[n,:], n).dot(
-    Del(xx[:,n], n) * D1(Del(E, n), omega3, units))
+    term22 = units.g**4 * ((Del(L[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
+        (Del(L[:,n], n) * D1(Del(E, n), omega1, units)))) * Del(L[n,:], n).dot(
+    Del(L[:,n], n) * D1(Del(E, n), omega3, units))
 
     return term22
 
-def gamma_term23(xx, E, omega1, omega2, omega3, units, n=0):
+def gamma_term23(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the third term of the second summand in sos expression
     for gamma_eeee
 
@@ -309,13 +309,13 @@ def gamma_term23(xx, E, omega1, omega2, omega3, units, n=0):
             the third sum in the second set of terms of gamma_eeee
     """
 
-    term23 = units.e**4 * ((Del(xx[n,:], n) * D3(Del(E.conjugate(), n), -omega1,-omega2, -omega3, units)).dot(
-        (Del(xx[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units)))) * Del(xx[n,:], n).dot(
-    Del(xx[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
+    term23 = units.g**4 * ((Del(L[n,:], n) * D3(Del(E.conjugate(), n), -omega1,-omega2, -omega3, units)).dot(
+        (Del(L[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units)))) * Del(L[n,:], n).dot(
+    Del(L[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
 
     return term23
 
-def gamma_term24(xx, E, omega1, omega2, omega3, units, n=0):
+def gamma_term24(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the fourth term of the second summand in sos expression
     for gamma_eeee
 
@@ -334,13 +334,13 @@ def gamma_term24(xx, E, omega1, omega2, omega3, units, n=0):
             the fourth sum in the second set of terms of gamma_eeee
     """
 
-    term24 = units.e**4 * ((Del(xx[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
-        (Del(xx[:,n], n) * D1(Del(E, n), omega2, units)))) * Del(xx[n,:], n).dot(
-    Del(xx[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
+    term24 = units.g**4 * ((Del(L[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
+        (Del(L[:,n], n) * D1(Del(E, n), omega2, units)))) * Del(L[n,:], n).dot(
+    Del(L[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
 
     return term24
 
-def gamma_term31(xx, E, omega1, omega2, omega3, units, n=0):
+def gamma_term31(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the third summand in sos expression
     for gamma_eeee
 
@@ -359,13 +359,13 @@ def gamma_term31(xx, E, omega1, omega2, omega3, units, n=0):
             the first sum in the third set of terms of gamma_eeee
     """
 
-    term31 = units.e**4 * (Del(xx[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
-        (Del(xx[:,n], n) * D2(Del(E, n), omega1, omega2, units))
-        ) / omega1 / omega2
+    term31 = units.g**4 * (Del(L[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
+        Del(Del(L, n, 0), n, 1).dot((Del(I[:,n], n) * D2(Del(E, n), omega1, omega2, units))
+        )) / 2
 
     return term31
 
-def gamma_term32(xx, E, omega1, omega2, omega3, units, n=0):
+def gamma_term32(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the third summand in sos expression
     for gamma_eeee
 
@@ -384,13 +384,13 @@ def gamma_term32(xx, E, omega1, omega2, omega3, units, n=0):
             the second sum in the third set of terms of gamma_eeee
     """
 
-    term32 = units.e**4 * (Del(xx[n,:], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units)).dot(
-        (Del(xx[:,n], n) * D2(Del(E.conjugate(), n), -omega1, -omega2, units))
-        ) / omega1 / omega2
+    term32 = units.g**4 * (Del(I[n,:], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units)).dot(
+        Del(Del(L, n, 0), n, 1).dot((Del(L[:,n], n) * D2(Del(E.conjugate(), n), -omega1, -omega2, units))
+        )) / 2
 
     return term32
 
-def gamma_term33(xx, E, omega1, omega2, omega3, units, n=0):
+def gamma_term33(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the third summand in sos expression
     for gamma_eeee
 
@@ -409,13 +409,13 @@ def gamma_term33(xx, E, omega1, omega2, omega3, units, n=0):
             the third sum in the third set of terms of gamma_eeee
     """
 
-    term33 = units.e**4 * (Del(xx[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
-        (Del(xx[:,n], n) * D2(Del(E, n), omega2, omega3, units))
-        ) / omega2 / omega3
+    term33 = units.g**4 * (Del(L[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
+        Del(Del(I, n, 0), n, 1).dot((Del(L[:,n], n) * D1(Del(E, n), omega1, units))
+        )) / 2
 
     return term33
 
-def gamma_term34(xx, E, omega1, omega2, omega3, units, n=0):
+def gamma_term34(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the third summand in sos expression
     for gamma_eeee
 
@@ -433,13 +433,184 @@ def gamma_term34(xx, E, omega1, omega2, omega3, units, n=0):
         gamma_term : complex
             the fourth sum in the third set of terms of gamma_eeee
     """
-    term34 = units.e**4 * (Del(xx[n,:], n) * D1(Del(E, n), omega1, units)).dot(
-        (Del(xx[:,n], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units))
-        ) / omega2 / omega3
+    term34 = units.g**4 * (Del(L[n,:], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units)).dot(
+        Del(Del(I, n, 0), n, 1).dot((Del(L[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
+        )) / 2
 
     return term34
 
-def permute_gamma_terms(gamma_term, xx, E, omega, units,n=0):
+def gamma_term35(L, I, E, omega1, omega2, omega3, units, n=0):
+    """Returns the first term of the third summand in sos expression
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the first sum in the third set of terms of gamma_eeee
+    """
+
+    term35 = units.g**4 * (Del(L[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
+        Del(Del(L, n, 0), n, 1).dot((Del(I[:,n], n) * D2(Del(E, n), omega2, omega3, units))
+        )) / 2
+
+    return term35
+
+def gamma_term36(L, I, E, omega1, omega2, omega3, units, n=0):
+    """Returns the second term of the third summand in sos expression
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the second sum in the third set of terms of gamma_eeee
+    """
+
+    term36 = units.g**4 * (Del(I[n,:], n) * D1(Del(E, n), omega1, units)).dot(
+        Del(Del(L, n, 0), n, 1).dot((Del(L[:,n], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units))
+        )) / 2
+
+    return term36
+
+def gamma_term41(L, I, E, omega1, omega2, omega3, units, n=0):
+    """Returns the second term of the third summand in sos expression
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the second sum in the third set of terms of gamma_eeee
+    """
+
+    term41 = units.g**4 * (Del(I[n,:], n) * D2(Del(E, n), omega2, omega3, units)).dot(
+        Del(Del(L, n, 0), n, 1).dot((Del(L[:,n], n) * D1(Del(E, n), omega3, units))
+        ))
+
+    return term41
+
+def gamma_term42(L, I, E, omega1, omega2, omega3, units, n=0):
+    """Returns the second term of the third summand in sos expression
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the second sum in the third set of terms of gamma_eeee
+    """
+
+    term42 = units.g**4 * (Del(L[n,:], n) * D2(Del(E.conjugate(), n), omega2, omega3, units)).dot(
+        Del(Del(L, n, 0), n, 1).dot((Del(I[:,n], n) * D1(Del(E.conjugate(), n), omega3, units))
+        ))
+
+    return term42
+
+def gamma_term43(L, I, E, omega1, omega2, omega3, units, n=0):
+    """Returns the second term of the third summand in sos expression
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the second sum in the third set of terms of gamma_eeee
+    """
+
+    term43 = units.g**4 * (Del(L[n,:], n) * D1(Del(E.conjugate(), n), omega1, units)).dot(
+        Del(Del(I, n, 0), n, 1).dot((Del(L[:,n], n) * D1(Del(E, n), omega3, units))
+        ))
+
+    return term43
+
+def gamma_term51(L, I, E, omega1, omega2, omega3, units, n=0):
+    """Returns the second term of the third summand in sos expression
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the second sum in the third set of terms of gamma_eeee
+    """
+    
+    term51 = units.g**4 * Del(I[n,:], n).dot(Del(I[:,n], n) * D2(Del(E, n), omega2, omega3, units)) / 2
+    
+    return term51
+
+def gamma_term52(L, I, E, omega1, omega2, omega3, units, n=0):
+    """Returns the second term of the third summand in sos expression
+    for gamma_eeee
+
+    Input
+        xx : np.array
+            transition matrix
+        E : np.array
+            complex eigenenergies (imaginary part is due to damping)
+        omega1-3 : np.float
+            incident field frequencies
+        units : class
+            fundamental constants
+
+    Output
+        gamma_term : complex
+            the second sum in the third set of terms of gamma_eeee
+    """
+    
+    term51 = units.g**4 * Del(I[n,:], n).dot(Del(I[:,n], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units)) / 2
+    
+    return term51
+
+def permute_gamma_terms(gamma_term, L, I, E, omega, units,n=0):
     """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
 
     Input
@@ -462,11 +633,11 @@ def permute_gamma_terms(gamma_term, xx, E, omega, units,n=0):
             The average of the term over all frequency permutations
         """
 
-    gamma_term = (1 / 6) * (gamma_term(xx, E, omega[0], omega[1], omega[2], units,n=0)
-        + gamma_term(xx, E, omega[0], omega[2], omega[1], units,n=0)
-        + gamma_term(xx, E, omega[1], omega[0], omega[2], units,n=0)
-        + gamma_term(xx, E, omega[1], omega[2], omega[0], units,n=0)
-        + gamma_term(xx, E, omega[2], omega[1], omega[0], units,n=0)
-        + gamma_term(xx, E, omega[2], omega[0], omega[1], units,n=0)) 
+    gamma_term = (1 / 6) * (gamma_term(L, I, E, omega[0], omega[1], omega[2], units,n=0)
+        + gamma_term(L, I, E, omega[0], omega[2], omega[1], units,n=0)
+        + gamma_term(L, I, E, omega[1], omega[0], omega[2], units,n=0)
+        + gamma_term(L, I, E, omega[1], omega[2], omega[0], units,n=0)
+        + gamma_term(L, I, E, omega[2], omega[1], omega[0], units,n=0)
+        + gamma_term(L, I, E, omega[2], omega[0], omega[1], units,n=0)) 
 
     return gamma_term
