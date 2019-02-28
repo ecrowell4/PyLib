@@ -37,14 +37,14 @@ def prob_density(psi, x, Ne, i):
         
     return rho
 
-def many_electron_dipole(rho, x, units):
+def many_electron_dipole(rho, dx, units):
     """Returns the many electron dipole moment.
     
     Input
         rho : np.array
             many electron density
-        x : np.array
-            position space
+        dx : np.array
+            grid spacing
         units : Class
             fundamental constants
             
@@ -53,25 +53,25 @@ def many_electron_dipole(rho, x, units):
             many electron dipole moment
     """
 
-    return -units.e * np.trapz(rho * x, x)
+    return -units.e * np.trapz(rho * x, dx=dx)
 
-def braket(x, psia, psib):
+def braket(psia, psib, dx):
     """Projects psia onto psib: <psia|psib>.
 
     Input
-        x : np.array
-            spatial array
         psia : np.array
             function to be projected
         psib : np.array
-            function to be projected onto]
+            function to be projected onto
+        dx : np.float
+            grid spacing
 
     Output
         proj : np.float
             projection of psia onto psib
     """
 
-    return np.trapz(psia.conjugate() * psib, x)
+    return np.trapz(psia.conjugate() * psib, dx=dx)
 
 def gram_schmidt(x, psi, units):
     """Takes in a set of basis functions and returns an orthonormal basis.
