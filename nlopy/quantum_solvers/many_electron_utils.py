@@ -124,11 +124,14 @@ def get_1D_coulomb_int(x, q, rho_charge):
             interaction energy for ith electron.
     """
     
+    # Determine grid spacing
+    dx = x[1] - x[0]
+    
     # Create array whose ij element is xi - xj
     Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
     
     # Compute corresponding 1D Coulomb interaction energies
-    U_coul = -2 * np.pi * q * np.trapz(rho_charge * abs(Deltax), x, axis=1)
+    U_coul = -2 * np.pi * q * np.trapz(rho_charge * abs(Deltax), dx=dx, axis=1)
 
     return U_coul     
 
