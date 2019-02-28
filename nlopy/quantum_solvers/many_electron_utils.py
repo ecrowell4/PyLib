@@ -101,7 +101,7 @@ def gram_schmidt(psi, dx, units):
     for k in range(N):
         psi_gm[k] = psi[k]
         for j in range(k):
-            psi_gm[k] -= braket(psi[j], psi[k], dx) * psi[j]
+            psi_gm[k] = psi_gm[k] - braket(psi[j], psi[k], dx) * psi[j]
     return psi_gm
 
 #==============================================================================
