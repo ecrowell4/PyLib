@@ -263,10 +263,10 @@ def get_HF_energy(x, psi, Varr, Ne, units):
     """
     # initialize energy to zero
     E = 0
-    
+
     for a in range(Ne):
         Fpsi = apply_f(x, psi[a], psi, Varr, a, Ne, units)
-        E += np.trapz(psi[a].conjugate() * Fpsi)
+        E += np.trapz(psi[a].conjugate() * Fpsi, x)
         
     return E
 
