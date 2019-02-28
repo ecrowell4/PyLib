@@ -155,11 +155,14 @@ def get_Jb_1D(x, psib, units):
             the direct integral as defined above.
     """
     
+    # Determine grid spacing
+    dx = x[1] - x[0]
+    
     # Compute matrix whose ij element is xi-xj
     Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
     
     # Compute direct integral
-    Jb = -2 * np.pi * units.e**2 * np.trapz(abs(psib)**2 * abs(Deltax), x, axis=1)
+    Jb = -2 * np.pi * units.e**2 * np.trapz(abs(psib)**2 * abs(Deltax), dx=dx, axis=1)
     
     return Jb
 
