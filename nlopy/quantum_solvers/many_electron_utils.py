@@ -73,7 +73,7 @@ def braket(psia, psib, dx):
 
     return np.trapz(psia.conjugate() * psib, dx=dx)
 
-def gram_schmidt(x, psi, units):
+def gram_schmidt(psi, dx, units):
     """Takes in a set of basis functions and returns an orthonormal basis.
 
     Input
@@ -101,7 +101,7 @@ def gram_schmidt(x, psi, units):
     for k in range(N):
         psi_gm[k] = psi[k]
         for j in range(k):
-            psi_gm[k] -= braket(x, psi[j], psi[k]) * psi[j]
+            psi_gm[k] -= braket(psi[j], psi[k], dx) * psi[j]
     return psi_gm
 
 #==============================================================================
