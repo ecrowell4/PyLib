@@ -201,11 +201,14 @@ def get_Kbpsi_1D(x, psia, psib, units):
             action of the exchange operator on the state.
     """
     
+    # Determine grid spacing
+    dx = x[1]-x[0]
+    
     # Compute array who's ij element is xi - xj
     Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
     
     # Evaluate integral
-    Kb = np.trapz(psib.conjugate() * Deltax * psia, x)
+    Kb = np.trapz(psib.conjugate() * Deltax * psia, dx=dx)
     
     # Act on state psib
     Kb_psi = Kb * psib
@@ -269,10 +272,13 @@ def get_HF_energy(x, psi, Varr, Ne, units):
     """
     # initialize energy to zero
     E = 0
+    
+    # Determine grid spacing
+    dx = x[1] - x[0]
 
     for a in range(Ne):
         Fpsi = apply_f(x, psi[a], psi, Varr, a, Ne, units)
-        E += np.trapz(psi[a].conjugate() * Fpsi, x)
+        E += np.trapz(psi[a].conjugate() * Fpsi, dx=dx)
         
     return E
 
