@@ -85,6 +85,9 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units):
         psi : np.array
             state vector at time t+dt
     """
+    
+    # Determine grid spacing
+    dx = x[1] - x[0]
 
     for a in range(Ne):
         # Compute Runge-Kutta coefficients
@@ -94,7 +97,7 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units):
         k4 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k3), psi, V_func(x, t + dt), a, Ne, units)
 
         psi[a] = psi[a] + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)
-        psi[a] = psi[a] / np.sqrt(np.trapz(abs(psi[a])**2, x))
+        psi[a] = psi[a] / np.sqrt(np.trapz(abs(psi[a])**2, dx=dx))
     
     return psi
 
@@ -124,6 +127,8 @@ def take_parallel_step(a, psi, V_func, Ne, x, t, dt, units):
         psi : np.array
             state vector at time t+dt
     """
+    # Determine grid spacing
+    dx = x[1] - x[0]
 
     k1 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a], psi, V_func(x, t), a, Ne, units)
     k2 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k1 / 2), psi, V_func(x, t + dt / 2), a, Ne, units)
@@ -131,11 +136,11 @@ def take_parallel_step(a, psi, V_func, Ne, x, t, dt, units):
     k4 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k3), psi, V_func(x, t + dt), a, Ne, units)
 
     psi[a] = psi[a] + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)
-    psi[a] = psi[a] / np.sqrt(np.trapz(abs(psi[a])**2, x))
+    psi[a] = psi[a] / np.sqrt(np.trapz(abs(psi[a])**2, dx=dx))
     
     return psi[a] 
 
-def take_step_RungeKutta_HF_parallel(psi, V_func, Ne, x, t, dt, units):
+def take_step_RungeKutta_HF_(psi, V_func, Ne, x, t, dt, units):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta, using
     the Hartree Fock operator to evolve.
 
@@ -162,7 +167,7 @@ def take_step_RungeKutta_HF_parallel(psi, V_func, Ne, x, t, dt, units):
             state vector at time t+dt
     """
     
-    ppool = futures.ThreadPoolExecutor(20)
+    ppool = futures.ProcessPoolExecutor(4)
     psi = np.asarray( list( ppool.map( 
             functools.partial(take_parallel_step, psi=psi, V_func=V_func, Ne=Ne, x=x, t=t, dt=dt, units=units )
             , np.arange(Ne))
