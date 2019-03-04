@@ -215,7 +215,7 @@ def get_Kbpsi_1D(x, psia, psib, units):
     
     return Kb_psi
 
-def apply_f(x, psia, psi, V_arr, a, Ne, units):
+def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=True):
     """Returns the action of the Hartree-Fock operator on the state psi[a]. The
     HF operator is s.t. 
         F psia = h psia + sum(2Jb - Kb, b not a) psia
@@ -240,8 +240,11 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units):
             array resulting from acting on psi[a] with HF operator.
     """
     
+    # Determine grid spacing
+    dx = x[1] - x[0]
+    
     # first compute h psi
-    hpsi = solver_utils.apply_H(psia, x, V_arr, units)
+    hpsia = solver_utils.apply_H(psia, x, V_arr, units)
     
     # Include all of the HF stuff
     hf_terms = np.zeros(len(x), dtype=complex)
@@ -249,7 +252,16 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units):
         if b != a:
             hf_terms += (2 * get_Jbpsi_1D(x, psia, psi[b], units) - 0*get_Kbpsi_1D(x, psia, psi[b], units))
     
-    return 2*hpsi + hf_terms
+    
+    fpsia = hpsia + hf_terms
+    
+    Fpsia = fpsia
+    if lagrange==True:
+        for b in range(Ne):
+            if b!= a:
+                Fpsia -= (braket(psi[b], fpsia, dx) / braket(psi[b], psi[b], dx)) * psi[b]
+    
+    return Fpsia
 
 def get_HF_energy(x, psi, Varr, Ne, units):
     """Returns the Hartree Fock energt for Ne electrons.
@@ -391,7 +403,7 @@ def get_hartree_states(psi0, E0, x, V, Ne, etol, units):
         plt.ylabel(r'$|\psi|^2$')
         plt.savefig('../data_files/'+str(count)+'png')
         plt.close()
-#        
+        
         percent_diff = np.max(abs(E - Eprev))
         count += 1
 
