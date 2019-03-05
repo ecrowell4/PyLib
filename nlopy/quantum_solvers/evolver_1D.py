@@ -152,7 +152,7 @@ def take_parallel_step(a, psi, V_func, Ne, x, t, dt, units, lagrange):
     
     return psi[a] 
 
-def take_step_RungeKutta_HF_(psi, V_func, Ne, x, t, dt, units):
+def take_step_RungeKutta_HF_(psi, V_func, Ne, x, t, dt, units, lagrange=True):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta, using
     the Hartree Fock operator to evolve.
 
@@ -179,9 +179,9 @@ def take_step_RungeKutta_HF_(psi, V_func, Ne, x, t, dt, units):
             state vector at time t+dt
     """
     
-    ppool = futures.ProcessPoolExecutor(4)
+    ppool = futures.ThreadPoolExecutor(4)
     psi = np.asarray( list( ppool.map( 
-            functools.partial(take_parallel_step, psi=psi, V_func=V_func, Ne=Ne, x=x, t=t, dt=dt, units=units )
+            functools.partial(take_parallel_step, psi=psi, V_func=V_func, Ne=Ne, x=x, t=t, dt=dt, units=units, lagrange=lagrange)
             , np.arange(Ne))
     ), dtype=object)
     
