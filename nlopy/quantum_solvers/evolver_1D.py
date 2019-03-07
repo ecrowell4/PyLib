@@ -95,14 +95,14 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange):
 
     for a in range(Ne):
         # Compute Runge-Kutta coefficients
-        k1 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a], psi, 
-             V_func(x, t), a, Ne, units, lagrange=lagrange)
-        k2 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k1 / 2), psi, 
-              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange)
-        k3 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k2 / 2), psi, 
-              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange)
-        k4 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k3), psi, 
-              V_func(x, t + dt), a, Ne, units, lagrange=lagrange)
+        k1 = (-1j / units.hbar) * np.append(np.append(0, many_electron_utils.apply_f(x, psi[a], psi, 
+             V_func(x, t), a, Ne, units, lagrange=lagrange)[1:-1]), 0)
+        k2 = (-1j / units.hbar) * np.append(np.append(0, many_electron_utils.apply_f(x, psi[a] + (dt * k1 / 2), psi, 
+              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange)[1:-1]), 0)
+        k3 = (-1j / units.hbar) * np.append(np.append(0, many_electron_utils.apply_f(x, psi[a] + (dt * k2 / 2), psi, 
+              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange)[1:-1]), 0)
+        k4 = (-1j / units.hbar) * np.append(np.append(0, many_electron_utils.apply_f(x, psi[a] + (dt * k3), psi, 
+              V_func(x, t + dt), a, Ne, units, lagrange=lagrange)[1:-1]), 0)
 
         psi_next[a][1:-1] = psi[a][1:-1] + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)[1:-1]
         psi_next[a] = psi_next[a] / np.sqrt(np.trapz(abs(psi_next[a])**2, dx=dx))
