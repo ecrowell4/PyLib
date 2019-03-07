@@ -215,7 +215,7 @@ def get_Kbpsi_1D(x, psia, psib, units):
     
     return Kb_psi
 
-def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=True):
+def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=True, exchange=False):
     """Returns the action of the Hartree-Fock operator on the state psi[a]. The
     HF operator is s.t. 
         F psia = h psia + sum(2Jb - Kb, b not a) psia
@@ -234,12 +234,21 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=True):
             number of electrons
         units : Class
             fundamental constants
+        lagrange : bool
+            if True, use lagrange multipliers to keep states orthogonal
+        exchange : bool
+            if True, include exchange term.
     
     Output
         f_psi : np.array
             array resulting from acting on psi[a] with HF operator.
     """
     
+    if exchange==True:
+    	coeff = 1
+    else:
+    	coeff = 0
+
     # Determine grid spacing
     dx = x[1] - x[0]
     
@@ -250,7 +259,7 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=True):
     hf_terms = np.zeros(len(x), dtype=complex)
     for b in range(Ne):
         if b != a:
-            hf_terms += (2 * get_Jbpsi_1D(x, psia, psi[b], units) - 0*get_Kbpsi_1D(x, psia, psi[b], units))
+            hf_terms += (2 * get_Jbpsi_1D(x, psia, psi[b], units) - coeff * get_Kbpsi_1D(x, psia, psi[b], units))
     
     
     fpsia = hpsia + hf_terms

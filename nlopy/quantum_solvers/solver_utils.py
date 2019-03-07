@@ -242,6 +242,32 @@ def laplacian(f, dx):
 
     return np.gradient(np.gradient(f, dx, edge_order=2), dx, edge_order=2)
 
+def laplacian_(f, dx):
+    """Compute the laplacian of function via a second order finite
+    difference method
+
+    Input
+        f : np.array
+            function to take gradient of
+        x : np.array
+            spatial array
+
+    Output
+        f_xx : np.array
+             laplacian of psi
+    """
+
+    ddf = np.zeros(len(f), dtype=complex)
+
+    # Use central difference for everything but endpoints
+    ddf[1:-1] = (np.roll(f, -1) - 2 * f + np.roll(f,1))[1:-1] / dx**2
+
+    # Use forward and backward difference for boundaries
+    ddf[0] = (-5 * f[1] + 4 * f[2] - f[3] + 2 * f[0]) / dx**2
+    ddf[-1] = (-5 * f[-2] + 4 * f[-3] - f[-4] + 2 * f[-1]) / dx**2
+
+    return np.gradient(np.gradient(f, dx, edge_order=2), dx, edge_order=2)
+
 def apply_H(psi, x, V_arr, units):
     """Returns the effect of Hamiltonian's action on the state at time t.
 
@@ -263,7 +289,7 @@ def apply_H(psi, x, V_arr, units):
     dx = x[1] - x[0]
 
     # Apply H to state
-    Hpsi = -(units.hbar**2 / 2 / units.m) * laplacian(psi, dx) + V_arr * psi
+    Hpsi = -(units.hbar**2 / 2 / units.m) * laplacian_(psi, dx) + V_arr * psi
 
     return Hpsi
 
