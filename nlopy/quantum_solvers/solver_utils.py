@@ -226,23 +226,8 @@ def make_angular_momentum(x, Psi, units):
 
     return L
 
+
 def laplacian(f, dx):
-    """Compute the laplacian of function.
-
-    Input
-        f : np.array
-            function to take gradient of
-        x : np.array
-            spatial array
-
-    Output
-        f_xx : np.array
-             laplacian of psi
-    """
-
-    return np.gradient(np.gradient(f, dx, edge_order=2), dx, edge_order=2)
-
-def laplacian_(f, dx):
     """Compute the laplacian of function via a second order finite
     difference method
 
