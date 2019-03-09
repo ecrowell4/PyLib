@@ -260,7 +260,7 @@ def laplacian_(f, dx):
     ddf = np.zeros(len(f), dtype=complex)
 
     # Use central difference for everything but endpoints
-    ddf[1:-1] = (np.roll(f, -1) - 2 * f + np.roll(f,1))[1:-1] / dx**2
+    ddf[1:-1] = (f[2:] - 2 * f[1:-1] + f[:-2]) / dx**2
 
     # Use forward and backward difference for boundaries
     ddf[0] = (-5 * f[1] + 4 * f[2] - f[3] + 2 * f[0]) / dx**2
