@@ -258,7 +258,7 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=True, exchange=False):
     # Include all of the HF stuff
     hf_terms = np.zeros(len(x), dtype=complex)
     for b in np.delete(range(Ne), a):
-        hf_terms += (2 * get_Jbpsi_1D(x, psia, psi[b], units) - coeff * get_Kbpsi_1D(x, psia, psi[b], units))
+        hf_terms += (get_Jbpsi_1D(x, psia, psi[b], units) - coeff * get_Kbpsi_1D(x, psia, psi[b], units))
     
     
     fpsia = hpsia + hf_terms
@@ -297,7 +297,7 @@ def get_HF_energy(x, psi, Varr, Ne, units):
     dx = x[1] - x[0]
 
     for a in range(Ne):
-        Fpsi = apply_f(x, psi[a], psi, Varr, a, Ne, units, lagrange=False)
+        Fpsi = np.append(np.append(0, apply_f(x, psi[a], psi, Varr, a, Ne, units, lagrange=False)[1:-1]), 0)
         E += np.trapz(psi[a].conjugate() * Fpsi, dx=dx)
     #print(E)
     assert np.allclose(E.imag, 0), "Energy is not real valued"   

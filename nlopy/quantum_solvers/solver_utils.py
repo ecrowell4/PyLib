@@ -229,7 +229,8 @@ def make_angular_momentum(x, Psi, units):
 
 def laplacian(f, dx):
     """Compute the laplacian of function via a second order finite
-    difference method
+    difference method. Dirichlet boundary conditions are enforced, which
+    means that the laplacian also vanishes at the boundary.
 
     Input
         f : np.array
@@ -246,10 +247,6 @@ def laplacian(f, dx):
 
     # Use central difference for everything but endpoints
     ddf[1:-1] = (f[2:] - 2 * f[1:-1] + f[:-2]) / dx**2
-
-    # Use forward and backward difference for boundaries
-    ddf[0] = (-5 * f[1] + 4 * f[2] - f[3] + 2 * f[0]) / dx**2
-    ddf[-1] = (-5 * f[-2] + 4 * f[-3] - f[-4] + 2 * f[-1]) / dx**2
 
     return ddf
 
