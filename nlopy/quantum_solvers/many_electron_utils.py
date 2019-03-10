@@ -297,7 +297,7 @@ def get_HF_energy(x, psi, Varr, Ne, units):
     dx = x[1] - x[0]
 
     for a in range(Ne):
-        Fpsi = np.append(np.append(0, apply_f(x, psi[a], psi, Varr, a, Ne, units, lagrange=False)[1:-1]), 0)
+        Fpsi = apply_f(x, psi[a], psi, Varr, a, Ne, units, lagrange=False)
         E += np.trapz(psi[a].conjugate() * Fpsi, dx=dx)
     #print(E)
     assert np.allclose(E.imag, 0), "Energy is not real valued"   
