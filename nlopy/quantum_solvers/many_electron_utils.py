@@ -73,13 +73,15 @@ def braket(psia, psib, dx):
 
     return np.trapz(psia.conjugate() * psib, dx=dx)
 
-def make_orthogonal(psi):
+def make_orthogonal(psi, dx):
     """Returns a set of orthonormal eigenvectors via QR decomposition.
 
     Input
         psi : np.array
             array whose rows are eigenvectors that aren't
             mutually orthogonal
+        dx : np.float
+            grid spacing. Used to make state normal in the usual sense
 
     Output
         psi : np.array
@@ -88,7 +90,7 @@ def make_orthogonal(psi):
 
     Q, R = np.linalg.qr(psi.transpose())
 
-    return -Q.transpose()
+    return -Q.transpose() / np.sqrt(dx)
 
 def gram_schmidt(psi, dx, units):
     """Takes in a set of basis functions and returns an orthonormal basis.

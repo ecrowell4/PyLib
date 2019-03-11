@@ -36,7 +36,7 @@ def solver_1D(x, V, units, num_states=15):
     
     #Reset num_states if the resolution of the space is less than the called for
     #  numer of states
-    if num_states >= N-2:
+    if num_states > N-2:
         print("Resolution too poor for requested number of states."+str(N-1)+
                 "states returned.")
         num_states = N-1
