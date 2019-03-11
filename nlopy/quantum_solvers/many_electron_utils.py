@@ -73,6 +73,23 @@ def braket(psia, psib, dx):
 
     return np.trapz(psia.conjugate() * psib, dx=dx)
 
+def make_orthogonal(psi):
+    """Returns a set of orthonormal eigenvectors via QR decomposition.
+
+    Input
+        psi : np.array
+            array whose rows are eigenvectors that aren't
+            mutually orthogonal
+
+    Output
+        psi : np.array
+            array whose rows are orthonormal vectors
+	"""
+
+    Q, R = np.linalg.qr(psi.transpose())
+
+    return -Q.transpose()
+
 def gram_schmidt(psi, dx, units):
     """Takes in a set of basis functions and returns an orthonormal basis.
 
@@ -245,15 +262,15 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=True, exchange=False):
     """
     
     if exchange==True:
-    	coeff = 1
+        coeff = 1
     else:
-    	coeff = 0
+        coeff = 0
 
     # Determine grid spacing
     dx = x[1] - x[0]
     
     # first compute h psi
-    hpsia = 2 * solver_utils.apply_H(psia, x, V_arr, units)
+    hpsia = solver_utils.apply_H(psia, x, V_arr, units)
     
     # Include all of the HF stuff
     hf_terms = np.zeros(len(x), dtype=complex)

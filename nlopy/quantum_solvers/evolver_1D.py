@@ -102,10 +102,13 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange):
         k4 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k3), psi, 
               V_func(x, t + dt), a, Ne, units, lagrange=lagrange)
 
+        # Take time step
         psi[a] = psi[a] + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)
-        psi[a] = psi[a] / np.sqrt(np.trapz(abs(psi[a])**2, dx=dx))
+
+        # Renormalize the wavefunction
+        psi[a] = psi[a] / np.sqrt(many_electron_utils.braket(psi[a], psi[a], dx))
     
-    return psi_next
+    return psi
 
 def take_parallel_step(a, psi, V_func, Ne, x, t, dt, units, lagrange):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta, using
