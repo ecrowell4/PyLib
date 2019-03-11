@@ -90,8 +90,6 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange):
     
     # Determine grid spacing
     dx = x[1] - x[0]
-    
-    psi_next = np.zeros(psi.shape, dtype=complex)
 
     for a in range(Ne):
         # Compute Runge-Kutta coefficients
@@ -104,8 +102,8 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange):
         k4 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k3), psi, 
               V_func(x, t + dt), a, Ne, units, lagrange=lagrange)
 
-        psi_next[a][1:-1] = psi[a][1:-1] + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)[1:-1]
-        psi_next[a] = psi_next[a] / np.sqrt(np.trapz(abs(psi_next[a])**2, dx=dx))
+        psi[a] = psi[a] + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)
+        psi[a] = psi[a] / np.sqrt(np.trapz(abs(psi[a])**2, dx=dx))
     
     return psi_next
 
