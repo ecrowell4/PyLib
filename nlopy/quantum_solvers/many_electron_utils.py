@@ -84,7 +84,7 @@ def make_orthogonal(psi):
     Output
         psi : np.array
             array whose rows are orthonormal vectors
-	"""
+    """
 
     Q, R = np.linalg.qr(psi.transpose())
 
@@ -108,7 +108,7 @@ def gram_schmidt(psi, dx, units):
     # Determine number of basis functions
     N = len(psi)
 
-    # Initialize array to store new vectors
+    # Initialize array to store new evctors
     psi_gm = np.zeros(psi.shape, dtype=complex)
 
     # First vector doesn't change
@@ -118,7 +118,7 @@ def gram_schmidt(psi, dx, units):
     for k in range(N):
         psi_gm[k] = psi[k]
         for j in range(k):
-            psi_gm[k] = psi_gm[k] - braket(psi[j], psi[k], dx) * psi[j]
+            psi_gm[k] = psi_gm[k] - (braket(psi[j], psi[k], dx) / braket(psi[j], psi[j], dx)) * psi[j]
     return psi_gm
 
 #==============================================================================
@@ -153,7 +153,7 @@ def get_1D_coulomb_int(x, q, rho_charge):
     return U_coul     
 
 def get_Jb_1D(x, psib, units):
-    """Return the direct integral of Hartree-Fock theory. This is basically the
+    """Return the pairwise direct integral of Hartree-Fock theory. This is basically the
     Coulomb energy associated with the electron in the bth state. This is 
     defined as the integral Jb = 2pi * q * Int[|psi_b|^2 r12]
     
@@ -171,20 +171,18 @@ def get_Jb_1D(x, psib, units):
         J : np.array
             the direct integral as defined above.
     """
-    
-    # Determine grid spacing
-    dx = x[1] - x[0]
-    
-    # Compute matrix whose ij element is xi-xj
-    Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
+
+    # Compute charge density associated with psib
+    rho_el = -units.e * abs(psib)**2
     
     # Compute direct integral
-    Jb = -2 * np.pi * units.e**2 * np.trapz(abs(psib)**2 * abs(Deltax), dx=dx, axis=1)
+    Jb = get_1D_coulomb_int(x, -units.e, rho_el)
     
     return Jb
 
 def get_Jbpsi_1D(x, psia, psib, units):
-    """Returns the action of the direct integral on the state.
+    """Returns the action of the pairwise direct integral on the state due 
+    to single state psib.
     
     Input
         x : np.array
@@ -201,7 +199,7 @@ def get_Jbpsi_1D(x, psia, psib, units):
     return Jb * psia
 
 def get_Kbpsi_1D(x, psia, psib, units):
-    """Returns the action of the exchange operator on the state.
+    """Returns the action of the pairwise exchange operator on the state.
     
     Input
         x : np.array
@@ -232,7 +230,67 @@ def get_Kbpsi_1D(x, psia, psib, units):
     
     return Kb_psi
 
-def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=True, exchange=False):
+def direct_integral(x, psi, a, Ne, units):
+    """Returns the direct integral from Hartree Fock theory in 1D.
+    This is just the sum of the pairwise direct integrals.
+
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            states
+        a : int
+            state to be acted on
+        Ne : int
+            number of electrons
+        units : Class
+            fundamental constants
+
+    Output
+        J : np.array
+            the direct integral
+    """
+    
+    # Initialize array for memory
+    J = np.zeros(len(x), dtype=complex)
+
+    # Compute the direct integral
+    for b in np.delete(range(Ne), a):
+        J += get_Jbpsi_1D(x, psi[a], psi[b], units)
+
+    return J
+
+def exchange_integral(x, psi, a, Ne, units):
+    """Returns the exchange integral from Hartree Fock theory in 1D.
+    This is just the sum of the pairwise exchange integrals.
+
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            states
+        a : int
+            state to be acted on
+        Ne : int
+            number of electrons
+        units : Class
+            fundamental constants
+
+    Output
+        J : np.array
+            the direct integral
+    """
+    
+    # Initialize array for memory
+    K = np.zeros(len(x), dtype=complex)
+
+    # Compute the direct integral
+    for b in np.delete(range(Ne), a):
+        K += get_Kbpsi_1D(x, psi[a], psi[b], units)
+
+    return K
+
+def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False):
     """Returns the action of the Hartree-Fock operator on the state psi[a]. The
     HF operator is s.t. 
         F psia = h psia + sum(2Jb - Kb, b not a) psia
@@ -269,26 +327,20 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=True, exchange=False):
     # Determine grid spacing
     dx = x[1] - x[0]
     
-    # first compute h psi
-    hpsia = solver_utils.apply_H(psia, x, V_arr, units)
     
-    # Include all of the HF stuff
-    hf_terms = np.zeros(len(x), dtype=complex)
-    for b in np.delete(range(Ne), a):
-        hf_terms += (2 * get_Jbpsi_1D(x, psia, psi[b], units) - coeff * get_Kbpsi_1D(x, psia, psi[b], units))
+    fpsia = (solver_utils.apply_H(psia, x, V_arr, units) 
+        + 2 * direct_integral(x, psi, a, Ne, units)
+        - coeff * exchange_integral(x, psi, a, Ne, units))
     
-    
-    fpsia = hpsia + hf_terms
-    
-    Fpsia = fpsia
-    if lagrange==True:
-        for b in range(Ne):
-            if b!= a:
-                Fpsia -= (braket(psi[b], fpsia, dx) / braket(psi[b], psi[b], dx)) * psi[b]
-    
-    return Fpsia
+    if lagrange==False:
+        return fpsia
+    else:
+        Fpsia = fpsia
+        for b in np.delete(range(Ne), a):
+            Fpsia -= (braket(psi[b], fpsia, dx) / braket(psi[b], psi[b], dx)) * psi[b]
+        return Fpsia
 
-def get_HF_energy(x, psi, Varr, Ne, units):
+def get_HF_energy(x, psi, Varr, Ne, units, exchange=False):
     """Returns the Hartree Fock energt for Ne electrons.
     
     Input
@@ -302,11 +354,19 @@ def get_HF_energy(x, psi, Varr, Ne, units):
             number of electrons
         units : Class
             fundamental constants
+        exchange : bool
+            if True, include the exchange integral
     
     Output
         E : np.float
             HF energy
     """
+
+    if exchange==True:
+        coeff = 1
+    else:
+        coeff = 0
+
     # initialize energy to zero
     E = 0
     
@@ -314,9 +374,13 @@ def get_HF_energy(x, psi, Varr, Ne, units):
     dx = x[1] - x[0]
 
     for a in range(Ne):
-        Fpsi = apply_f(x, psi[a], psi, Varr, a, Ne, units, lagrange=False)
-        E += np.trapz(psi[a].conjugate() * Fpsi, dx=dx)
-    #print(E)
+        # For each particle, compute fpsi (note the factor of 2 in apply_H)
+        fpsi = (2 * solver_utils.apply_H(psi[a], x, Varr, units) 
+            + 2 * direct_integral(x, psi, a, Ne, units)
+            - coeff * exchange_integral(x, psi, a, Ne, units))
+
+        E += np.trapz(psi[a].conjugate() * fpsi, dx=dx)
+    
     assert np.allclose(E.imag, 0), "Energy is not real valued"   
     return E
 

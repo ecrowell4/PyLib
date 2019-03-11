@@ -103,7 +103,7 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange):
               V_func(x, t + dt), a, Ne, units, lagrange=lagrange)
 
         # Take time step
-        psi[a] = psi[a] + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)
+        psi[a] = psi[a] + (dt / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
 
         # Renormalize the wavefunction
         psi[a] = psi[a] / np.sqrt(many_electron_utils.braket(psi[a], psi[a], dx))
