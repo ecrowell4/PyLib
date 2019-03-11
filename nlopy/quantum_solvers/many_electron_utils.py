@@ -253,12 +253,12 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=True, exchange=False):
     dx = x[1] - x[0]
     
     # first compute h psi
-    hpsia = solver_utils.apply_H(psia, x, V_arr, units)
+    hpsia = 2 * solver_utils.apply_H(psia, x, V_arr, units)
     
     # Include all of the HF stuff
     hf_terms = np.zeros(len(x), dtype=complex)
     for b in np.delete(range(Ne), a):
-        hf_terms += (get_Jbpsi_1D(x, psia, psi[b], units) - coeff * get_Kbpsi_1D(x, psia, psi[b], units))
+        hf_terms += (2 * get_Jbpsi_1D(x, psia, psi[b], units) - coeff * get_Kbpsi_1D(x, psia, psi[b], units))
     
     
     fpsia = hpsia + hf_terms
