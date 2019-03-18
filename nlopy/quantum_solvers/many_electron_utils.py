@@ -253,14 +253,13 @@ def direct_integral(x, psi, a, Ne, units):
             the direct integral
     """
     
-    # Initialize array for memory
-    J = np.zeros(len(x), dtype=complex)
+    # Compute charge density that ath electron sees
+    rho_el = -units.e * prob_density(psi, x, Ne, a)
 
-    # Compute the direct integral
-    for b in np.delete(range(Ne), a):
-        J += get_Jbpsi_1D(x, psi[a], psi[b], units)
+    # Compute Coulomb interaction
+    J = get_1D_coulomb_int(x, -units.e, rho_el)
 
-    return J
+    return J * psi[a]
 
 def exchange_integral(x, psi, a, Ne, units):
     """Returns the exchange integral from Hartree Fock theory in 1D.
