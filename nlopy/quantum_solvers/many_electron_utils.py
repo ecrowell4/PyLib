@@ -334,7 +334,7 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False):
         return fpsia
     else:
         Fpsia = fpsia
-        for b in np.delete(range(Ne), a):
+        for b in range(Ne):
             Fpsia -= (braket(psi[b], fpsia, dx) / braket(psi[b], psi[b], dx)) * psi[b]
         return Fpsia
 

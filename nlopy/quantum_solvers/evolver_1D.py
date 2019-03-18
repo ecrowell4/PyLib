@@ -58,9 +58,6 @@ def take_step_RungeKutta(psi, V_func, x, t, dt, units):
     # Take step
     psi = psi + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)
 
-    # normalize
-    psi = psi / np.sqrt(np.trapz(abs(psi)**2, x))
-    
     return psi
 
 def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange):
@@ -104,9 +101,6 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange):
 
         # Take time step
         psi[a] = psi[a] + (dt / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
-
-        # Renormalize the wavefunction
-        psi[a] = psi[a] / np.sqrt(many_electron_utils.braket(psi[a], psi[a], dx))
     
     return psi
 
@@ -150,9 +144,6 @@ def take_parallel_step(a, psi, V_func, Ne, x, t, dt, units, lagrange):
 
     # Take time step
     psi[a] = psi[a] + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)
-
-    # Renormalize
-    psi[a] = psi[a] / np.sqrt(np.trapz(abs(psi[a])**2, dx=dx))
     
     return psi[a] 
 
