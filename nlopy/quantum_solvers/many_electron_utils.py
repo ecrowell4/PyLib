@@ -319,19 +319,16 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False):
         f_psi : np.array
             array resulting from acting on psi[a] with HF operator.
     """
-    
-    if exchange==True:
-        coeff = 1
-    else:
-        coeff = 0
 
     # Determine grid spacing
     dx = x[1] - x[0]
     
     
     fpsia = (solver_utils.apply_H(psia, x, V_arr, units) 
-        + 2 * direct_integral(x, psi, a, Ne, units)
-        - coeff * exchange_integral(x, psi, a, Ne, units))
+        + 2 * direct_integral(x, psi, a, Ne, units))
+
+    if exchange==True:
+        fpsia = fpsia - exchange_integral(x, psi, a, Ne, units)
     
     if lagrange==False:
         return fpsia
