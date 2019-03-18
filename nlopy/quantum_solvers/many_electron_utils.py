@@ -373,9 +373,11 @@ def get_HF_energy(x, psi, Varr, Ne, units, exchange=False):
 
     for a in range(Ne):
         # For each particle, compute fpsi (note the factor of 2 in apply_H)
-        fpsi = (2 * solver_utils.apply_H(psi[a], x, Varr, units) 
-            + 2 * direct_integral(x, psi, a, Ne, units)
-            - coeff * exchange_integral(x, psi, a, Ne, units))
+        fpsi = 2 * (solver_utils.apply_H(psi[a], x, Varr, units) 
+            + direct_integral(x, psi, a, Ne, units))
+
+        if exchange==True:
+            fpsi -= exchange_integral(x, psi, a, Ne, units)
 
         E += np.trapz(psi[a].conjugate() * fpsi, dx=dx)
     
