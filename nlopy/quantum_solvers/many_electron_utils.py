@@ -4,8 +4,6 @@ import nlopy
 from nlopy import utils
 from nlopy.quantum_solvers import solver_1D, solver_utils
 
-import matplotlib.pyplot as plt
-
 #==============================================================================
 # General many electron utilities
 #==============================================================================
@@ -482,17 +480,6 @@ def get_hartree_states(psi0, E0, x, V, Ne, etol, units):
         
         if np.allclose(percent_diff, 0, etol) == True:
             flag = True
-        
-        plt.figure()
-        plt.title(np.sum(E))
-        plt.plot(x, psi[0], label='grnd state after '+str(count+1)+' iterations')
-        plt.plot(x, psi[1], label='frst exc stt')
-        plt.plot(x, psi[2], label='scnd exc st')
-        plt.legend()
-        plt.xlabel('position')
-        plt.ylabel(r'$|\psi|^2$')
-        plt.savefig('../data_files/'+str(count)+'png')
-        plt.close()
         
         percent_diff = np.max(abs(E - Eprev))
         count += 1
