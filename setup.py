@@ -4,6 +4,9 @@ https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
 
+# TO download this package, type "python setup.py develop"
+# in command line
+
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
 
