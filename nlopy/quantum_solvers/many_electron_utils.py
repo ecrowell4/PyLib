@@ -1,5 +1,7 @@
 
 import numpy as np
+import scipy
+from scipy import integrate
 import nlopy
 from nlopy import utils
 from nlopy.quantum_solvers import solver_1D, solver_utils
@@ -69,7 +71,7 @@ def braket(psia, psib, dx):
             projection of psia onto psib
     """
 
-    return np.trapz(psia.conjugate() * psib, dx=dx)
+    return integrate.simps(psia.conjugate() * psib, dx=dx)
 
 def make_orthogonal(psi, dx):
     """Returns a set of orthonormal eigenvectors via QR decomposition.
@@ -121,6 +123,25 @@ def gram_schmidt(psi, dx, units):
             psi_gm[k] = psi_gm[k] - (braket(psi[j], psi[k], dx) / braket(psi[j], psi[j], dx)) * psi[j]
     return psi_gm
 
+def overlap_matrix(psi, dx):
+    """ Returns the overlap of all states contained in psi. For orthonormal
+    states, this should be equal to the idential operator.
+
+    Input
+        psi : np.array
+            collection of states
+        ds : np.float
+            grid spacing
+
+    Output
+        S : np.array
+            overlap matrix <n|m>
+    """
+    Ne = len(psi)
+    S = np.zeros((Ne, Ne))
+    for i in range(Ne):
+        for j in range(Ne):
+            S[i,j] = many_electron_utils.braket(psi_temp[i], psi_temp[j], dx)
 #==============================================================================
 # Utilities specific to Hartree Method
 #==============================================================================
@@ -148,7 +169,7 @@ def get_1D_coulomb_int(x, q, rho_charge):
     Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
     
     # Compute corresponding 1D Coulomb interaction energies
-    U_coul = -2 * np.pi * q * np.trapz(rho_charge * abs(Deltax), dx=dx, axis=1)
+    U_coul = -2 * np.pi * q * integrate.simps(rho_charge * abs(Deltax), dx=dx, axis=1)
 
     return U_coul     
 
@@ -223,7 +244,7 @@ def get_Kbpsi_1D(x, psia, psib, units):
     Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
     
     # Evaluate integral
-    Kb = np.trapz(psib.conjugate() * Deltax * psia, dx=dx)
+    Kb = integrate.simps(psib.conjugate() * Deltax * psia, dx=dx)
     
     # Act on state psib
     Kb_psi = Kb * psib
@@ -377,7 +398,7 @@ def get_HF_energy(x, psi, Varr, Ne, units, exchange=False):
         if exchange==True:
             fpsi -= exchange_integral(x, psi, a, Ne, units)
 
-        E += np.trapz(psi[a].conjugate() * fpsi, dx=dx)
+        E += integrate.simps(psi[a].conjugate() * fpsi, dx=dx)
     
     assert np.allclose(E.imag, 0), "Energy is not real valued"   
     return E
