@@ -141,7 +141,8 @@ def overlap_matrix(psi, dx):
     S = np.zeros((Ne, Ne))
     for i in range(Ne):
         for j in range(Ne):
-            S[i,j] = many_electron_utils.braket(psi_temp[i], psi_temp[j], dx)
+            S[i,j] = braket(psi[i], psi[j], dx)
+    return S
 #==============================================================================
 # Utilities specific to Hartree Method
 #==============================================================================
