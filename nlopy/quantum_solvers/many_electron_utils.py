@@ -121,6 +121,7 @@ def gram_schmidt(psi, dx, units):
         psi_gm[k] = psi[k]
         for j in range(k):
             psi_gm[k] = psi_gm[k] - (braket(psi[j], psi[k], dx) / braket(psi[j], psi[j], dx)) * psi[j]
+        psi_gm[k] = psi_gm[k] / np.sqrt(braket(psi[k], psi[k], dx).real)
     return psi_gm
 
 def overlap_matrix(psi, dx):
