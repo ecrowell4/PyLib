@@ -534,12 +534,15 @@ def assert_iteration_lim(n, max_iter):
         np.save('../data_files/hartree_full_box/hartree_'+str(Ne)+'_max_iter', psi) 
         quit()
 
-def update_dt(dt, delta, updown):
+def update_dt(dt, updown, delta=0.1):
     """Updates the time step
 
     Input
         dt : np.float
             current step size
+        delta : np.float
+            small number by which to change dt. The percent change
+            in dt is given by 100 * delta. 
         updown : string
             Increase time step by factor delta if "increase"
             Decrease time step by factor delta if "decrease"
@@ -549,7 +552,9 @@ def update_dt(dt, delta, updown):
             updated time step
     """
     if updown=="increase":
-        dt *= delta
+        dt *= (1 + delta)
+        print("Increasing time step - dt = %.3f" % dt)
     elif updown=="decrease":
-        dt /=delta
+        dt *= (1 - delta)
+        print("Decreasing time step - dt = %.3f" % dt)
     return dt
