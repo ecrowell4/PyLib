@@ -527,9 +527,29 @@ def assert_iteration_lim(n, max_iter):
     Output
         None
     """
-    
+
     if n > max_iter:
         print('Maximum number of iterations ('+str(max_iter)+') exceeded.')
         np.save('../data_files/hartree_full_box/hartree_'+str(Ne)+'_max_iter', Es)
         np.save('../data_files/hartree_full_box/hartree_'+str(Ne)+'_max_iter', psi) 
         quit()
+
+def update_dt(dt, delta, updown):
+    """Updates the time step
+
+    Input
+        dt : np.float
+            current step size
+        updown : string
+            Increase time step by factor delta if "increase"
+            Decrease time step by factor delta if "decrease"
+
+    Output
+        dt : np.float
+            updated time step
+    """
+    if updown=="increase":
+        dt *= delta
+    elif updown=="decrease":
+        dt /=delta
+    return dt
