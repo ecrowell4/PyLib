@@ -7,16 +7,16 @@ Created on Fri Jan 22 12:33:36 2016
 
 import numpy as np
 from matplotlib import pyplot as plt
-import os
-from scipy.integrate import simps
+#import os
+#from scipy.integrate import simps
 
-fsize = 10.
-#fsize = 24
+
+fsize = 10
 params = {
-    #'figure.figsize': [3.35,2.5],
-    'figure.figsize': [4.0,3.0],
+    'figure.figsize': [3.35,2.0],
+    #'figure.figsize': [9.83,7.5],
     'figure.dpi': 300,
-    'text.fontsize': fsize,
+    'font.size': fsize,
     'font.family' : 'serif',
     'font.weight' : 'light',
     'axes.labelsize': fsize,
