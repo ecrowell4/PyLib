@@ -512,3 +512,24 @@ def get_hartree_states(psi0, E0, x, V, Ne, etol, units):
 
     
     return psi, E
+
+def assert_iteration_lim(n, max_iter):
+    """This is to prevent excessively long loops. Once a maximum number
+    of iterations has been reached, the current states are saved and the
+    loop is closed.
+
+    Input
+        n : int
+            current iterations number
+        max_iter
+            max allowed iterations.
+
+    Output
+        None
+    """
+    
+    if n > max_iter:
+        print('Maximum number of iterations ('+str(max_iter)+') exceeded.')
+        np.save('../data_files/hartree_full_box/hartree_'+str(Ne)+'_max_iter', Es)
+        np.save('../data_files/hartree_full_box/hartree_'+str(Ne)+'_max_iter', psi) 
+        quit()
