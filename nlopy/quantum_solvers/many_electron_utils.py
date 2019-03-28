@@ -73,6 +73,9 @@ def braket(psia, psib, dx):
 
     return integrate.simps(psia.conjugate() * psib, dx=dx)
 
+def norm2(psia, dx):
+    return integrate.simps(abs(psia)**2, dx=dx)
+
 def make_orthogonal(psi, dx):
     """Returns a set of orthonormal eigenvectors via QR decomposition.
 
@@ -121,7 +124,7 @@ def gram_schmidt(psi, dx, units):
         psi_gm[k] = psi[k]
         for j in range(k):
             psi_gm[k] = psi_gm[k] - (braket(psi[j], psi[k], dx) / braket(psi[j], psi[j], dx)) * psi[j]
-        psi_gm[k] = psi_gm[k] / np.sqrt(braket(psi[k], psi[k], dx).real)
+        psi_gm[k] /= np.sqrt(braket(psi_gm[k], psi_gm[k], dx))
     return psi_gm
 
 def overlap_matrix(psi, dx):
