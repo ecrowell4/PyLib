@@ -553,8 +553,8 @@ def update_dt(dt, updown, delta=0.1):
     """
     if updown=="increase":
         dt *= (1 + delta)
-        print("Increasing time step - dt = %.3f" % dt)
+        print("Increasing time step - dt = "+str(dt))
     elif updown=="decrease":
         dt *= (1 - delta)
-        print("Decreasing time step - dt = %.3f" % dt)
+        print("Decreasing time step - dt = "+str(dt))
     return dt
