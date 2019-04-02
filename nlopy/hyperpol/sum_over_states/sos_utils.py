@@ -641,3 +641,23 @@ def permute_gamma_terms(gamma_term, L, I, E, omega, units,n=0):
         + gamma_term(L, I, E, omega[2], omega[0], omega[1], units,n=0)) 
 
     return gamma_term
+
+def get_F_DL(x, psi0):
+    """Returns the operator F_0(x) as defined in DalGarno Lewis
+    perturbation theory. See reference [1]
+
+    Input
+        x : np.array
+            position grid
+        psi0 : np.array
+            ground state wavefunction
+
+    Output
+        F : np.array
+            F operator from DL PT
+
+    [1] S. Mossman, R. Lytel, M. G. Kuzk Dalgarno-Lewis perturbation theory
+    for nonlinear optics, Vol. 33, No. 12, (2016)
+    """
+
+    
