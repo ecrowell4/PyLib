@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.integrate as sp_integrate
 import copy
 import sys
 
@@ -9,18 +10,18 @@ def D1(E, omega, units):
     """Returns the propogator for a first order process.
     
     Input
-    	E : np.array
-        	array of eigenergies.
-        	Note: if omega is take as negative, then user 
-        	should pass E.conjugate() instead of E.
+        E : np.array
+            array of eigenergies.
+            Note: if omega is take as negative, then user 
+            should pass E.conjugate() instead of E.
     omega : float
         input frequency
     units : class
         class whose attributes are the fundamental constants hbar, e, m, c, etc
         
     Output
-    	D1 : np.array
-    		propogator for first order process
+        D1 : np.array
+            propogator for first order process
     """
     
     # Compute and return the propogator
@@ -660,4 +661,21 @@ def get_F_DL(x, psi0):
     for nonlinear optics, Vol. 33, No. 12, (2016)
     """
 
-    
+    dx = x[1] - x[0]
+
+    # Compute mean position of unperturbed ground state x00 = <0|x|0>
+    x00 = sp_integrate.simps(psi0.conjugate() * x * psi0, dx=dx)
+
+    # The first integral has a definite lower bound, but a variable upper
+    # bound. Thus, we represent it as an array of integrals, each
+    # beginning at the left of the domain.
+    int1 = np.array([np.trapz( (x[:i]-x00)*psi0[:i]**2, x[:i] ) 
+                            for i in np.arange(1, len(x)+1)])
+
+    # Now we integrate int1 to get F(x)
+    F = 2*m/hbar**2 * np.array(
+        [np.trapz( psi0[1:i]**(-2)*int1[1:i], x[1:i])
+                                for i in np.arange(2, len(x))]
+                              )
+    F = np.append(0,np.append(F,0))
+    return F
