@@ -643,7 +643,7 @@ def permute_gamma_terms(gamma_term, L, I, E, omega, units,n=0):
 
     return gamma_term
 
-def get_F_DL(x, psi0, units, trimL=False, trimR=False, trim_man=[0,0]):
+def get_F_DL(x, psi0, units):
     """Returns the operator F_0(x) as defined in DalGarno Lewis
     perturbation theory. See reference [1]
 
@@ -652,6 +652,8 @@ def get_F_DL(x, psi0, units, trimL=False, trimR=False, trim_man=[0,0]):
             position grid
         psi0 : np.array
             ground state wavefunction
+        units : Class
+            fundamental constants
 
     Output
         F : np.array
