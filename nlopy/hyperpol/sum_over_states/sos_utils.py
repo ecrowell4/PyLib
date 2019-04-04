@@ -643,7 +643,7 @@ def permute_gamma_terms(gamma_term, L, I, E, omega, units,n=0):
 
     return gamma_term
 
-def get_F_DL(x, psi0):
+def get_F_DL(x, psi0, units, trimL=False, trimR=False, trim_man=[0,0]):
     """Returns the operator F_0(x) as defined in DalGarno Lewis
     perturbation theory. See reference [1]
 
@@ -673,9 +673,56 @@ def get_F_DL(x, psi0):
                             for i in np.arange(1, len(x)+1)])
 
     # Now we integrate int1 to get F(x)
-    F = 2*m/hbar**2 * np.array(
+    F = 2*units.m/units.hbar**2 * np.array(
         [np.trapz( psi0[1:i]**(-2)*int1[1:i], x[1:i])
                                 for i in np.arange(2, len(x))]
                               )
     F = np.append(0,np.append(F,0))
+
+    #Trim the space to the region where the integrand has converged as much as
+    #   as it is able to.
+    #Walking in from the left, the integrand must vanish at the proper end
+    #   points so we clip until the integrand begins increasing.
+    if trimL == True:    
+        i = 1    
+        integrand = x*F**2*psi0**2
+        while True:
+            slope = np.polyfit(
+                    x[i:i+5], abs(integrand[i:i+5]), 1)[0]
+            if slope >= 0:
+                cutleft = i+2
+                break
+            else: 
+                i+=1
+        x = x[cutleft:]
+        F = F[cutleft:]
+        psi0 = psi0[cutleft:]
+    if trimR == True:
+        integrand = x*F**2*psi0**2
+        i = -2
+        while True:
+            slope = np.polyfit(
+                    x[i-5:i], abs(integrand[i-5:i]), 1)[0]
+            if slope <= 0:
+                cutright = i-2
+                break
+            else:
+                i-=1
+        x = x[:cutright]
+        F = F[:cutright]
+        psi0 = psi0[:cutright]
+    if trim_man != [0,0]:
+        for i in np.arange(len(x)):
+            if x[i] >= trim_man[0]:
+                cutleft = i
+                break
+        for j in np.arange(len(x))[::-1]:
+            if x[j] <= trim_man[1]:
+                cutright = j
+                break
+        x = x[cutleft:cutright]
+        F = F[cutleft:cutright]
+        psi0 = psi0[cutleft:cutright]
+    
+    F = F - sp_integrate.simps(F*psi0**2,x)
     return F
