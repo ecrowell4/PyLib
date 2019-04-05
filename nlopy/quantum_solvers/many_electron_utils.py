@@ -249,7 +249,7 @@ def get_Kbpsi_1D(x, psia, psib, units):
     Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
     
     # Evaluate integral
-    Kb = integrate.simps(psib.conjugate() * Deltax * psia, dx=dx)
+    Kb = integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx)
     
     # Act on state psib
     Kb_psi = Kb * psib
