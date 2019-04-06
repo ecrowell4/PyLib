@@ -60,7 +60,7 @@ def take_step_RungeKutta(psi, V_func, x, t, dt, units):
 
     return psi
 
-def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange):
+def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange, exchange):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta, using
     the Hartree Fock operator to evolve.
 
@@ -79,6 +79,10 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange):
             time step size
         units : Class
             object containing fundamental constants
+        lagrange : bool
+            if True, use lagrange multipliers
+        exchange : bool
+            if True, include exchange integral
 
     Output
         psi : np.array
@@ -91,20 +95,20 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange):
     for a in range(Ne):
         # Compute Runge-Kutta coefficients
         k1 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a], psi, 
-             V_func(x, t), a, Ne, units, lagrange=lagrange)
+             V_func(x, t), a, Ne, units, lagrange=lagrange, exchange=exchange)
         k2 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k1 / 2), psi, 
-              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange)
+              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange)
         k3 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k2 / 2), psi, 
-              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange)
+              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange)
         k4 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k3), psi, 
-              V_func(x, t + dt), a, Ne, units, lagrange=lagrange)
+              V_func(x, t + dt), a, Ne, units, lagrange=lagrange, exchange=exchange)
 
         # Take time step
         psi[a] = psi[a] + (dt / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
     
     return psi
 
-def take_parallel_step(a, psi, V_func, Ne, x, t, dt, units, lagrange):
+def take_parallel_step(a, psi, V_func, Ne, x, t, dt, units, lagrange, exchange):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta, using
     the Hartree Fock operator to evolve.
 
@@ -125,6 +129,10 @@ def take_parallel_step(a, psi, V_func, Ne, x, t, dt, units, lagrange):
             time step size
         units : Class
             object containing fundamental constants
+        lagrange : bool
+            if True, use lagrange mult
+        excahgen : bool
+            if True, include exchange
 
     Output
         psi : np.array
@@ -134,20 +142,20 @@ def take_parallel_step(a, psi, V_func, Ne, x, t, dt, units, lagrange):
     dx = x[1] - x[0]
 
     k1 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a], psi, 
-         V_func(x, t), a, Ne, units, lagrange=lagrange)
+         V_func(x, t), a, Ne, units, lagrange=lagrange, exchange=exchange)
     k2 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k1 / 2), psi, 
-          V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange)
+          V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange)
     k3 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k2 / 2), psi, 
-          V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange)
+          V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange)
     k4 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k3), psi, 
-          V_func(x, t + dt), a, Ne, units, lagrange=lagrange)
+          V_func(x, t + dt), a, Ne, units, lagrange=lagrange, exchange=exchange)
 
     # Take time step
     psi[a] = psi[a] + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)
     
     return psi[a] 
 
-def take_step_RungeKutta_HF_(psi, V_func, Ne, x, t, dt, units, lagrange=True):
+def take_step_RungeKutta_HF_(psi, V_func, Ne, x, t, dt, units, lagrange, exchange):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta, using
     the Hartree Fock operator to evolve.
 
@@ -168,6 +176,10 @@ def take_step_RungeKutta_HF_(psi, V_func, Ne, x, t, dt, units, lagrange=True):
             time step size
         units : Class
             object containing fundamental constants
+        lagrange : bool
+            if True, include lagrange mult
+        exchange : bool
+            if True, include exchange
 
     Output
         psi : np.array
@@ -176,7 +188,8 @@ def take_step_RungeKutta_HF_(psi, V_func, Ne, x, t, dt, units, lagrange=True):
     
     ppool = futures.ThreadPoolExecutor(4)
     psi = np.asarray( list( ppool.map( 
-            functools.partial(take_parallel_step, psi=psi, V_func=V_func, Ne=Ne, x=x, t=t, dt=dt, units=units, lagrange=lagrange)
+            functools.partial(take_parallel_step, psi=psi, V_func=V_func,
+             Ne=Ne, x=x, t=t, dt=dt, units=units, lagrange=lagrange, exchange=exchange)
             , np.arange(Ne))
     ), dtype=complex)
     
