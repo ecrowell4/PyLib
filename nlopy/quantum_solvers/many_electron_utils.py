@@ -410,7 +410,7 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False):
         + 2 * direct_integral(x, psi, a, Ne, units))
 
     if exchange==True:
-        fpsia = fpsia - exchange_integral(x, psi, a, Ne, units)
+        fpsia = fpsia - exchange_integral_jit(x, psi, a, Ne, len(x), units.e)
     
     if lagrange==False:
         return fpsia
@@ -459,7 +459,7 @@ def get_HF_energy(x, psi, Varr, Ne, units, exchange=False):
             + direct_integral(x, psi, a, Ne, units))
 
         if exchange==True:
-            fpsi -= exchange_integral(x, psi, a, Ne, units)
+            fpsi -= exchange_integral_jit(x, psi, a, Ne, len(x), units.e)
 
         E += integrate.simps(psi[a].conjugate() * fpsi, dx=dx)
     
