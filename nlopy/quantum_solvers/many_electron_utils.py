@@ -281,7 +281,7 @@ def get_Kbpsi_1D_fast(x : float, psia : complex, psib : complex, N : int, e : fl
     K: complex = np.zeros(N) 
     for i in range(len(x)):
         f : complex = psib.conjugate() * np.abs(x - x[i]) * psia
-        K[i] = simps_(f, x, len(x))        
+        K[i] = -2*np.pi * simps_(f, x, len(x))        
     return K * psib
 
 def direct_integral(x, psi, a, Ne, units):
@@ -343,6 +343,35 @@ def exchange_integral(x, psi, a, Ne, units):
 
     return K
 
+@jit(nopython=True)
+def exchange_integral_fast(x : float, psi : complex, a : int, Ne : int, N : int, e : float)->complex:
+   """Returns the exchange integral from Hartree Fock theory in 1D.
+    This is just the sum of the pairwise exchange integrals.
+
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            states
+        a : int
+            state to be acted on
+        Ne : int
+            number of electrons
+        N : int 
+            length of position array
+        e : float
+            electron charge
+
+    Output
+        J : np.array
+            the direct integral
+    """
+    K: complex = np.zeros(N)
+    for b in range(Ne):
+        if b != a:
+            integral: complex = get_Kbpsi_1D_fast(x, psi[a], psi[b], len(x), e)
+            K = K + integral
+    return K
 
 def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False):
     """Returns the action of the Hartree-Fock operator on the state psi[a]. The
