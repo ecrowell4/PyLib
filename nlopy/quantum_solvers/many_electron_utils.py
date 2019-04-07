@@ -249,7 +249,7 @@ def get_Kbpsi_1D(x, psia, psib, units):
     Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
     
     # Evaluate integral
-    Kb = integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx)
+    Kb = integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx, axis=1)
     
     # Act on state psib
     Kb_psi = Kb * psib
@@ -314,6 +314,7 @@ def exchange_integral(x, psi, a, Ne, units):
         K += get_Kbpsi_1D(x, psi[a], psi[b], units)
 
     return K
+
 
 def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False):
     """Returns the action of the Hartree-Fock operator on the state psi[a]. The
