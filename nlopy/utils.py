@@ -3,6 +3,7 @@
 of application."""
 
 import numpy as np
+from numba import jit
 
 def position_space(L, N, centered=False, periodic=False):
     """Returns an array that represents a discretized representation of
@@ -101,3 +102,29 @@ def smooth_func(x, n, periodic=False):
         f += m * x
 
     return f
+
+@jit(nopython=True)
+def my_simps(f: float, x: float, N: int)->float:
+    """Returns the integral of f over the domain x using the simposons
+    rule.
+
+    Input
+        f : np.array
+            function to be integrated
+        x : np.aray
+            spatial domain
+        N : int
+            len(x)
+
+    Output
+        int(f) : np.float
+            integral of f over domain x
+    """
+
+    result = f[0]
+    for j in range(1,N-1,2):
+        result = result + 4 * f[j]
+    for i in range(2,N-1,2):
+        result = result + 2 * f[i]
+    result = result + f[-1]
+    return result * dx / 3
