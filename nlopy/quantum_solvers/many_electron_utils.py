@@ -1,7 +1,9 @@
 
 import numpy as np
+from numba import jit
 import scipy
 from scipy import integrate
+
 import nlopy
 from nlopy import utils
 from nlopy.quantum_solvers import solver_1D, solver_utils
@@ -255,6 +257,32 @@ def get_Kbpsi_1D(x, psia, psib, units):
     Kb_psi = Kb * psib
     
     return Kb_psi
+
+@jit(nopython=True)
+def get_Kbpsi_1D_fast(x : float, psia : complex, psib : complex, N : int, e : float)->complex:
+	"""Returns the action of the pairwise exchange operator on the state. This is jit compiled.
+    
+    Input
+        x : np.array
+            spatial array
+        psia : np.array
+            wavefunction. state to be acted on
+        psib : np.array
+            wavefunction. state giving rise to exchange operator
+        N : int
+            length of position array
+        e : float
+            electric charge
+    
+    Output
+        Kb_psi : np.array
+            action of the exchange operator on the state.
+    """
+    K: complex = np.zeros(N) 
+    for i in range(len(x)):
+        f : complex = psib.conjugate() * np.abs(x - x[i]) * psia
+        K[i] = simps_(f, x, len(x))        
+    return K * psib
 
 def direct_integral(x, psi, a, Ne, units):
     """Returns the direct integral from Hartree Fock theory in 1D.
