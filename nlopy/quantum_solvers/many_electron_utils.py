@@ -259,8 +259,8 @@ def get_Kbpsi_1D(x, psia, psib, units):
     return Kb_psi
 
 @jit(nopython=True)
-def get_Kbpsi_1D_fast(x : float, psia : complex, psib : complex, N : int, e : float)->complex:
-	"""Returns the action of the pairwise exchange operator on the state. This is jit compiled.
+def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, e : float)->complex:
+    """Returns the action of the pairwise exchange operator on the state. This is jit compiled.
     
     Input
         x : np.array
@@ -344,8 +344,8 @@ def exchange_integral(x, psi, a, Ne, units):
     return K
 
 @jit(nopython=True)
-def exchange_integral_fast(x : float, psi : complex, a : int, Ne : int, N : int, e : float)->complex:
-   """Returns the exchange integral from Hartree Fock theory in 1D.
+def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, e : float)->complex:
+    """Returns the exchange integral from Hartree Fock theory in 1D.
     This is just the sum of the pairwise exchange integrals.
 
     Input
