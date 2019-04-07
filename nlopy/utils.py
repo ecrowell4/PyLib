@@ -104,7 +104,7 @@ def smooth_func(x, n, periodic=False):
     return f
 
 @jit(nopython=True)
-def my_simps(f: float, x: float, N: int)->float:
+def my_simps(f: complex, x: float, N: int)->complex:
     """Returns the integral of f over the domain x using the simposons
     rule. It is important to note that simpsons rule requires an even
     number of intervals. However, we typpically choose and odd number
@@ -125,7 +125,8 @@ def my_simps(f: float, x: float, N: int)->float:
         int(f) : np.float
             integral of f over domain x
     """
-
+    
+    dx : float = x[1] - x[0]
     result_left = f[0]
     for j in range(1, N-2, 2):
         result_left = result_left + 4 * f[j]

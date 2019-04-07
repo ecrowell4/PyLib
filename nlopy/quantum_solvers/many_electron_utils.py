@@ -251,7 +251,7 @@ def get_Kbpsi_1D(x, psia, psib, units):
     Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
     
     # Evaluate integral
-    Kb = integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx, axis=1)
+    Kb = -2*np.pi*integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx, axis=1)
     
     # Act on state psib
     Kb_psi = Kb * psib
@@ -281,7 +281,7 @@ def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, e : flo
     K: complex = np.zeros(N) 
     for i in range(len(x)):
         f : complex = psib.conjugate() * np.abs(x - x[i]) * psia
-        K[i] = -2*np.pi * simps_(f, x, len(x))        
+        K[i] = -2*np.pi * utils.my_simps(f, x, N)        
     return K * psib
 
 def direct_integral(x, psi, a, Ne, units):
@@ -369,7 +369,7 @@ def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, 
     K: complex = np.zeros(N)
     for b in range(Ne):
         if b != a:
-            integral: complex = get_Kbpsi_1D_fast(x, psi[a], psi[b], len(x), e)
+            integral: complex = get_Kbpsi_1D_jit(x, psi[a], psi[b], len(x), e)
             K = K + integral
     return K
 
