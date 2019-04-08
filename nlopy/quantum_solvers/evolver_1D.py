@@ -138,6 +138,7 @@ def take_parallel_step(a, psi, V_func, Ne, x, t, dt, units, lagrange, exchange):
         psi : np.array
             state vector at time t+dt
     """
+    
     # Determine grid spacing
     dx = x[1] - x[0]
 

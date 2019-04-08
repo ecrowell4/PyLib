@@ -259,7 +259,7 @@ def get_Kbpsi_1D(x, psia, psib, units):
     return Kb_psi
 
 @jit(nopython=True)
-def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, e : float)->complex:
+def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, q : float)->complex:
     """Returns the action of the pairwise exchange operator on the state. This is jit compiled.
     
     Input
@@ -278,10 +278,10 @@ def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, e : flo
         Kb_psi : np.array
             action of the exchange operator on the state.
     """
-    K: complex = np.zeros(N) 
+    K: complex = np.zeros(N) + 1j * np.zeros(N) 
     for i in range(len(x)):
         f : complex = psib.conjugate() * np.abs(x - x[i]) * psia
-        K[i] = -2*np.pi * utils.my_simps(f, x, N)        
+        K[i] = -2 * np.pi * q * utils.my_simps(f, x, N)        
     return K * psib
 
 def direct_integral(x, psi, a, Ne, units):
@@ -344,7 +344,7 @@ def exchange_integral(x, psi, a, Ne, units):
     return K
 
 @jit(nopython=True)
-def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, e : float)->complex:
+def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, q : float)->complex:
     """Returns the exchange integral from Hartree Fock theory in 1D.
     This is just the sum of the pairwise exchange integrals.
 
@@ -366,10 +366,10 @@ def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, 
         J : np.array
             the direct integral
     """
-    K: complex = np.zeros(N)
+    K: complex = np.zeros(N) + 0j*np.zeros(N)
     for b in range(Ne):
         if b != a:
-            integral: complex = get_Kbpsi_1D_jit(x, psi[a], psi[b], len(x), e)
+            integral: complex = get_Kbpsi_1D_jit(x, psi[a], psi[b], len(x), q)
             K = K + integral
     return K
 
@@ -410,7 +410,7 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False):
         + 2 * direct_integral(x, psi, a, Ne, units))
 
     if exchange==True:
-        fpsia = fpsia - exchange_integral_jit(x, psi, a, Ne, len(x), units.e)
+        fpsia = fpsia - exchange_integral_jit(x, psi, a, Ne, len(x), -units.e)
     
     if lagrange==False:
         return fpsia
@@ -459,7 +459,7 @@ def get_HF_energy(x, psi, Varr, Ne, units, exchange=False):
             + direct_integral(x, psi, a, Ne, units))
 
         if exchange==True:
-            fpsi -= exchange_integral_jit(x, psi, a, Ne, len(x), units.e)
+            fpsi -= exchange_integral_jit(x, psi, a, Ne, len(x), -units.e)
 
         E += integrate.simps(psi[a].conjugate() * fpsi, dx=dx)
     
