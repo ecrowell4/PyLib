@@ -12,23 +12,31 @@ units = utils.Units('atomic')
 etol = 1e-8
 
 def minimize_energy(V, Ne, units, lagrange=True, exchange=False, etol=1e-8):
-	"""Returns the Hartree approximation of the ground state.
+	"""Returns the single particle orbitals whose direct product (or slater det
+	if exchange is True) minimizes the many electron energy.
 
 	Input
-	    x : np.array
-	        spatial grid
+	    Ne : int
+	        number of electrons. Must be even for closed shell!
 	    V : function
 	        external potential. V(x, t) return potential
 	        at position x and time t
 	    units : class
 	        fundamnetal constants
-	    Ne : int
-	        number of electrons. Must be even for closed Shell!
+	    lagrange : bool
+	        if true, use lagrange multipliers to keep states
+	        orthonormal
+	    exchange : bool
+	        if true, use Hartree Fock instead of Hartree
+	    etol : float
+	        tolerance for derivatives convergence.
 
 	Output 
 	    psi : np.array
 	         array of single particle orbitals that minimize the
 	         energy.
+	    Es : np.array
+	        many electron energies for each iteration
     """
     
     N_orb = int(Ne / 2)
