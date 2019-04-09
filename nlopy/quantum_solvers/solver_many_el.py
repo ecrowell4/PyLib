@@ -51,8 +51,10 @@ def minimize_energy(V, Ne, units, lagrange=True, exchange=False, etol=1e-8):
     Es = np.zeros(0, dtype=complex)
     Es = np.append(Es, many_electron_utils.get_HF_energy(x, psi0, V(x,0), N_orb, units))
 
+    n = 1
     while np.allclose(ediff, 0, atol=etol) is False:
-
+        
+        start = time.time()
         # Get states at next time step
         psi_temp = evolver_1D.take_step_RungeKutta_HF_(psi, V, N_orb, x, 
                                                  -1j*n*dt, -1j*dt, units, lagrange=lagrange,
@@ -68,6 +70,9 @@ def minimize_energy(V, Ne, units, lagrange=True, exchange=False, etol=1e-8):
 	    # Compute energy of new configuration
 	    E_temp = many_electron_utils.get_HF_energy(x, psi_temp.astype(complex), 
 	        V(x, -1j*n*dt), N_orb, units, exchange=exchange)    
+
+        end = time.time()
+        print("step "+str(n)+" took %.3f seconds" % (end - start))
 
 	    # Compute overlap matrix of new configuration
 	    S = many_electron_utils.overlap_matrix(psi_temp, dx)
