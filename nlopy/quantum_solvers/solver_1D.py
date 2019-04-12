@@ -67,3 +67,57 @@ def solver_1D(x, V, units, num_states=15):
     psi = psi.transpose()
     
     return psi, E
+
+def solver_fft(x, V, units):
+    """Returns eigenstates and eigenenergies of one dimensional potentials
+    define on grid using fourier methods to approximate the kinetic energy. 
+    
+    Assumes infinite walls at both ends of the problem space.
+    
+    Input
+        x : np.array([x_i]) 
+            The spacial grid points including the endpoints
+        V : np.array([V(x_i)]) 
+            The potential function defined on the grid
+        units : class
+            Class whose attributes are the fundamental constants hbar, e, m, c, etc.
+        num_states : int
+            number of states to be returns
+        
+    Output
+        psi : np.array([psi_0(x), ..., psi_N(x)]) where N = NumStates
+            Eigenfunctions of Hamiltonian
+        E : np.array([E_0, ..., E_N]) 
+            Eigenvalues of Hamiltonian
+    """
+        
+    # Determine parameters from spacial grid
+    N = len(x)
+    dx = x[1]-x[0]
+    L = N * dx
+
+    # Determine k space parameters
+    n = np.fft.fftshift(np.fft.fftfreq(N, d=dx)) * L
+    k = 2 * np.pi * n / L
+
+    # Kinetic energy in k space
+    Tk = units.hbar**2 * k**2 / 2 / units.m
+
+    # Transform to position space
+    M_kn = np.exp(-1j * k[:, None] * x[None, :]) / np.sqrt(N)
+    Tx = M_kn.conj().dot((k**2 / 2)[:, None] * M_kn)
+
+    # Construct the Hamiltonian in position space
+    H = Tx + np.diag(V)
+    
+    # Compute eigenvalues and eigenfunctions:
+    E, psi = linalg.eigh(H)
+    
+    # Normalize to unity:
+    for i in range(len(x)):
+        psi[:,i] = psi[:,i] / sp.sqrt(sp.trapz( psi[:,i]*psi[:,i], x))
+    
+    # Take the transpose so that psi[i] is the ith eigenfunction:
+    psi = psi.transpose()
+    
+    return psi, E
