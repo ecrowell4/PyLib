@@ -5,8 +5,9 @@ import numpy as np
 from nlopy.quantum_solvers import solver_utils
 
 def solver_1D(x, V, units, num_states=15):
-    """Uses finite difference to discretize and solve for the eigenstates and 
-    energy eigenvalues one dimensional potentials.
+    """Returns eigenstates and eigenenergies of one dimensional potentials
+    define on grid using a second order finite difference approximation
+    for the kinetic energy. 
     
     Assumes infinite walls at both ends of the problem space.
     
@@ -17,6 +18,8 @@ def solver_1D(x, V, units, num_states=15):
             The potential function defined on the grid
         units : class
             Class whose attributes are the fundamental constants hbar, e, m, c, etc.
+        num_states : int
+            number of states to be returns
         
     Output
         psi : np.array([psi_0(x), ..., psi_N(x)]) where N = NumStates
