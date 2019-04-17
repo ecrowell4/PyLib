@@ -39,7 +39,7 @@ def prob_density(psi, x, Ne, i):
         
     return rho
 
-def many_electron_dipole(rho, dx, units):
+def many_electron_dipole(rho, x, units):
     """Returns the many electron dipole moment.
     
     Input
@@ -54,7 +54,7 @@ def many_electron_dipole(rho, dx, units):
         mu : float
             many electron dipole moment
     """
-
+    dx = x[1] - x[0]
     return -units.e * np.trapz(rho * x, dx=dx)
 
 def braket(psia, psib, dx):
