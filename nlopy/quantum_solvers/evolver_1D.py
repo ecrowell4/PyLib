@@ -27,7 +27,7 @@ def take_step_split_op(psi, V_func, x, t, dt, units):
     """
     
 
-def take_step_RungeKutta(psi, V_func, x, t, dt, units):
+def take_step_RungeKutta(psi, V_func, x, t, dt, units, fft=False):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta.
 
     Input
@@ -43,6 +43,8 @@ def take_step_RungeKutta(psi, V_func, x, t, dt, units):
             time step size
         units : Class
             object containing fundamental constants
+        fft : bool
+            if True, use spectral methods on the kinetic energy operator
     
     Output
         psi : np.array
@@ -50,10 +52,10 @@ def take_step_RungeKutta(psi, V_func, x, t, dt, units):
     """
 
     # Compute Runge-Kutta coefficients
-    k1 = (-1j / units.hbar) * solver_utils.apply_H(psi, x, V_func(x, t), units)
-    k2 = (-1j / units.hbar) * solver_utils.apply_H(psi + (dt * k1 / 2), x, V_func(x, t + dt / 2), units)
-    k3 = (-1j / units.hbar) * solver_utils.apply_H(psi + (dt * k2 / 2), x, V_func(x, t + dt / 2), units)
-    k4 = (-1j / units.hbar) * solver_utils.apply_H(psi + (dt * k3), x, V_func(x, t + dt), units)
+    k1 = (-1j / units.hbar) * solver_utils.apply_H(psi, x, V_func(x, t), units, fft)
+    k2 = (-1j / units.hbar) * solver_utils.apply_H(psi + (dt * k1 / 2), x, V_func(x, t + dt / 2), units, fft)
+    k3 = (-1j / units.hbar) * solver_utils.apply_H(psi + (dt * k2 / 2), x, V_func(x, t + dt / 2), units, fft)
+    k4 = (-1j / units.hbar) * solver_utils.apply_H(psi + (dt * k3), x, V_func(x, t + dt), units, fft)
 
     # Take step
     psi = psi + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)

@@ -292,12 +292,9 @@ def apply_H(psi, x, V_arr, units, fft=False):
 
     dx = x[1] - x[0]
     if fft is True:
-        lap = laplacian_fft
+        Hpsi = -(units.hbar**2 / 2 / units.m) * laplacian_fft(psi, x) + V_arr * psi
     elif fft is False:
-        lap = laplacian
-
-    # Apply H to state
-    Hpsi = -(units.hbar**2 / 2 / units.m) * lap(psi, dx) + V_arr * psi
+        Hpsi = -(units.hbar**2 / 2 / units.m) * laplacian(psi, dx) + V_arr * psi
 
     return Hpsi
 
