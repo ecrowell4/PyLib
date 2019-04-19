@@ -269,7 +269,7 @@ def laplacian_fft(f, x):
     k = 2 * np.pi * np.fft.fftfreq(N, d=dx)
     return np.fft.ifft(-k**2 * np.fft.fft(f))
 
-def apply_H(psi, x, V_arr, units):
+def apply_H(psi, x, V_arr, units, fft=False):
     """Returns the effect of Hamiltonian's action on the state at time t.
 
     Input
@@ -281,6 +281,9 @@ def apply_H(psi, x, V_arr, units):
             potential at time t
         units : class
             object containing fundamental constants
+        fft : bool
+            if True, use spectral methods for computing laplacian.
+            This is only good for periodic systems.
 
     Output
         Hpsi : np.array
@@ -288,9 +291,13 @@ def apply_H(psi, x, V_arr, units):
     """
 
     dx = x[1] - x[0]
+    if fft is True:
+        lap = laplacian_fft
+    elif fft is False:
+        lap = laplacian
 
     # Apply H to state
-    Hpsi = -(units.hbar**2 / 2 / units.m) * laplacian(psi, dx) + V_arr * psi
+    Hpsi = -(units.hbar**2 / 2 / units.m) * lap(psi, dx) + V_arr * psi
 
     return Hpsi
 
