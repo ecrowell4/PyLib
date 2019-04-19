@@ -250,6 +250,25 @@ def laplacian(f, dx):
 
     return ddf
 
+def laplacian_fft(f, x):
+    """Compute the laplacian of function via spectral methods.
+    This is only good for periodic functions.
+
+    Input
+        f : np.array
+            function to take gradient of
+        x : np.array
+            spatial array
+
+    Output
+        f_xx : np.array
+             laplacian of psi
+    """
+    N = len(x)
+    dx = x[1] - x[0]
+    k = 2 * np.pi * np.fft.fftfreq(N, d=dx)
+    return np.fft.ifft(-k**2 * np.fft.fft(f))
+
 def apply_H(psi, x, V_arr, units):
     """Returns the effect of Hamiltonian's action on the state at time t.
 
