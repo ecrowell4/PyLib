@@ -11,7 +11,7 @@ from nlopy.quantum_solvers import solver_1D, solver_utils, evolver_1D, many_elec
 units = utils.Units('atomic')
 etol = 1e-8
 
-def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8):
+def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8, fft=False):
     """Returns the single particle orbitals whose direct product (or slater det
     if exchange is True) minimizes the many electron energy.
 
@@ -30,6 +30,8 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
             if true, use Hartree Fock instead of Hartree
         etol : float
             tolerance for derivatives convergence.
+        fft : bool
+            if true, use fourier methods for derivatives
 
     Output 
         psi : np.array
@@ -61,7 +63,7 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
         # Get states at next time step
         psi_temp = evolver_1D.take_step_RungeKutta_HF_(psi, V, N_orb, x, 
                                                  -1j*n*dt, -1j*dt, units, lagrange=lagrange,
-                                                  exchange=exchange)        
+                                                  exchange=exchange, fft=fft)        
 
         # Renormalize/Reorthogonalize
         if lagrange is False:
