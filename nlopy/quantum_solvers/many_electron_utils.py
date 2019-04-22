@@ -373,7 +373,7 @@ def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, 
             K = K + integral
     return K
 
-def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False):
+def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False, fft=False):
     """Returns the action of the Hartree-Fock operator on the state psi[a]. The
     HF operator is s.t. 
         F psia = h psia + sum(2Jb - Kb, b not a) psia
@@ -396,6 +396,9 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False):
             if True, use lagrange multipliers to keep states orthogonal
         exchange : bool
             if True, include exchange term.
+        fft : bool
+            if True, use fourier methods for the derivatives. Otherwise, use 
+            finite differences.
     
     Output
         f_psi : np.array
@@ -406,7 +409,7 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False):
     dx = x[1] - x[0]
     
     
-    fpsia = (solver_utils.apply_H(psia, x, V_arr, units) 
+    fpsia = (solver_utils.apply_H(psia, x, V_arr, units, fft) 
         + 2 * direct_integral(x, psi, a, Ne, units))
 
     if exchange==True:
