@@ -62,7 +62,7 @@ def take_step_RungeKutta(psi, V_func, x, t, dt, units, fft=False):
 
     return psi
 
-def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange, exchange):
+def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange, exchange, fft=False):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta, using
     the Hartree Fock operator to evolve.
 
@@ -85,6 +85,8 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange, exchange
             if True, use lagrange multipliers
         exchange : bool
             if True, include exchange integral
+        fft : bool
+            if True, use fourier methods for derivatives
 
     Output
         psi : np.array
@@ -97,13 +99,13 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange, exchange
     for a in range(Ne):
         # Compute Runge-Kutta coefficients
         k1 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a], psi, 
-             V_func(x, t), a, Ne, units, lagrange=lagrange, exchange=exchange)
+             V_func(x, t), a, Ne, units, lagrange=lagrange, exchange=exchange, fft)
         k2 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k1 / 2), psi, 
-              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange)
+              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft)
         k3 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k2 / 2), psi, 
-              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange)
+              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft)
         k4 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k3), psi, 
-              V_func(x, t + dt), a, Ne, units, lagrange=lagrange, exchange=exchange)
+              V_func(x, t + dt), a, Ne, units, lagrange=lagrange, exchange=exchange, fft)
 
         # Take time step
         psi[a] = psi[a] + (dt / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
