@@ -99,13 +99,13 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange, exchange
     for a in range(Ne):
         # Compute Runge-Kutta coefficients
         k1 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a], psi, 
-             V_func(x, t), a, Ne, units, lagrange=lagrange, exchange=exchange, fft)
+             V_func(x, t), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
         k2 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k1 / 2), psi, 
-              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft)
+              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
         k3 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k2 / 2), psi, 
-              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft)
+              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
         k4 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k3), psi, 
-              V_func(x, t + dt), a, Ne, units, lagrange=lagrange, exchange=exchange, fft)
+              V_func(x, t + dt), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
 
         # Take time step
         psi[a] = psi[a] + (dt / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
@@ -149,13 +149,13 @@ def take_parallel_step(a, psi, V_func, Ne, x, t, dt, units, lagrange, exchange, 
     dx = x[1] - x[0]
 
     k1 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a], psi, 
-         V_func(x, t), a, Ne, units, lagrange=lagrange, exchange=exchange, fft)
+         V_func(x, t), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
     k2 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k1 / 2), psi, 
-          V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft)
+          V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
     k3 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k2 / 2), psi, 
-          V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft)
+          V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
     k4 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k3), psi, 
-          V_func(x, t + dt), a, Ne, units, lagrange=lagrange, exchange=exchange, fft)
+          V_func(x, t + dt), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
 
     # Take time step
     psi[a] = psi[a] + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4)

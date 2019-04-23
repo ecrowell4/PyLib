@@ -423,7 +423,7 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False, f
             Fpsia -= (braket(psi[b], fpsia, dx) / braket(psi[b], psi[b], dx)) * psi[b]
         return Fpsia
 
-def get_HF_energy(x, psi, Varr, Ne, units, exchange=False):
+def get_HF_energy(x, psi, Varr, Ne, units, exchange=False, fft=False):
     """Returns the Hartree Fock energt for Ne electrons.
     
     Input
@@ -439,6 +439,8 @@ def get_HF_energy(x, psi, Varr, Ne, units, exchange=False):
             fundamental constants
         exchange : bool
             if True, include the exchange integral
+        fft : bool
+            if true, use fourier methods for derivatives
     
     Output
         E : np.float
@@ -458,7 +460,7 @@ def get_HF_energy(x, psi, Varr, Ne, units, exchange=False):
 
     for a in range(Ne):
         # For each particle, compute fpsi (note the factor of 2 in apply_H)
-        fpsi = 2 * (solver_utils.apply_H(psi[a], x, Varr, units) 
+        fpsi = 2 * (solver_utils.apply_H(psi[a], x, Varr, units, fft=fft) 
             + direct_integral(x, psi, a, Ne, units))
 
         if exchange==True:

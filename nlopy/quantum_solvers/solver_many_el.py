@@ -74,7 +74,7 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
 
         # Compute energy of new configuration
         E_temp = many_electron_utils.get_HF_energy(x, psi_temp.astype(complex), 
-            V(x, -1j*n*dt), N_orb, units, exchange=exchange)    
+            V(x, -1j*n*dt), N_orb, units, exchange=exchange, fft=fft)    
 
         end = time.time()
         print("step "+str(n)+" took %.3f seconds" % (end - start))
@@ -88,10 +88,10 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
             success_number = 0
             print("States not orthonormal.")
             dt = many_electron_utils.update_dt(dt, 'decrease', delta=0.1)
-        elif E_temp > Es[n-1]:
-            print('Going uphill')
-            print(E_temp)
-            dt = many_electron_utils.update_dt(dt, 'decrease', delta=0.1)
+        # elif E_temp > Es[n-1]:
+        #     print('Going uphill')
+        #     print(E_temp)
+        #     dt = many_electron_utils.update_dt(dt, 'decrease', delta=0.1)
         else:
             psi = psi_temp
             Es = np.append(Es, E_temp)
