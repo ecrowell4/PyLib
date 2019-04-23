@@ -144,7 +144,7 @@ def overlap_matrix(psi, dx):
             overlap matrix <n|m>
     """
     Ne = len(psi)
-    S = np.zeros((Ne, Ne))
+    S = np.zeros((Ne, Ne)) + 0j
     for i in range(Ne):
         for j in range(Ne):
             S[i,j] = braket(psi[i], psi[j], dx)
