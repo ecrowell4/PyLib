@@ -106,7 +106,7 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
                     dt = dt_tmp
     time.sleep(2)
     for i in range(100):
-        print(i)
+        #print(i)
         start = time.time()
         # Get states at next time step
         psi_temp = evolver_1D.take_step_RungeKutta_HF(psi, V, N_orb, x, 
@@ -125,7 +125,7 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
             V(x, -1j*n*dt), N_orb, units, exchange=exchange, fft=fft)    
 
         end = time.time()
-        print("step "+str(n)+" took %.3f seconds" % (end - start))
+        #print("step "+str(n)+" took %.3f seconds" % (end - start))
 
         # Compute overlap matrix of new configuration
         S = many_electron_utils.overlap_matrix(psi_temp, dx)
@@ -146,7 +146,7 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
             ediff = abs(Es[n] - Es[n-1]) / dt
             success_number += 1
             n += 1
-            print('Energy difference = '+str(ediff))
+            #print('Energy difference = '+str(ediff))
             if success_number % 10 == 0:
                 success_number = 0
                 dt_tmp = many_electron_utils.update_dt(dt, 'increase', delta=0.1)
