@@ -61,7 +61,55 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
         
         start = time.time()
         # Get states at next time step
-        psi_temp = evolver_1D.take_step_RungeKutta_HF_(psi, V, N_orb, x, 
+        psi_temp = evolver_1D.take_step_RungeKutta_HF(psi, V, N_orb, x, 
+                                                 -1j*n*dt, -1j*dt, units, lagrange=lagrange,
+                                                  exchange=exchange, fft=fft)        
+
+        # Renormalize/Reorthogonalize
+        if lagrange is False:
+            psi_temp = many_electron_utils.make_orthogonal(psi_temp, dx)
+        elif lagrange is True:
+            psi_temp = many_electron_utils.gram_schmidt(psi_temp, dx, units)
+
+
+        # Compute energy of new configuration
+        E_temp = many_electron_utils.get_HF_energy(x, psi_temp.astype(complex), 
+            V(x, -1j*n*dt), N_orb, units, exchange=exchange, fft=fft)    
+
+        end = time.time()
+        #print("step "+str(n)+" took %.3f seconds" % (end - start))
+
+        # Compute overlap matrix of new configuration
+        S = many_electron_utils.overlap_matrix(psi_temp, dx)
+        
+        # Ensure that we're going downhill and that states are orthonormal
+
+        if np.allclose(S, np.eye(N_orb), atol=1e-2)==False:
+            success_number = 0
+            print("States not orthonormal.")
+            dt = many_electron_utils.update_dt(dt, 'decrease', delta=0.1)
+        # elif E_temp > Es[n-1]:
+        #     print('Going uphill')
+        #     print(E_temp)
+        #     dt = many_electron_utils.update_dt(dt, 'decrease', delta=0.1)
+        else:
+            psi = psi_temp
+            Es = np.append(Es, E_temp)
+            ediff = abs(Es[n] - Es[n-1]) / dt
+            success_number += 1
+            n += 1
+            #print('Energy difference = '+str(ediff))
+            if success_number % 10 == 0:
+                success_number = 0
+                dt_tmp = many_electron_utils.update_dt(dt, 'increase', delta=0.1)
+                if dt_tmp < dx**2 / 2:
+                    dt = dt_tmp
+    time.sleep(2)
+    for i in range(100):
+        print(i)
+        start = time.time()
+        # Get states at next time step
+        psi_temp = evolver_1D.take_step_RungeKutta_HF(psi, V, N_orb, x, 
                                                  -1j*n*dt, -1j*dt, units, lagrange=lagrange,
                                                   exchange=exchange, fft=fft)        
 
@@ -104,5 +152,4 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
                 dt_tmp = many_electron_utils.update_dt(dt, 'increase', delta=0.1)
                 if dt_tmp < dx**2 / 2:
                     dt = dt_tmp
-
     return psi, Es

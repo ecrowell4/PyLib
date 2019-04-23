@@ -95,20 +95,30 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange, exchange
     
     # Determine grid spacing
     dx = x[1] - x[0]
-
+    
+    k1 = np.zeros((Ne, len(psi[0]))) + 0j
+    k2 = np.zeros((Ne, len(psi[0]))) + 0j
+    k3 = np.zeros((Ne, len(psi[0]))) + 0j
+    k4 = np.zeros((Ne, len(psi[0]))) + 0j
+    
+    # Compute Runge-Kutta coefficients
     for a in range(Ne):
-        # Compute Runge-Kutta coefficients
-        k1 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a], psi, 
+        k1[a] = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a], psi, 
              V_func(x, t), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
-        k2 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k1 / 2), psi, 
+    psi_temp = psi + (dt * k1 / 2)
+    for a in range(Ne):
+        k2[a] = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi_temp[a], psi_temp, 
               V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
-        k3 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k2 / 2), psi, 
+    psi_temp = psi + (dt * k2 / 2)
+    for a in range(Ne):
+        k3[a] = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi_temp[a], psi_temp, 
               V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
-        k4 = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a] + (dt * k3), psi, 
+    psi_temp = psi + (dt * k3)
+    for a in range(Ne):
+        k4[a] = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi_temp[a], psi_temp, 
               V_func(x, t + dt), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
-
-        # Take time step
-        psi[a] = psi[a] + (dt / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
+    # Take time step
+    psi = psi + (dt / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
     
     return psi
 

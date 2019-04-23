@@ -468,9 +468,7 @@ def get_HF_energy(x, psi, Varr, Ne, units, exchange=False, fft=False):
 
         E += integrate.simps(psi[a].conjugate() * fpsi, dx=dx)
     
-    assert np.allclose(E.imag, 0), "Energy is not real valued"
-    if E > 1 / dx**2:
-        print("Grid spacing too coarse")    
+    assert np.allclose(E.imag, 0), "Energy is not real valued" 
     return E
 
 def get_next_psi(psi_current, x, V, Ne, units):
