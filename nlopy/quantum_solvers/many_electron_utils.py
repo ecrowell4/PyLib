@@ -55,7 +55,7 @@ def many_electron_dipole(rho, x, units):
             many electron dipole moment
     """
     dx = x[1] - x[0]
-    return -units.e * np.trapz(rho * x, dx=dx)
+    return -units.e * integrate.simps(rho * x, dx=dx)
 
 def braket(psia, psib, dx):
     """Projects psia onto psib: <psia|psib>.
