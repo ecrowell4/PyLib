@@ -26,7 +26,7 @@ def position_space(L, N, centered=False, periodic=False):
             Spatial grid
     """
 
-    dx = L / N
+    dx = L / (N-1)
 
     if centered is True:
         left_adjust = L / 2
@@ -34,9 +34,9 @@ def position_space(L, N, centered=False, periodic=False):
         left_adjust = 0
 
     if periodic is True:
-        x = np.arange(N) * dx - left_adjust
+        x = np.arange(N - 1) * dx - left_adjust
     else:
-        x = np.arange(N+1) * dx - left_adjust
+        x = np.arange(N) * dx - left_adjust
 
     return x
     
