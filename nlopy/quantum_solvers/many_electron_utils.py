@@ -152,7 +152,7 @@ def overlap_matrix(psi, dx):
 #==============================================================================
 # Utilities specific to Hartree Method
 #==============================================================================
-def get_1D_coulomb_int(x, q, rho_charge):
+def get_1D_coulomb_int(x, q, rho_charge, d=1, oneD=False):
     """Compute the 1D coulomb interaction energy between charge q and charge
     density rho_charge. Note that this is in gaussian units.
     
@@ -163,6 +163,11 @@ def get_1D_coulomb_int(x, q, rho_charge):
             test charge
         rho_charge : np.array
             charge density that
+        d : np.float
+            transverse dimension of wire
+        oneD : bool
+            if True, use the 1D coulomb int ~|x - x'|
+            if False, use 1 / sqrt(|x - x'|^2 + d^2)
     
     Output
         U : np.float
@@ -176,9 +181,10 @@ def get_1D_coulomb_int(x, q, rho_charge):
     Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
     
     # Compute corresponding 1D Coulomb interaction energies
-    U_coul = -2 * np.pi * q * integrate.simps(rho_charge * abs(Deltax), dx=dx, axis=1)
-
-    return U_coul     
+    if oneD==True:
+        return -2 * np.pi * q * integrate.simps(rho_charge * abs(Deltax), dx=dx, axis=1)
+    else:
+    	return -q * integrate.simps(rho_charge / np.sqrt(abs(Deltax)**2 + d**2), dx=dx, axis=1)
 
 def get_Jb_1D(x, psib, units):
     """Return the pairwise direct integral of Hartree-Fock theory. This is basically the

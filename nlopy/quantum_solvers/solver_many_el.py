@@ -43,7 +43,7 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
     
     N_orb = int(Ne / 2)
     L = Ne
-    N = 20 * Ne
+    N = 20 * Ne + 1
     dx = L / (N-1)
     dt = dx**2 / 2
     x = utils.position_space(L, N)
