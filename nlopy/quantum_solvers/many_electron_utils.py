@@ -295,7 +295,7 @@ def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, q : flo
         for i in range(len(x)):
             f : complex = psib.conjugate() * psia / np.sqrt((x - x[i])**2 + d**2)
             K[i] = -q * utils.my_simps(f, x, N)
-
+        return K * psib
 def direct_integral(x, psi, a, Ne, units):
     """Returns the direct integral from Hartree Fock theory in 1D.
     This is just the sum of the pairwise direct integrals.
