@@ -184,7 +184,7 @@ def get_1D_coulomb_int(x, q, rho_charge, d=1, oneD=False):
     if oneD==True:
         return -2 * np.pi * q * integrate.simps(rho_charge * abs(Deltax), dx=dx, axis=1)
     else:
-    	return -q * integrate.simps(rho_charge / np.sqrt(abs(Deltax)**2 + d**2), dx=dx, axis=1)
+        return -q * integrate.simps(rho_charge / np.sqrt(abs(Deltax)**2 + d**2), dx=dx, axis=1)
 
 def get_Jb_1D(x, psib, units):
     """Return the pairwise direct integral of Hartree-Fock theory. This is basically the
@@ -261,9 +261,9 @@ def get_Kbpsi_1D(x, psia, psib, units, d=1, oneD=False):
         Kb = -2*np.pi*integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx, axis=1)
         return Kb * psib
     else:
-    	Kb = -2*np.pi*integrate.simps(psib.conjugate() * psia / np.sqrt(abs(Deltax)**2 + d**2),
-    	 dx=dx, axis=1)
-    	return Kb * psib
+        Kb = -2*np.pi*integrate.simps(psib.conjugate() * psia / np.sqrt(abs(Deltax)**2 + d**2),
+         dx=dx, axis=1)
+        return Kb * psib
 
 @jit(nopython=True)
 def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, q : float, d : float, oneD : bool)->complex:
@@ -286,15 +286,15 @@ def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, q : flo
             action of the exchange operator on the state.
     """
     K: complex = np.zeros(N) + 1j * np.zeros(N) 
-    if oneD==True
-	    for i in range(len(x)):
-	        f : complex = psib.conjugate() * np.abs(x - x[i]) * psia
-	        K[i] = -2 * np.pi * q * utils.my_simps(f, x, N)        
-	    return K * psib
-	else:
-		for i in range(len(x)):
-			f : complex = psib.conjugate() * psia / np.sqrt((x - x[i])**2 + d**2)
-			K[i] = -q * utils.my_simps(f, x, N)
+    if oneD==True:
+        for i in range(len(x)):
+            f : complex = psib.conjugate() * np.abs(x - x[i]) * psia
+            K[i] = -2 * np.pi * q * utils.my_simps(f, x, N)        
+        return K * psib
+    else:
+        for i in range(len(x)):
+            f : complex = psib.conjugate() * psia / np.sqrt((x - x[i])**2 + d**2)
+            K[i] = -q * utils.my_simps(f, x, N)
 
 def direct_integral(x, psi, a, Ne, units):
     """Returns the direct integral from Hartree Fock theory in 1D.
