@@ -232,7 +232,7 @@ def get_Jbpsi_1D(x, psia, psib, units):
     
     return Jb * psia
 
-def get_Kbpsi_1D(x, psia, psib, units):
+def get_Kbpsi_1D(x, psia, psib, units, d=1, oneD=False):
     """Returns the action of the pairwise exchange operator on the state.
     
     Input
@@ -257,12 +257,13 @@ def get_Kbpsi_1D(x, psia, psib, units):
     Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
     
     # Evaluate integral
-    Kb = -2*np.pi*integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx, axis=1)
-    
-    # Act on state psib
-    Kb_psi = Kb * psib
-    
-    return Kb_psi
+    if oneD==True:
+        Kb = -2*np.pi*integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx, axis=1)
+        return Kb * psib
+    else:
+    	Kb = -2*np.pi*integrate.simps(psib.conjugate() * psia / np.sqrt(abs(Deltax)**2 + d**2),
+    	 dx=dx, axis=1)
+    	return Kb * psib
 
 @jit(nopython=True)
 def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, q : float)->complex:
