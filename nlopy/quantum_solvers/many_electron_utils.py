@@ -476,7 +476,7 @@ def get_HF_energy(x, psi, Varr, Ne, units, d=1, oneD=False, exchange=False, fft=
             + direct_integral(x, psi, a, Ne, units, d, oneD))
 
         if exchange==True:
-            fpsi -= exchange_integral_jit(x, psi, a, Ne, len(x), -units.e, d oneD)
+            fpsi -= exchange_integral_jit(x, psi, a, Ne, len(x), -units.e, d, oneD)
 
         E += integrate.simps(psi[a].conjugate() * fpsi, dx=dx)
     
