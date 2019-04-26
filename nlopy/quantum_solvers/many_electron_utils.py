@@ -261,7 +261,7 @@ def get_Kbpsi_1D(x, psia, psib, units, d=1, oneD=False):
         Kb = -2*np.pi*integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx, axis=1)
         return Kb * psib
     else:
-        Kb = -2*np.pi*integrate.simps(psib.conjugate() * psia / np.sqrt(abs(Deltax)**2 + d**2),
+        Kb = -integrate.simps(psib.conjugate() * psia / np.sqrt(abs(Deltax)**2 + d**2),
          dx=dx, axis=1)
         return Kb * psib
 
@@ -296,7 +296,7 @@ def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, q : flo
             f : complex = psib.conjugate() * psia / np.sqrt((x - x[i])**2 + d**2)
             K[i] = -q * utils.my_simps(f, x, N)
         return K * psib
-def direct_integral(x, psi, a, Ne, units):
+def direct_integral(x, psi, a, Ne, units, d=1, oneD=False):
     """Returns the direct integral from Hartree Fock theory in 1D.
     This is just the sum of the pairwise direct integrals.
 
@@ -321,11 +321,11 @@ def direct_integral(x, psi, a, Ne, units):
     rho_el = -units.e * prob_density(psi, x, Ne, a)
 
     # Compute Coulomb interaction
-    J = get_1D_coulomb_int(x, -units.e, rho_el)
+    J = get_1D_coulomb_int(x, -units.e, rho_el, d, oneD)
 
     return J * psi[a]
 
-def exchange_integral(x, psi, a, Ne, units):
+def exchange_integral(x, psi, a, Ne, units, d=1, oneD=False):
     """Returns the exchange integral from Hartree Fock theory in 1D.
     This is just the sum of the pairwise exchange integrals.
 
@@ -351,12 +351,12 @@ def exchange_integral(x, psi, a, Ne, units):
 
     # Compute the direct integral
     for b in np.delete(range(Ne), a):
-        K += get_Kbpsi_1D(x, psi[a], psi[b], units)
+        K += get_Kbpsi_1D(x, psi[a], psi[b], units, d, oneD)
 
     return K
 
 @jit(nopython=True)
-def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, q : float)->complex:
+def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, q : float, d : float, oneD : bool)->complex:
     """Returns the exchange integral from Hartree Fock theory in 1D.
     This is just the sum of the pairwise exchange integrals.
 
@@ -381,11 +381,11 @@ def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, 
     K: complex = np.zeros(N) + 0j*np.zeros(N)
     for b in range(Ne):
         if b != a:
-            integral: complex = get_Kbpsi_1D_jit(x, psi[a], psi[b], len(x), q)
+            integral: complex = get_Kbpsi_1D_jit(x, psi[a], psi[b], len(x), q, d, oneD)
             K = K + integral
     return K
 
-def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False, fft=False):
+def apply_f(x, psia, psi, V_arr, a, Ne, units, d=1, oneD=False, lagrange=False, exchange=False, fft=False):
     """Returns the action of the Hartree-Fock operator on the state psi[a]. The
     HF operator is s.t. 
         F psia = h psia + sum(2Jb - Kb, b not a) psia
@@ -425,7 +425,7 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False, f
         + 2 * direct_integral(x, psi, a, Ne, units))
 
     if exchange==True:
-        fpsia = fpsia - exchange_integral_jit(x, psi, a, Ne, len(x), -units.e)
+        fpsia = fpsia - exchange_integral_jit(x, psi, a, Ne, len(x), -units.e, d, oneD)
     
     if lagrange==False:
         return fpsia
