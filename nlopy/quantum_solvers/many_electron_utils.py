@@ -422,7 +422,7 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, d=1, oneD=False, lagrange=False, 
     
     
     fpsia = (solver_utils.apply_H(psia, x, V_arr, units, fft) 
-        + 2 * direct_integral(x, psi, a, Ne, units))
+        + 2 * direct_integral(x, psi, a, Ne, units, d, oneD))
 
     if exchange==True:
         fpsia = fpsia - exchange_integral_jit(x, psi, a, Ne, len(x), -units.e, d, oneD)
