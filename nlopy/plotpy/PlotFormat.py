@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 #from scipy.integrate import simps
 
 
-fsize = 10
+fsize = 16
 params = {
     'figure.figsize': [3.35,2.0],
     #'figure.figsize': [9.83,7.5],
