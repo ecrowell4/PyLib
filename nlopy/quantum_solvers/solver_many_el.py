@@ -42,7 +42,7 @@ def minimize_energy(psi0, V, Ne, units, d=1, oneD=False, lagrange=True, exchange
     """
     
     N_orb = int(Ne / 2)
-    L = Ne
+    L = d * Ne
     N = 20 * Ne + 1
     dx = L / (N-1)
     dt = dx**2 / 2
