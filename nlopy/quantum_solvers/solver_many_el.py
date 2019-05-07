@@ -11,7 +11,7 @@ from nlopy.quantum_solvers import solver_1D, solver_utils, evolver_1D, many_elec
 units = utils.Units('atomic')
 etol = 1e-8
 
-def minimize_energy(psi0, V, Ne, units, d=1, oneD=False, lagrange=True, exchange=False, etol=1e-8, fft=False):
+def minimize_energy(psi0, V, Ne, units, d=1, oneD=True, lagrange=True, exchange=True, etol=1e-8, fft=False):
     """Returns the single particle orbitals whose direct product (or slater det
     if exchange is True) minimizes the many electron energy.
 
