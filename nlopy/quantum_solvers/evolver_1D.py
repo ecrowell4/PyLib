@@ -62,7 +62,7 @@ def take_step_RungeKutta(psi, V_func, x, t, dt, units, fft=False):
 
     return psi
 
-def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, d, oneD, lagrange, exchange, fft=False):
+def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, lagrange, exchange, fft=False):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta, using
     the Hartree Fock operator to evolve.
 
@@ -104,19 +104,19 @@ def take_step_RungeKutta_HF(psi, V_func, Ne, x, t, dt, units, d, oneD, lagrange,
     # Compute Runge-Kutta coefficients
     for a in range(Ne):
         k1[a] = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi[a], psi, 
-             V_func(x, t), a, Ne, units, d=d, oneD=False, lagrange=lagrange, exchange=exchange, fft=fft)
+             V_func(x, t), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
     psi_temp = psi + (dt * k1 / 2)
     for a in range(Ne):
         k2[a] = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi_temp[a], psi_temp, 
-              V_func(x, t + dt / 2), a, Ne, units, d=d, oneD=False, lagrange=lagrange, exchange=exchange, fft=fft)
+              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
     psi_temp = psi + (dt * k2 / 2)
     for a in range(Ne):
         k3[a] = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi_temp[a], psi_temp, 
-              V_func(x, t + dt / 2), a, Ne, units, d=d, oneD=False, lagrange=lagrange, exchange=exchange, fft=fft)
+              V_func(x, t + dt / 2), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
     psi_temp = psi + (dt * k3)
     for a in range(Ne):
         k4[a] = (-1j / units.hbar) * many_electron_utils.apply_f(x, psi_temp[a], psi_temp, 
-              V_func(x, t + dt), a, Ne, units, d=d, oneD=False, lagrange=lagrange, exchange=exchange, fft=fft)
+              V_func(x, t + dt), a, Ne, units, lagrange=lagrange, exchange=exchange, fft=fft)
     # Take time step
     psi = psi + (dt / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
     

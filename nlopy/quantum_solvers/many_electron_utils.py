@@ -152,7 +152,7 @@ def overlap_matrix(psi, dx):
 #==============================================================================
 # Utilities specific to Hartree Method
 #==============================================================================
-def get_1D_coulomb_int(x, q, rho_charge, d=1, oneD=False):
+def get_1D_coulomb_int(x, q, rho_charge):
     """Compute the 1D coulomb interaction energy between charge q and charge
     density rho_charge. Note that this is in gaussian units.
     
@@ -163,11 +163,6 @@ def get_1D_coulomb_int(x, q, rho_charge, d=1, oneD=False):
             test charge
         rho_charge : np.array
             charge density that
-        d : np.float
-            transverse dimension of wire
-        oneD : bool
-            if True, use the 1D coulomb int ~|x - x'|
-            if False, use 1 / sqrt(|x - x'|^2 + d^2)
     
     Output
         U : np.float
@@ -181,10 +176,9 @@ def get_1D_coulomb_int(x, q, rho_charge, d=1, oneD=False):
     Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
     
     # Compute corresponding 1D Coulomb interaction energies
-    if oneD==True:
-        return -2 * np.pi * q * integrate.simps(rho_charge * abs(Deltax), dx=dx, axis=1)
-    else:
-        return -q * integrate.simps(rho_charge / np.sqrt(abs(Deltax)**2 + d**2), dx=dx, axis=1)
+    U_coul = -2 * np.pi * q * integrate.simps(rho_charge * abs(Deltax), dx=dx, axis=1)
+
+    return U_coul     
 
 def get_Jb_1D(x, psib, units):
     """Return the pairwise direct integral of Hartree-Fock theory. This is basically the
@@ -232,7 +226,7 @@ def get_Jbpsi_1D(x, psia, psib, units):
     
     return Jb * psia
 
-def get_Kbpsi_1D(x, psia, psib, units, d=1, oneD=False):
+def get_Kbpsi_1D(x, psia, psib, units):
     """Returns the action of the pairwise exchange operator on the state.
     
     Input
@@ -257,16 +251,15 @@ def get_Kbpsi_1D(x, psia, psib, units, d=1, oneD=False):
     Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
     
     # Evaluate integral
-    if oneD==True:
-        Kb = -2*np.pi*integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx, axis=1)
-        return Kb * psib
-    else:
-        Kb = -integrate.simps(psib.conjugate() * psia / np.sqrt(abs(Deltax)**2 + d**2),
-         dx=dx, axis=1)
-        return Kb * psib
+    Kb = -2*np.pi*integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx, axis=1)
+    
+    # Act on state psib
+    Kb_psi = Kb * psib
+    
+    return Kb_psi
 
 @jit(nopython=True)
-def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, q : float, d : float, oneD : bool)->complex:
+def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, q : float)->complex:
     """Returns the action of the pairwise exchange operator on the state. This is jit compiled.
     
     Input
@@ -286,17 +279,12 @@ def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, q : flo
             action of the exchange operator on the state.
     """
     K: complex = np.zeros(N) + 1j * np.zeros(N) 
-    if oneD==True:
-        for i in range(len(x)):
-            f : complex = psib.conjugate() * np.abs(x - x[i]) * psia
-            K[i] = -2 * np.pi * q * utils.my_simps(f, x, N)        
-        return K * psib
-    else:
-        for i in range(len(x)):
-            f : complex = psib.conjugate() * psia / np.sqrt((x - x[i])**2 + d**2)
-            K[i] = -q * utils.my_simps(f, x, N)
-        return K * psib
-def direct_integral(x, psi, a, Ne, units, d=1, oneD=False):
+    for i in range(len(x)):
+        f : complex = psib.conjugate() * np.abs(x - x[i]) * psia
+        K[i] = -2 * np.pi * q * utils.my_simps(f, x, N)        
+    return K * psib
+
+def direct_integral(x, psi, a, Ne, units):
     """Returns the direct integral from Hartree Fock theory in 1D.
     This is just the sum of the pairwise direct integrals.
 
@@ -321,11 +309,11 @@ def direct_integral(x, psi, a, Ne, units, d=1, oneD=False):
     rho_el = -units.e * prob_density(psi, x, Ne, a)
 
     # Compute Coulomb interaction
-    J = get_1D_coulomb_int(x, -units.e, rho_el, d, oneD)
+    J = get_1D_coulomb_int(x, -units.e, rho_el)
 
     return J * psi[a]
 
-def exchange_integral(x, psi, a, Ne, units, d=1, oneD=False):
+def exchange_integral(x, psi, a, Ne, units):
     """Returns the exchange integral from Hartree Fock theory in 1D.
     This is just the sum of the pairwise exchange integrals.
 
@@ -351,12 +339,12 @@ def exchange_integral(x, psi, a, Ne, units, d=1, oneD=False):
 
     # Compute the direct integral
     for b in np.delete(range(Ne), a):
-        K += get_Kbpsi_1D(x, psi[a], psi[b], units, d, oneD)
+        K += get_Kbpsi_1D(x, psi[a], psi[b], units)
 
     return K
 
 @jit(nopython=True)
-def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, q : float, d : float, oneD : bool)->complex:
+def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, q : float)->complex:
     """Returns the exchange integral from Hartree Fock theory in 1D.
     This is just the sum of the pairwise exchange integrals.
 
@@ -381,11 +369,11 @@ def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, 
     K: complex = np.zeros(N) + 0j*np.zeros(N)
     for b in range(Ne):
         if b != a:
-            integral: complex = get_Kbpsi_1D_jit(x, psi[a], psi[b], len(x), q, d, oneD)
+            integral: complex = get_Kbpsi_1D_jit(x, psi[a], psi[b], len(x), q)
             K = K + integral
     return K
 
-def apply_f(x, psia, psi, V_arr, a, Ne, units, d=1, oneD=False, lagrange=False, exchange=False, fft=False):
+def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False, fft=False):
     """Returns the action of the Hartree-Fock operator on the state psi[a]. The
     HF operator is s.t. 
         F psia = h psia + sum(2Jb - Kb, b not a) psia
@@ -422,10 +410,10 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, d=1, oneD=False, lagrange=False, 
     
     
     fpsia = (solver_utils.apply_H(psia, x, V_arr, units, fft) 
-        + 2 * direct_integral(x, psi, a, Ne, units, d, oneD))
+        + 2 * direct_integral(x, psi, a, Ne, units))
 
     if exchange==True:
-        fpsia = fpsia - exchange_integral_jit(x, psi, a, Ne, len(x), -units.e, d, oneD)
+        fpsia = fpsia - exchange_integral_jit(x, psi, a, Ne, len(x), -units.e)
     
     if lagrange==False:
         return fpsia
@@ -435,7 +423,7 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, d=1, oneD=False, lagrange=False, 
             Fpsia -= (braket(psi[b], fpsia, dx) / braket(psi[b], psi[b], dx)) * psi[b]
         return Fpsia
 
-def get_HF_energy(x, psi, Varr, Ne, units, d=1, oneD=False, exchange=False, fft=False):
+def get_HF_energy(x, psi, Varr, Ne, units, exchange=False, fft=False):
     """Returns the Hartree Fock energt for Ne electrons.
     
     Input
@@ -473,10 +461,10 @@ def get_HF_energy(x, psi, Varr, Ne, units, d=1, oneD=False, exchange=False, fft=
     for a in range(Ne):
         # For each particle, compute fpsi (note the factor of 2 in apply_H)
         fpsi = 2 * (solver_utils.apply_H(psi[a], x, Varr, units, fft=fft) 
-            + direct_integral(x, psi, a, Ne, units, d, oneD))
+            + direct_integral(x, psi, a, Ne, units))
 
         if exchange==True:
-            fpsi -= exchange_integral_jit(x, psi, a, Ne, len(x), -units.e, d, oneD)
+            fpsi -= exchange_integral_jit(x, psi, a, Ne, len(x), -units.e)
 
         E += integrate.simps(psi[a].conjugate() * fpsi, dx=dx)
     

@@ -11,7 +11,7 @@ from nlopy.quantum_solvers import solver_1D, solver_utils, evolver_1D, many_elec
 units = utils.Units('atomic')
 etol = 1e-8
 
-def minimize_energy(psi0, V, Ne, units, d=1, oneD=True, lagrange=True, exchange=True, etol=1e-8, fft=False):
+def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8, fft=False):
     """Returns the single particle orbitals whose direct product (or slater det
     if exchange is True) minimizes the many electron energy.
 
@@ -42,8 +42,8 @@ def minimize_energy(psi0, V, Ne, units, d=1, oneD=True, lagrange=True, exchange=
     """
     
     N_orb = int(Ne / 2)
-    L = d * Ne
-    N = 20 * Ne + 1
+    L = Ne
+    N = 20 * Ne
     dx = L / (N-1)
     dt = dx**2 / 2
     x = utils.position_space(L, N)
@@ -51,7 +51,7 @@ def minimize_energy(psi0, V, Ne, units, d=1, oneD=True, lagrange=True, exchange=
 
     # Create array to store energies at each iteration
     Es = np.zeros(0, dtype=complex)
-    Es = np.append(Es, many_electron_utils.get_HF_energy(x, psi0, V(x, 0), N_orb, units, d=d, oneD=oneD))
+    Es = np.append(Es, many_electron_utils.get_HF_energy(x, psi0, V(x, 0), N_orb, units))
 
     n = 1
     ediff = 1
@@ -61,8 +61,7 @@ def minimize_energy(psi0, V, Ne, units, d=1, oneD=True, lagrange=True, exchange=
         start = time.time()
         # Get states at next time step
         psi_temp = evolver_1D.take_step_RungeKutta_HF(psi, V, N_orb, x, 
-                                                 -1j*n*dt, -1j*dt, units, d=d,
-                                                  oneD=oneD, lagrange=lagrange,
+                                                 -1j*n*dt, -1j*dt, units, lagrange=lagrange,
                                                   exchange=exchange, fft=fft)        
 
         # Renormalize/Reorthogonalize
@@ -74,7 +73,7 @@ def minimize_energy(psi0, V, Ne, units, d=1, oneD=True, lagrange=True, exchange=
 
         # Compute energy of new configuration
         E_temp = many_electron_utils.get_HF_energy(x, psi_temp.astype(complex), 
-            V(x, -1j*n*dt), N_orb, units, d=d, oneD=oneD, exchange=exchange, fft=fft)    
+            V(x, -1j*n*dt), N_orb, units, exchange=exchange, fft=fft)    
 
         end = time.time()
         #print("step "+str(n)+" took %.3f seconds" % (end - start))
@@ -110,8 +109,7 @@ def minimize_energy(psi0, V, Ne, units, d=1, oneD=True, lagrange=True, exchange=
         start = time.time()
         # Get states at next time step
         psi_temp = evolver_1D.take_step_RungeKutta_HF(psi, V, N_orb, x, 
-                                                 -1j*n*dt, -1j*dt, units,
-                                                 d=d, oneD=oneD, lagrange=lagrange,
+                                                 -1j*n*dt, -1j*dt, units, lagrange=lagrange,
                                                   exchange=exchange, fft=fft)        
 
         # Renormalize/Reorthogonalize
@@ -123,7 +121,7 @@ def minimize_energy(psi0, V, Ne, units, d=1, oneD=True, lagrange=True, exchange=
 
         # Compute energy of new configuration
         E_temp = many_electron_utils.get_HF_energy(x, psi_temp.astype(complex), 
-            V(x, -1j*n*dt), N_orb, units, d=d, oneD=oneD, exchange=exchange, fft=fft)    
+            V(x, -1j*n*dt), N_orb, units, exchange=exchange, fft=fft)    
 
         end = time.time()
         #print("step "+str(n)+" took %.3f seconds" % (end - start))

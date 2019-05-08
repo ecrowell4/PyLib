@@ -127,32 +127,23 @@ def my_simps(f: complex, x: float, N: int)->complex:
     """
     
     dx : float = x[1] - x[0]
-
-    if N%2==0:
-        result_left = f[0]
-        for j in range(1, N-2, 2):
-            result_left = result_left + 4 * f[j]
-        for i in range(2, N-3, 2):
-            result_left = result_left + 2 * f[i]
-        result_left = result_left + f[-2]
-        result_left = result_left * dx / 3
-        
-        result_left = result_left + (f[-2] + f[-1]) * dx / 2
-        
-        result_right = f[1]
-        for j in range(2, N-1, 2):
-            result_right = result_right + 4 * f[j]
-        for i in range(3, N-2, 2):
-            result_right = result_right + 2 * f[i]
-        result_right = result_right + f[-1]
-        result_right = result_right * dx / 3
-        
-        result_right = result_right + (f[0] + f[1]) * dx / 2
-        return 0.5 * (result_left + result_right)
-    else:
-        result = f[0] + f[-1]
-        for j in range(1, N, 2):
-            result = result + 4 * f[j]
-        for i in range(2, N-1, 2):
-            result = result + 2 * f[i]
-        return result * dx / 3
+    result_left = f[0]
+    for j in range(1, N-2, 2):
+        result_left = result_left + 4 * f[j]
+    for i in range(2, N-3, 2):
+        result_left = result_left + 2 * f[i]
+    result_left = result_left + f[-2]
+    result_left = result_left * dx / 3
+    
+    result_left = result_left + (f[-2] + f[-1]) * dx / 2
+    
+    result_right = f[1]
+    for j in range(2, N-1, 2):
+        result_right = result_right + 4 * f[j]
+    for i in range(3, N-2, 2):
+        result_right = result_right + 2 * f[i]
+    result_right = result_right + f[-1]
+    result_right = result_right * dx / 3
+    
+    result_right = result_right + (f[0] + f[1]) * dx / 2
+    return 0.5 * (result_left + result_right)
