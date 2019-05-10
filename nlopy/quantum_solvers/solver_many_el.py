@@ -88,8 +88,8 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
             print("States not orthonormal.")
             dt = many_electron_utils.update_dt(dt, 'decrease', delta=0.1)
         elif E_temp > Es[n-1]:
-            print('Going uphill')
-            print(E_temp)
+            #print('Going uphill')
+            #print(E_temp)
             dt = many_electron_utils.update_dt(dt, 'decrease', delta=0.1)
         else:
             psi = psi_temp
@@ -97,7 +97,7 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
             ediff = abs(Es[n] - Es[n-1]) / dt
             success_number += 1
             n += 1
-            print('Energy difference = '+str(ediff))
+            #print('Energy difference = '+str(ediff))
             if success_number % 10 == 0:
                 success_number = 0
                 dt_tmp = many_electron_utils.update_dt(dt, 'increase', delta=0.1)
@@ -136,8 +136,8 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
             print("States not orthonormal.")
             dt = many_electron_utils.update_dt(dt, 'decrease', delta=0.1)
         elif E_temp > Es[n-1]:
-            print('Going uphill')
-            print(E_temp)
+            #print('Going uphill')
+            #print(E_temp)
             dt = many_electron_utils.update_dt(dt, 'decrease', delta=0.1)
         else:
             psi = psi_temp
