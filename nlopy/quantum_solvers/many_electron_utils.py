@@ -313,6 +313,34 @@ def direct_integral(x, psi, a, Ne, units):
 
     return J * psi[a]
 
+@jit(nopython=True)
+def direct_integral_jit(x : float, psi : complex, a : int, Ne : int, q : float)->complex:
+    """Returns the direction integral from Hartree Fock theory in 1D.
+
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            states
+        a : int
+            state to be acted on
+        Ne : int
+            number of electrons
+        q : float
+            electron charge
+
+    Output
+        J : np.array
+            direct integral
+    """
+    N : int = len(x)
+    rho : complex = np.sum(psi[:a] * psi[:a].conjugate(), axis=0) + np.sum(psi[a+1:] * psi[a+1:].conjugate(), axis=0)
+    J: complex = np.zeros(N) + 1j * np.zeros(N) 
+    for i in range(len(x)):
+        f : complex = rho * np.abs(x - x[i])
+        J[i] = -2 * np.pi * q * utils.my_simps(f, x, N)        
+    return -J * psi[a]
+
 def exchange_integral(x, psi, a, Ne, units):
     """Returns the exchange integral from Hartree Fock theory in 1D.
     This is just the sum of the pairwise exchange integrals.
