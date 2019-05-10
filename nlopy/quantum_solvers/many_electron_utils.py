@@ -438,7 +438,7 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False, f
     
     
     fpsia = (solver_utils.apply_H(psia, x, V_arr, units, fft) 
-        + 2 * direct_integral(x, psi, a, Ne, units))
+        + 2 * direct_integral_jit(x, psi, a, Ne, -units.e))
 
     if exchange==True:
         fpsia = fpsia - exchange_integral_jit(x, psi, a, Ne, len(x), -units.e)
@@ -489,7 +489,7 @@ def get_HF_energy(x, psi, Varr, Ne, units, exchange=False, fft=False):
     for a in range(Ne):
         # For each particle, compute fpsi (note the factor of 2 in apply_H)
         fpsi = 2 * (solver_utils.apply_H(psi[a], x, Varr, units, fft=fft) 
-            + direct_integral(x, psi, a, Ne, units))
+            + direct_integral_jit(x, psi, a, Ne, -units.e))
 
         if exchange==True:
             fpsi -= exchange_integral_jit(x, psi, a, Ne, len(x), -units.e)
