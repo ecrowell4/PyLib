@@ -76,7 +76,7 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
             V(x, -1j*n*dt), N_orb, units, exchange=exchange, fft=fft)    
 
         end = time.time()
-        print("step "+str(n)+" took %.3f seconds" % (end - start))
+        #print("step "+str(n)+" took %.3f seconds" % (end - start))
 
         # Compute overlap matrix of new configuration
         S = many_electron_utils.overlap_matrix(psi_temp, dx)
