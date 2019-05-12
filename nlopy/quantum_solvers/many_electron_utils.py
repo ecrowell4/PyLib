@@ -477,7 +477,7 @@ def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, 
     return K
 
 @jit(nopython=True)
-def subtract_lagrange_jit(psi : complex, fpsi : complex, x : float)->complex:
+def subtract_lagrange_jit(fpsi : complex, psi : complex, x : float, Ne : int)->complex:
     """Takes as input the result of f action on psi, and returns the result
     with the lagrange multipliers subtracted off.
 
@@ -494,10 +494,10 @@ def subtract_lagrange_jit(psi : complex, fpsi : complex, x : float)->complex:
             fpsi - lagrange_multipliers
     """
 
-    Fpsia : complex = fpsia
+    Fpsi : complex = fpsi
     for b in range(Ne):
-        Fpsia -= (braket_jit(psi[b], fpsia, x) / braket_jit(psi[b], psi[b], x)) * psi[b]
-    return Fpsia
+        Fpsi -= (braket_jit(psi[b], fpsi, x) / braket_jit(psi[b], psi[b], x)) * psi[b]
+    return Fpsi
 
 def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False, fft=False):
     """Returns the action of the Hartree-Fock operator on the state psi[a]. The
@@ -544,9 +544,7 @@ def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False, f
     if lagrange==False:
         return fpsia
     else:
-        Fpsia = fpsia
-        for b in range(Ne):
-            Fpsia -= (braket(psi[b], fpsia, dx) / braket(psi[b], psi[b], dx)) * psi[b]
+        Fpsia = subtract_lagrange_jit(fpsia, psi, x, Ne)
         return Fpsia
 
 def get_HF_energy(x, psi, Varr, Ne, units, exchange=False, fft=False):
