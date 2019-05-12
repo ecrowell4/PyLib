@@ -57,6 +57,7 @@ def many_electron_dipole(rho, x, units):
     dx = x[1] - x[0]
     return -units.e * integrate.simps(rho * x, dx=dx)
 
+@jit(nopython=True)
 def braket_jit(psia : complex, psib : complex, x : float)-> complex:
     """Projects psia onto psib: <psia|psib>.
 
@@ -147,6 +148,7 @@ def gram_schmidt(psi, dx, units):
         psi_gm[k] /= np.sqrt(braket(psi_gm[k], psi_gm[k], dx))
     return psi_gm
 
+@jit(nopython=True)
 def gram_schmidt_jit(psi : complex, x : float)->complex:
     """Takes in a set of basis functions and returns an orthonormal basis.
 
@@ -166,7 +168,7 @@ def gram_schmidt_jit(psi : complex, x : float)->complex:
     N : int = len(psi)
 
     # Initialize array to store new evctors
-    psi_gm = np.zeros(psi.shape, dtype=complex) + 0j
+    psi_gm : complex = np.zeros(psi.shape) + 0j
 
     # First vector doesn't change
     psi_gm[0] = psi[0]
@@ -176,7 +178,7 @@ def gram_schmidt_jit(psi : complex, x : float)->complex:
         psi_gm[k] = psi[k]
         for j in range(k):
             psi_gm[k] -= (braket_jit(psi[k], psi_gm[j], x) 
-            	/ braket_jit(psi_gm[j], psi_gm[j], x)) * psi_gm[j]
+                / braket_jit(psi_gm[j], psi_gm[j], x)) * psi_gm[j]
         psi_gm[k] /= np.sqrt(braket_jit(psi_gm[k], psi_gm[k], x))
     return psi_gm
 
@@ -201,6 +203,7 @@ def overlap_matrix(psi, dx):
             S[i,j] = braket(psi[i], psi[j], dx)
     return S
 
+@jit(nopython=True)
 def overlap_matrix_jit(psi : complex, x : float)->complex:
     """ Returns the overlap of all states contained in psi. For orthonormal
     states, this should be equal to the idential operator.
@@ -472,6 +475,29 @@ def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, 
             integral: complex = get_Kbpsi_1D_jit(x, psi[a], psi[b], len(x), q)
             K = K + integral
     return K
+
+@jit(nopython=True)
+def subtract_lagrange_jit(psi : complex, fpsi : complex, x : float)->complex:
+    """Takes as input the result of f action on psi, and returns the result
+    with the lagrange multipliers subtracted off.
+
+    Input
+        fpsi : np.array
+            action of f on state psi
+        psi : np.arra
+            orbitals
+        x : np.array
+            spatial array
+
+    Output
+        Fpsi : np.array
+            fpsi - lagrange_multipliers
+    """
+
+    Fpsia : complex = fpsia
+    for b in range(Ne):
+        Fpsia -= (braket_jit(psi[b], fpsia, x) / braket_jit(psi[b], psi[b], x)) * psi[b]
+    return Fpsia
 
 def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False, fft=False):
     """Returns the action of the Hartree-Fock operator on the state psi[a]. The
