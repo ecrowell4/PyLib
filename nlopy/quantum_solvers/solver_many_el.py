@@ -68,7 +68,7 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
         if lagrange is False:
             psi_temp = many_electron_utils.make_orthogonal(psi_temp, dx)
         elif lagrange is True:
-            psi_temp = many_electron_utils.gram_schmidt(psi_temp, dx, units)
+            psi_temp = many_electron_utils.gram_schmidt_jit(psi_temp, x)
 
 
         # Compute energy of new configuration
@@ -79,7 +79,7 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
         print("step "+str(n)+" took %.3f seconds" % (end - start))
 
         # Compute overlap matrix of new configuration
-        S = many_electron_utils.overlap_matrix(psi_temp, dx)
+        S = many_electron_utils.overlap_matrix_jit(psi_temp, x)
         
         # Ensure that we're going downhill and that states are orthonormal
 
@@ -116,7 +116,7 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
         if lagrange is False:
             psi_temp = many_electron_utils.make_orthogonal(psi_temp, dx)
         elif lagrange is True:
-            psi_temp = many_electron_utils.gram_schmidt(psi_temp, dx, units)
+            psi_temp = many_electron_utils.gram_schmidt_jit(psi_temp, x)
 
 
         # Compute energy of new configuration
@@ -127,7 +127,7 @@ def minimize_energy(psi0, V, Ne, units, lagrange=True, exchange=False, etol=1e-8
         print("step "+str(n)+" took %.3f seconds" % (end - start))
 
         # Compute overlap matrix of new configuration
-        S = many_electron_utils.overlap_matrix(psi_temp, dx)
+        S = many_electron_utils.overlap_matrix_jit(psi_temp, x)
         
         # Ensure that we're going downhill and that states are orthonormal
 
