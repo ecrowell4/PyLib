@@ -57,6 +57,24 @@ def many_electron_dipole(rho, x, units):
     dx = x[1] - x[0]
     return -units.e * integrate.simps(rho * x, dx=dx)
 
+def braket_jit(psia : complex, psib : complex, x : float)-> complex:
+    """Projects psia onto psib: <psia|psib>.
+
+    Input
+        psia : np.array
+            function to be projected
+        psib : np.array
+            function to be projected onto
+        dx : np.float
+            grid spacing
+
+    Output
+        proj : np.float
+            projection of psia onto psib
+    """
+
+    return utils.my_simps(psia.conjugate() * psib, x, len(x))
+
 def braket(psia, psib, dx):
     """Projects psia onto psib: <psia|psib>.
 
