@@ -200,6 +200,27 @@ def overlap_matrix(psi, dx):
         for j in range(Ne):
             S[i,j] = braket(psi[i], psi[j], dx)
     return S
+
+def overlap_matrix_jit(psi : complex, x : float)->complex:
+    """ Returns the overlap of all states contained in psi. For orthonormal
+    states, this should be equal to the idential operator.
+
+    Input
+        psi : np.array
+            collection of states
+        ds : np.float
+            grid spacing
+
+    Output
+        S : np.array
+            overlap matrix <n|m>
+    """
+    Ne : int = len(psi)
+    S : complex = np.zeros((Ne, Ne)) + 0j
+    for i in range(Ne):
+        for j in range(Ne):
+            S[i,j] = braket_jit(psi[i], psi[j], x)
+    return S
 #==============================================================================
 # Utilities specific to Hartree Method
 #==============================================================================
