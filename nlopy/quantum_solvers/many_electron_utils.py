@@ -147,6 +147,39 @@ def gram_schmidt(psi, dx, units):
         psi_gm[k] /= np.sqrt(braket(psi_gm[k], psi_gm[k], dx))
     return psi_gm
 
+def gram_schmidt_jit(psi : complex, x : float)->complex:
+    """Takes in a set of basis functions and returns an orthonormal basis.
+
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            array whose elements are the basis functions
+        units : Class
+            fundamental constants
+
+    Output
+        psi_gm : np.array
+            array of orthonormal basis functions
+    """
+    # Determine number of basis functions
+    N : int = len(psi)
+
+    # Initialize array to store new evctors
+    psi_gm = np.zeros(psi.shape, dtype=complex) + 0j
+
+    # First vector doesn't change
+    psi_gm[0] = psi[0]
+
+    # Loop through each function and orthogonalize
+    for k in range(N):
+        psi_gm[k] = psi[k]
+        for j in range(k):
+            psi_gm[k] -= (braket_jit(psi[k], psi_gm[j], x) 
+            	/ braket_jit(psi_gm[j], psi_gm[j], x)) * psi_gm[j]
+        psi_gm[k] /= np.sqrt(braket_jit(psi_gm[k], psi_gm[k], x))
+    return psi_gm
+
 def overlap_matrix(psi, dx):
     """ Returns the overlap of all states contained in psi. For orthonormal
     states, this should be equal to the idential operator.
