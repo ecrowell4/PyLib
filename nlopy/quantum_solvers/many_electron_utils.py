@@ -94,6 +94,24 @@ def braket(psia, psib, dx):
 
     return integrate.simps(psia.conjugate() * psib, dx=dx)
 
+def project_off(psi1, psi2, x):
+	"""Subtracts of the component of psi1 along psi2. Thus, the result
+	is the component of psi1 that is orthogonal to psi2.
+
+	Input
+	    psi1 : np.array
+	        state to be subtracted off of
+	    psi2 : np.array
+	        state to which we want the result orthogonal to
+	    x : np.array
+	        spatial array
+
+	Output
+	    psi3 : np.array
+	        component of psi1 that is orthogonal to psi2.
+	"""
+	return psi1 - braket_jit(psi1, psi2, x) * psi2 / braket_jit(psi2, psi2, x)
+	
 def norm2(psia, dx):
     return integrate.simps(abs(psia)**2, dx=dx)
 
