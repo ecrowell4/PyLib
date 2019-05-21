@@ -11,7 +11,7 @@ from nlopy.quantum_solvers import solver_1D, solver_utils, evolver_1D, many_elec
 units = utils.Units('atomic')
 etol = 1e-8
 
-def minimize_energy(psi0, x, V, Ne, units, lagrange=True, exchange=False, etol=1e-8, fft=False):
+def minimize_energy(psi0, x, V, Ne, units, lagrange=True, exchange=False, etol=1e-8, fft=False, exc_state=False, psi_grnd=None):
     """Returns the single particle orbitals whose direct product (or slater det
     if exchange is True) minimizes the many electron energy.
 
@@ -32,6 +32,10 @@ def minimize_energy(psi0, x, V, Ne, units, lagrange=True, exchange=False, etol=1
             tolerance for derivatives convergence.
         fft : bool
             if true, use fourier methods for derivatives
+        exc_state : bool
+            if True, get first excited state instead of ground state
+        psi_grnd : np.array, None
+            actual ground state. Only needed when finding excited state
 
     Output 
         psi : np.array
@@ -40,6 +44,9 @@ def minimize_energy(psi0, x, V, Ne, units, lagrange=True, exchange=False, etol=1
         Es : np.array
             many electron energies for each iteration
     """
+
+    if exc_state is True:
+        assert psi_grnd is not None, "Err: Need ground state in order to get excited state."
     
     N_orb = int(Ne / 2)
     L = x[-1] - x[0]
@@ -47,6 +54,12 @@ def minimize_energy(psi0, x, V, Ne, units, lagrange=True, exchange=False, etol=1
     dx = x[1] - x[0]
     dt = dx**2 / 2
     psi = psi0
+
+    if exc_state is True:
+        # Project out the ground state from initial state
+        for n in range(N_orb):
+            psi[-1] = many_electron_utils.project_off(psi[-1], psi_grnd[n], x)
+            assert np.allclose(many_electron_utils.braket_jit(psi[-1], psi_grnd[n], x), 0), "Not make_orthogonal" 
 
     # Create array to store energies at each iteration
     Es = np.zeros(0, dtype=complex)
@@ -61,14 +74,18 @@ def minimize_energy(psi0, x, V, Ne, units, lagrange=True, exchange=False, etol=1
         # Get states at next time step
         psi_temp = evolver_1D.take_step_RungeKutta_HF(psi, V, N_orb, x, 
                                                  -1j*n*dt, -1j*dt, units, lagrange=lagrange,
-                                                  exchange=exchange, fft=fft)        
+                                                  exchange=exchange, fft=fft)  
+        if exc_state is True:
+            # Project out the ground state from initial state
+            for l in range(N_orb):
+                psi_temp[-1] = many_electron_utils.project_off(psi_temp[-1], psi_grnd[l], x)
+                assert np.allclose(many_electron_utils.braket_jit(psi_temp[-1], psi_grnd[l], x), 0), "Not make_orthogonal"    
 
         # Renormalize/Reorthogonalize
         if lagrange is False:
             psi_temp = many_electron_utils.make_orthogonal(psi_temp, dx)
         elif lagrange is True:
             psi_temp = many_electron_utils.gram_schmidt_jit(psi_temp, x)
-
 
         # Compute energy of new configuration
         E_temp = many_electron_utils.get_HF_energy(x, psi_temp.astype(complex), 
@@ -94,15 +111,17 @@ def minimize_energy(psi0, x, V, Ne, units, lagrange=True, exchange=False, etol=1
         else:
             psi = psi_temp
             Es = np.append(Es, E_temp)
+            ediff_ = (Es[n] - Es[n-1]) / dt
             ediff = abs(Es[n] - Es[n-1]) / dt
             success_number += 1
             n += 1
-            #print('Energy difference = '+str(ediff))
+            print('Energy difference = '+str(ediff_))
             if success_number % 10 == 0:
                 success_number = 0
                 dt_tmp = many_electron_utils.update_dt(dt, 'increase', delta=0.1)
                 if dt_tmp < dx**2 / 2:
                     dt = dt_tmp
+    
     time.sleep(2)
     for i in range(100):
         #print(i)
@@ -112,12 +131,16 @@ def minimize_energy(psi0, x, V, Ne, units, lagrange=True, exchange=False, etol=1
                                                  -1j*n*dt, -1j*dt, units, lagrange=lagrange,
                                                   exchange=exchange, fft=fft)        
 
+        if exc_state is True:
+            # Project out the ground state from initial state
+            for n in range(N_orb):
+                psi[-1] = many_electron_utils.project_off(psi[-1], psi_grnd[n], x)
+
         # Renormalize/Reorthogonalize
         if lagrange is False:
             psi_temp = many_electron_utils.make_orthogonal(psi_temp, dx)
         elif lagrange is True:
             psi_temp = many_electron_utils.gram_schmidt_jit(psi_temp, x)
-
 
         # Compute energy of new configuration
         E_temp = many_electron_utils.get_HF_energy(x, psi_temp.astype(complex), 
