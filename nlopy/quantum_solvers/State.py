@@ -30,7 +30,7 @@ class State(object):
         get_copy()
             returns a deep copy of the class"""
 
-    def __init__(self, psi, L, Nx, Ne, state, unit_type='atomic',
+    def __init__(self, psiu, psid, L, Nx, state, unit_type='atomic',
     	         lagrange=True, exchange=True, centered=True):
  
         if unit_type is 'atomic':
@@ -48,7 +48,6 @@ class State(object):
         else:
             assert False, "Indicated units not supported. Please choose from ['atomic', Gaussian']."
 
-        self.psi = psi
         # Initialize spatial domain
         self.L = L
         self.Nx = Nx
@@ -59,12 +58,10 @@ class State(object):
             self.x -= self.L / 2
 
         # Initialize Hartree Fock parameters
-        self.Ne = Ne
-        self.state = state
-        if self.state is 'ground':
-            self.n = 2 * np.ones(self.Ne//2)
-        elif self.state is 'excited':
-            self.n = np.append(2*np.ones((self.Ne - 2)//2), np.ones(2))
+        self.psiu = psiu
+        self.psid = psid
+        self.Nu = len(psiu)
+        self.Nd = len(psid)
         self.state = state
         self.lagrange = lagrange
         self.exchange = exchange
