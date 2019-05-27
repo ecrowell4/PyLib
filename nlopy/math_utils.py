@@ -12,9 +12,30 @@ def laplacian(y:complex, dx:float)->complex:
 
 
 @jit(nopython=True)
-def my_convolve(y:complex, h:complex, dx:float)->complex:
+def coulomb_convolve(y:complex, Uc:complex, x:float)->complex:
 	"""Returns the convolution of two complex valued functions
-	y*h."""
+	y*h.
+
+	Input
+	    y : np.array
+	        function to be convolved
+	    Uc : np.array
+	        Coulomb kernel to be convoled
+	    x : np.array
+	        spatial array
+
+	Output
+	    g : np.array
+	        convolution of y with coulomb kernel.
+	"""
+    N:int = len(x)
+    res:complex = np.zeros(N) + 0j
+    for i in range(N):
+    	Uc_roll:complex = np.roll(Uc, i)
+    	Uc_roll[:i] = np.arange(i+1)[1:][::-1]
+    	res[i] = my_simps(f * Uc_roll, x)
+    return res
+
 
 @jit(nopython=True)
 def subtract_lagrange(f:complex, y:complex, dx:float)->complex:
