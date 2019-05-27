@@ -21,7 +21,8 @@ def apply_F(Psi, Vx, spin):
             'u' or 'd': string indicating spin of electron. 
 
     Output
-        Fpsi : the action of HF operator on orbitals of given spin.
+        Fpsi : array
+            the action of HF operator on orbitals of given spin.
     """
 
     if spin is 'u':
@@ -34,9 +35,9 @@ def apply_F(Psi, Vx, spin):
     Jpsia = direct_integrals(psia, Psi.Uc, Psi.e, Psi.dx)
     Jpsib = direct_integrals(psib, Psi.Uc, Psi.e, Psi.dx)
     Kpsia = exchange_integrals(psia, Psi.Uc, Psi.e, Psi.dx)
-    Fpsi = Hpsia + Jpsia - Kpsia + Jpsib
+    Fpsia = Hpsia + Jpsia - Kpsia + Jpsib
     if Psi.lagrange is True:
-    	Fpsi = math_utils.subtract_lagrange(Fpsi, Psi.psia, Psi.dx)
+    	Fpsia = math_utils.subtract_lagrange(Fpsia, Psi.psia, Psi.dx)
     return Fpsi
 
 @jit(nopython=True)
