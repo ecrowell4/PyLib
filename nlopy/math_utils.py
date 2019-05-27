@@ -78,7 +78,7 @@ def braket(y:complex, f:complex, x:float)->complex:
             projection of psia onto psib
     """
 
-    return utils.my_simps(y.conjugate()*f, x)
+    return my_simps(y.conjugate()*f, x)
 
 @jit(nopython=True)
 def my_simps(f: complex, x:float)->complex:
