@@ -33,3 +33,58 @@ def subtract_lagrange(f:complex, y:complex, dx:float)->complex:
 	        the variation of functional with constraints imposed.
 	"""
 
+@jit(nopython=True)
+def my_simps(f: complex, x: float, N: int)->complex:
+    """Returns the integral of f over the domain x using the simpsons
+    rule. Note that simpsons rule requires an even
+    number of intervals. However, we typpically choose and odd number
+    (even number of points). Thus, we use simpsons rule for all but the
+    last segment and use a trapezoidal on the last segment. Then we do
+    simpsons on all but first and use trapz on first. We then average
+    the two results.    
+
+    Input
+        f : np.array
+            function to be integrated
+        x : np.aray
+            spatial domain
+        N : int
+            len(x)
+
+    Output
+        int(f) : np.float
+            integral of f over domain x
+    """
+    
+    if N%2 == 0:
+        dx : float = x[1] - x[0]
+        result_left = f[0]
+        for j in range(1, N-2, 2):
+            result_left = result_left + 4 * f[j]
+        for i in range(2, N-3, 2):
+            result_left = result_left + 2 * f[i]
+        result_left = result_left + f[-2]
+        result_left = result_left * dx / 3
+        
+        result_left = result_left + (f[-2] + f[-1]) * dx / 2
+        
+        result_right = f[1]
+        for j in range(2, N-1, 2):
+            result_right = result_right + 4 * f[j]
+        for i in range(3, N-2, 2):
+            result_right = result_right + 2 * f[i]
+        result_right = result_right + f[-1]
+        result_right = result_right * dx / 3
+        
+        result_right = result_right + (f[0] + f[1]) * dx / 2
+        return 0.5 * (result_left + result_right)
+    else:
+        dx : float = x[1] - x[0]
+        result = f[0]
+        for j in range(1, N, 2):
+            result = result + 4 * f[j]
+        for i in range(2, N-1, 2):
+            result = result + 2 * f[i]
+        result = result + f[-1]
+        result = result * dx / 3
+        return result
