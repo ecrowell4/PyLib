@@ -34,7 +34,10 @@ def apply_F(Psi, Vx, spin):
     Jpsia = direct_integrals(psia, Psi.Uc, Psi.e, Psi.dx)
     Jpsib = direct_integrals(psib, Psi.Uc, Psi.e, Psi.dx)
     Kpsia = exchange_integrals(psia, Psi.Uc, Psi.e, Psi.dx)
-    return Hpsia + Jpsia - Kpsia + Jpsib
+    Fpsi = Hpsia + Jpsia - Kpsia + Jpsib
+    if Psi.lagrange is True:
+    	Fpsi = math_utils.subtract_lagrange(Fpsi, Psi.psia, Psi.dx)
+    return Fpsi
 
 @jit(nopython=True)
 def apply_H(psi:complex, x:float, Vx:float, hbar:float, m:float, e:float)->complex:
