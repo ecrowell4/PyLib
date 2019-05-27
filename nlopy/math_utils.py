@@ -55,6 +55,23 @@ def subtract_lagrange(f:complex, y:complex, dx:float)->complex:
 	"""
 
 @jit(nopython=True)
+def braket(y:complex, f:complex, x:float)->complex:
+    """Computes integral <y|f> = <f|y>*.
+
+    Input
+        y,f : np.array
+            functions to be integrated.
+        x : np.array
+            spatial array
+
+    Output
+        <y|f> : np.float
+            projection of psia onto psib
+    """
+
+    return utils.my_simps(y.conjugate()*f, x)
+
+@jit(nopython=True)
 def my_simps(f: complex, x: float, N: int)->complex:
     """Returns the integral of f over the domain x using the simpsons
     rule. Note that simpsons rule requires an even
