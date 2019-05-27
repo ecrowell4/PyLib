@@ -1,31 +1,8 @@
 import numpy as np
 from nlopy.quantum_solvers import solver_utils
-from nlopy.quantum_solvers import many_electron_utils
+from nlopy.quantum_solvers import evolver_utils
 from concurrent import futures
 import functools
-
-def take_step_split_op(psi, V_func, x, t, dt, units):
-    """Evolves psi(t) to psi(t+dt) via the split operator method.
-
-    Input
-        psi : np.array
-            state vector at time t
-        V_func(x, t) : function
-            function that returns potential at point x and time t
-        x : np.array
-            spatial array
-        t : float
-            current time
-        dt : float
-            time step size
-        units : Class
-            object containing fundamental constants
-
-    Output
-        psi : np.array
-            state vector at time t+dt
-    """
-    
 
 def take_step_RungeKutta(psi, V_func, x, t, dt, units, fft=False):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta.
@@ -152,23 +129,23 @@ def take_step_RK_HF(Psi, Vfunc, t, dt):
     newPsi = Psi.get_copy()
     tmpPsi = Psi.get_copy()
 
-    k1u = many_electron_utils.apply_F(Psi, Vfunc(Psi.x, t), '+')
-    k1u = many_electron_utils.apply_F(Psi, Vfunc(Psi.x, t), '-')
+    k1u = many_electron_utils.apply_F(Psi, Vfunc(Psi.x, t), 'u')
+    k1u = many_electron_utils.apply_F(Psi, Vfunc(Psi.x, t), 'd')
     tmpPsi.psiu = Psi.psiu + dt * k1u / 2
     tmpPsi.psid = Psi.psiu + dt * k1d / 2
 
-    k2u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), '+')
-    k2u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), '-')
+    k2u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'u')
+    k2u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'd')
     tmpPsi.psiu = Psi.psiu + dt * k2u / 2
     tmpPsi.psid = Psi.psiu + dt * k2d / 2
 
-    k3u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), '+')
-    k3u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), '-')
+    k3u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'u')
+    k3u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'd')
     tmpPsi.psiu = Psi.psiu + dt * k3u
     tmpPsi.psid = Psi.psiu + dt * k3d
 
-    k4u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt), '+')
-    k4u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt), '-')
+    k4u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt), 'u')
+    k4u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt), 'd')
  
     # Take time step
     newPsi.psiu = Psi.psiu + (dt/6) * (k1u + 2*k2u + 2*k3u + k4u)
@@ -268,39 +245,3 @@ def take_step_RungeKutta_HF_(psi, V_func, Ne, x, t, dt, units, lagrange, exchang
     
     return psi
     
-    
-
-def evolve(psi0, V_func, x, T, units):
-    """Evolves the state psi0 over the time doma
-    in T.
-
-    Input
-        psi0 : np.array
-            initial state
-        V_func(x, t) : function
-            function that returns the potential at point x and time t
-        x, T : np.array
-            spatial and temporal array
-        units : Class
-            object containing fundamental constants
-
-    Output
-        psis : np.array
-            psis[i] is state vector at ith time step
-    """
-
-    # Determine cardinality of space and time arrays
-    Nt = len(T)
-    Nx = len(x)
-    dt = T[1] - T[0]
-
-    # Create array to store state vectors
-    psis = np.zeros((Nt, Nx), dtype=complex)
-    psis[0] = psi0
-
-    # Propogate in time
-    for counter, t in enumerate(T[:-1]):
-        psis[counter+1] = take_step_RungeKutta(psis[counter], V_func, x, t, dt, units)
-
-    return psis
-
