@@ -38,7 +38,7 @@ def coulomb_convolve(y:complex, Uc:complex, x:float)->complex:
 
 
 @jit(nopython=True)
-def subtract_lagrange(f:complex, y:complex, dx:float)->complex:
+def subtract_lagrange(f:complex, y:complex, x:float)->complex:
 	"""Subtacts off the set of lagrange multipliers Y from y.
 
 	Input
@@ -48,6 +48,8 @@ def subtract_lagrange(f:complex, y:complex, dx:float)->complex:
 	        orbital
 	    y : np.array
 	        set of orbitals
+	    x : np.array
+	        spatial array
 
 	Output
 	    F : np.array
@@ -78,7 +80,7 @@ def braket(y:complex, f:complex, x:float)->complex:
     return utils.my_simps(y.conjugate()*f, x)
 
 @jit(nopython=True)
-def my_simps(f: complex, x: float, N: int)->complex:
+def my_simps(f: complex, x:float)->complex:
     """Returns the integral of f over the domain x using the simpsons
     rule. Note that simpsons rule requires an even
     number of intervals. However, we typpically choose and odd number
@@ -100,6 +102,7 @@ def my_simps(f: complex, x: float, N: int)->complex:
             integral of f over domain x
     """
     
+    N:int = len(x)
     if N%2 == 0:
         dx : float = x[1] - x[0]
         result_left = f[0]
