@@ -62,5 +62,5 @@ def apply_H(psi:complex, x:float, Vx:float, hbar:float, m:float, e:float)->compl
     Hpsi:complex = np.zeros(psi.shape) + 0j
     Norb:int = len(psi)
     for n in range(Norb):
-    	Hpsi[n] = -(hbar**2/2/m) * laplacian(psi[n], dx) + Vx*psi[n]
+    	Hpsi[n] = -(hbar**2/2/m) * math_utils.laplacian(psi[n], dx) + Vx*psi[n]
     return Hpsi
