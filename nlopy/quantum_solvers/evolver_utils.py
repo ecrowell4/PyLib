@@ -31,9 +31,9 @@ def apply_F(Psi, Vx, spin):
         psia = Psi.psid
         psib = Psi.psiu
     Hpsia = apply_H(psia, x, Vx, Psi.hbar, Psi.m, Psi.e)
-    Jpsia = direct_integrals(psia, x, q)
-    Jpsib = direct_integrals(psib, x, q)
-    Kpsia = exchange_integrals(psia, x, q)
+    Jpsia = direct_integrals(psia, Psi.Uc, Psi.e, Psi.dx)
+    Jpsib = direct_integrals(psib, Psi.Uc, Psi.e, Psi.dx)
+    Kpsia = exchange_integrals(psia, Psi.Uc, Psi.e, Psi.dx)
     return Hpsia + Jpsia - Kpsia + Jpsib
 
 @jit(nopython=True)
@@ -66,7 +66,7 @@ def apply_H(psi:complex, x:float, Vx:float, hbar:float, m:float, e:float)->compl
     return Hpsi
 
 @jit(nopython=True)
-def direct_integrals(psi:complex, x:float, q:float)->complex:
+def direct_integrals(psi:complex, Uc:float, q:float, dx:float)->complex:
     """Returns the direct integrals for orbitals of given type.
     Note that the direct integral for all of the orbitals is the same.
     This allows us to only compute a single integral, then broadcast
@@ -75,8 +75,8 @@ def direct_integrals(psi:complex, x:float, q:float)->complex:
     Input
         psi : np.array
             psi[i] is the ith orbital of specific spin type
-        x : np.array
-            spatial array
+        Uc : np.array
+            Coulomb kernel in position space (i.e. 1/r, |r|, log(r), etc.)
         q : float
             charge of particle
 
@@ -87,8 +87,33 @@ def direct_integrals(psi:complex, x:float, q:float)->complex:
 
     Norb:int = len(psi)
     rho:float = np.sum(psi.conjugate() * psi, axis=0)
-    coulomb_operator:complex = my_convolve(rho, x)
+    coulomb_operator:complex = my_convolve(rho, Uc, dx)
     J:complex = np.zeros(psi.shape) + 0j
     for n in range(Norb): 
         J[n] = coulomb_operator * psi[n]
     return J
+
+@jit(nopython=True)
+def exchange_integrals(psi:complex, Uc:float, q:float, dx:float)->complex:
+	"""Returns action of exchange operator on each orbital of given
+	type.
+
+	Input
+	    psi : np.array
+	        psi[i] is ith orbital
+	    Uc : np.array
+	        Coulomb kernel in position space
+	    q : float
+	        charge of particle
+    Output 
+        Kpsi : np.array
+            Kpsi[i] is action of exchange operator on orbital psi[i]
+	"""
+
+	Norb:int = len(psi)
+	K:complex = np.zeros(psi.shape) + 0j
+	for i in range(Norb):
+		for j in range(Norb):
+			K[i] = K[i] + my_convolve(psi[j].conjugate()*psi[i], Uc, dx) * psi[j]
+	return K
+
