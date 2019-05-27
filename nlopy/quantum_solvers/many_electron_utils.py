@@ -518,34 +518,6 @@ def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, 
             K = K + integral
     return K
 
-def apply_F(Psi, Vx, spin):
-	"""Returns the action of HF operator on orbitals for paritcular
-	spin state.
-
-	Input
-	    Psi : class
-	        state of system
-	    Vx : np.array
-	        external potential
-	    spin : string
-	        'u' or 'd': string indicating spin of electron. 
-
-	Output
-	    Fpsi : the action of HF operator on orbitals of given spin.
-	"""
-
-    if spin is 'u':
-    	psia = Psi.psiu
-    	psib = Psi.psid
-    if spin is 'd':
-    	psia = Psi.psid
-    	psib = Psi.psiu
-    Hpsia = apply_H(psia, x, Vx, Psi.hbar, Psi.m, Psi.e)
-	Jpsia = direct_integrals(psia, x, q)
-	Jpsib = direct_integrals(psib, x, q)
-	Kpsia = exchange_integrals(psia, x, q)
-	return Hpsia + Jpsia - Kpsia + Jpsib
-
 
 def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False, fft=False):
     """Returns the action of the Hartree-Fock operator on the state psi[a]. The
