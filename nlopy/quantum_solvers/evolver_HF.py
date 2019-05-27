@@ -34,23 +34,23 @@ def take_RK_step(Psi, Vfunc, t, dt):
     newPsi = Psi.get_copy()
     tmpPsi = Psi.get_copy()
 
-    k1u = many_electron_utils.apply_F(Psi, Vfunc(Psi.x, t), 'u')
-    k1u = many_electron_utils.apply_F(Psi, Vfunc(Psi.x, t), 'd')
+    k1u = evolver_utils.apply_F(Psi, Vfunc(Psi.x, t), 'u')
+    k1u = evolver_utils.apply_F(Psi, Vfunc(Psi.x, t), 'd')
     tmpPsi.psiu = Psi.psiu + dt * k1u / 2
     tmpPsi.psid = Psi.psiu + dt * k1d / 2
 
-    k2u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'u')
-    k2u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'd')
+    k2u = evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'u')
+    k2u = evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'd')
     tmpPsi.psiu = Psi.psiu + dt * k2u / 2
     tmpPsi.psid = Psi.psiu + dt * k2d / 2
 
-    k3u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'u')
-    k3u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'd')
+    k3u = evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'u')
+    k3u = evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'd')
     tmpPsi.psiu = Psi.psiu + dt * k3u
     tmpPsi.psid = Psi.psiu + dt * k3d
 
-    k4u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt), 'u')
-    k4u = many_electron_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt), 'd')
+    k4u = evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt), 'u')
+    k4u = evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt), 'd')
  
     # Take time step
     newPsi.psiu = Psi.psiu + (dt/6) * (k1u + 2*k2u + 2*k3u + k4u)
