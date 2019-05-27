@@ -6,6 +6,10 @@ def laplacian(y:complex, dx:float)->complex:
 	"""Returns laplacian of complex valued function `y(x)`
 	Dirichlet b.c.s are assumed, implying laplacian vanishes
 	at the boundary."""
+	ddf:complex = np.zeros(len(f)) + 0j
+	ddf[1:-1] = (f[2:] - 2*f[1:-1] + f[:-2]) / dx**2
+	return ddf
+
 
 @jit(nopython=True)
 def my_convolve(y:complex, h:complex, dx:float)->complex:
