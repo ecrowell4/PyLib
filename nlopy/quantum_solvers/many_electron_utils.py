@@ -342,64 +342,6 @@ def get_Jbpsi_1D(x, psia, psib, units):
     
     return Jb * psia
 
-def get_Kbpsi_1D(x, psia, psib, units):
-    """Returns the action of the pairwise exchange operator on the state.
-    
-    Input
-        x : np.array
-            spatial array
-        psia : np.array
-            wavefunction. state to be acted on
-        psib : np.array
-            wavefunction. state giving rise to exchange operator
-        units : Class
-            fundamental constants
-    
-    Output
-        Kb_psi : np.array
-            action of the exchange operator on the state.
-    """
-    
-    # Determine grid spacing
-    dx = x[1]-x[0]
-    
-    # Compute array who's ij element is xi - xj
-    Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
-    
-    # Evaluate integral
-    Kb = -2*np.pi*integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx, axis=1)
-    
-    # Act on state psib
-    Kb_psi = Kb * psib
-    
-    return Kb_psi
-
-@jit(nopython=True)
-def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, q : float)->complex:
-    """Returns the action of the pairwise exchange operator on the state. This is jit compiled.
-    
-    Input
-        x : np.array
-            spatial array
-        psia : np.array
-            wavefunction. state to be acted on
-        psib : np.array
-            wavefunction. state giving rise to exchange operator
-        N : int
-            length of position array
-        e : float
-            electric charge
-    
-    Output
-        Kb_psi : np.array
-            action of the exchange operator on the state.
-    """
-    K: complex = np.zeros(N) + 1j * np.zeros(N) 
-    for i in range(len(x)):
-        f : complex = psib.conjugate() * np.abs(x - x[i]) * psia
-        K[i] = -2 * np.pi * q * utils.my_simps(f, x, N)        
-    return K * psib
-
 def direct_integral(x, psi, a, Ne, units):
     """Returns the direct integral from Hartree Fock theory in 1D.
     This is just the sum of the pairwise direct integrals.
@@ -458,6 +400,64 @@ def direct_integral_jit(x : float, psi : complex, a : int, Ne : int, q : float)-
         J[i] = -2 * np.pi * q * utils.my_simps(f, x, N)        
     return -J * psi[a]
 
+def get_Kbpsi_1D(x, psia, psib, units):
+    """Returns the action of the pairwise exchange operator on the state.
+    
+    Input
+        x : np.array
+            spatial array
+        psia : np.array
+            wavefunction. state to be acted on
+        psib : np.array
+            wavefunction. state giving rise to exchange operator
+        units : Class
+            fundamental constants
+    
+    Output
+        Kb_psi : np.array
+            action of the exchange operator on the state.
+    """
+    
+    # Determine grid spacing
+    dx = x[1]-x[0]
+    
+    # Compute array who's ij element is xi - xj
+    Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
+    
+    # Evaluate integral
+    Kb = -2*np.pi*integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx, axis=1)
+    
+    # Act on state psib
+    Kb_psi = Kb * psib
+    
+    return Kb_psi
+
+@jit(nopython=True)
+def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, q : float)->complex:
+    """Returns the action of the pairwise exchange operator on the state. This is jit compiled.
+    
+    Input
+        x : np.array
+            spatial array
+        psia : np.array
+            wavefunction. state to be acted on
+        psib : np.array
+            wavefunction. state giving rise to exchange operator
+        N : int
+            length of position array
+        e : float
+            electric charge
+    
+    Output
+        Kb_psi : np.array
+            action of the exchange operator on the state.
+    """
+    K: complex = np.zeros(N) + 1j * np.zeros(N) 
+    for i in range(len(x)):
+        f : complex = psib.conjugate() * np.abs(x - x[i]) * psia
+        K[i] = -2 * np.pi * q * utils.my_simps(f, x, N)        
+    return K * psib
+    
 def exchange_integral(x, psi, a, Ne, units):
     """Returns the exchange integral from Hartree Fock theory in 1D.
     This is just the sum of the pairwise exchange integrals.
