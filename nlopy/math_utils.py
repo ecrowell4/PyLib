@@ -44,8 +44,8 @@ def subtract_lagrange(f:complex, y:complex, dx:float)->complex:
 	Input
 	    f : np.array
 	        the variation of some functional F.
-	        In context of HF theory, F is action of HF operator on
-	        som orbital
+	        In context of HF theory, f[i] is action of HF operator each
+	        orbital
 	    y : np.array
 	        set of orbitals
 
@@ -53,6 +53,12 @@ def subtract_lagrange(f:complex, y:complex, dx:float)->complex:
 	    F : np.array
 	        the variation of functional with constraints imposed.
 	"""
+
+	Norb:int = len(f)
+	for i in range(Norb):
+		for j in range(Norb):
+			F[i] -= braket(psi[j], f[i], x) * psi[j] / braket(psi[j], psi[j], x)
+	return F
 
 @jit(nopython=True)
 def braket(y:complex, f:complex, x:float)->complex:
