@@ -2,65 +2,66 @@ import numpy as np
 from numba import jit
 
 @jit(nopython=True)
-def laplacian(y:complex, dx:float)->complex:
-	"""Returns laplacian of complex valued function `y(x)`
-	Dirichlet b.c.s are assumed, implying laplacian vanishes
-	at the boundary."""
-	ddf:complex = np.zeros(len(f)) + 0j
-	ddf[1:-1] = (f[2:] - 2*f[1:-1] + f[:-2]) / dx**2
-	return ddf
+def laplacian(f:complex, dx:float)->complex:
+    """Returns laplacian of complex valued function `y(x)`
+    Dirichlet b.c.s are assumed, implying laplacian vanishes
+    at the boundary."""
+    N:int = len(f)
+    ddf:complex = np.zeros(N) + 0j
+    ddf[1:-1] = (f[2:] - 2*f[1:-1] + f[:-2]) / dx**2
+    return ddf
 
 
 @jit(nopython=True)
 def coulomb_convolve(y:complex, Uc:complex, x:float)->complex:
-	"""Returns the convolution of two complex valued functions
-	y*h.
+    """Returns the convolution of two complex valued functions
+    y*h.
 
-	Input
-	    y : np.array
-	        function to be convolved
-	    Uc : np.array
-	        Coulomb kernel to be convoled
-	    x : np.array
-	        spatial array
+    Input
+        y : np.array
+            function to be convolved
+        Uc : np.array
+            Coulomb kernel to be convoled
+        x : np.array
+            spatial array
 
-	Output
-	    g : np.array
-	        convolution of y with coulomb kernel.
-	"""
+    Output
+        g : np.array
+            convolution of y with coulomb kernel.
+    """
     N:int = len(x)
     res:complex = np.zeros(N) + 0j
     for i in range(N):
-    	Uc_roll:complex = np.roll(Uc, i)
-    	Uc_roll[:i] = np.arange(i+1)[1:][::-1]
-    	res[i] = my_simps(f * Uc_roll, x)
+        Uc_roll:complex = np.roll(Uc, i)
+        Uc_roll[:i] = np.arange(i+1)[1:][::-1]
+        res[i] = my_simps(f * Uc_roll, x)
     return res
 
 
 @jit(nopython=True)
 def subtract_lagrange(f:complex, y:complex, x:float)->complex:
-	"""Subtacts off the set of lagrange multipliers Y from y.
+    """Subtacts off the set of lagrange multipliers Y from y.
 
-	Input
-	    f : np.array
-	        the variation of some functional F.
-	        In context of HF theory, f[i] is action of HF operator each
-	        orbital
-	    y : np.array
-	        set of orbitals
-	    x : np.array
-	        spatial array
+    Input
+        f : np.array
+            the variation of some functional F.
+            In context of HF theory, f[i] is action of HF operator each
+            orbital
+        y : np.array
+            set of orbitals
+        x : np.array
+            spatial array
 
-	Output
-	    F : np.array
-	        the variation of functional with constraints imposed.
-	"""
+    Output
+        F : np.array
+            the variation of functional with constraints imposed.
+    """
 
-	Norb:int = len(f)
-	for i in range(Norb):
-		for j in range(Norb):
-			F[i] -= braket(psi[j], f[i], x) * psi[j] / braket(psi[j], psi[j], x)
-	return F
+    Norb:int = len(f)
+    for i in range(Norb):
+        for j in range(Norb):
+            F[i] -= braket(psi[j], f[i], x) * psi[j] / braket(psi[j], psi[j], x)
+    return F
 
 @jit(nopython=True)
 def braket(y:complex, f:complex, x:float)->complex:
