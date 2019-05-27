@@ -1,0 +1,795 @@
+
+import numpy as np
+from numba import jit
+import scipy
+from scipy import integrate
+
+import nlopy
+from nlopy import utils
+from nlopy.quantum_solvers import solver_1D, solver_utils
+
+#==============================================================================
+# General many electron utilities
+#==============================================================================
+def prob_density(psi, x, Ne, i):
+    """Compute multielectron density that ith particle sees. If i is none, then
+    computes total multielectron density.
+    
+    Input
+        psi : np.array
+            single particle wavefunctions
+        x : np.array
+            position space
+        Ne : np.int
+            number of electrons
+        i : np.int
+            label of electron. If None, then total probability density is computed.
+    
+    Output
+        rho : np.array
+            the probability density that the ith electron sees.
+    """
+    
+    if i == None:
+        # Compute total probability density
+        rho = np.sum(abs(psi[:Ne])**2, axis=0)
+    else:
+        # Compute probability density excluding ith particle
+        rho = np.sum(abs(psi[:i])**2, axis=0) + np.sum(abs(psi[i+1:Ne])**2, axis=0)
+        
+    return rho
+
+def many_electron_dipole(rho, x, units):
+    """Returns the many electron dipole moment.
+    
+    Input
+        rho : np.array
+            many electron density
+        dx : np.array
+            grid spacing
+        units : Class
+            fundamental constants
+            
+    Output
+        mu : float
+            many electron dipole moment
+    """
+    dx = x[1] - x[0]
+    return -units.e * integrate.simps(rho * x, dx=dx)
+
+@jit(nopython=True)
+def braket_jit(psia : complex, psib : complex, x : float)-> complex:
+    """Projects psia onto psib: <psia|psib>.
+
+    Input
+        psia : np.array
+            function to be projected
+        psib : np.array
+            function to be projected onto
+        dx : np.float
+            grid spacing
+
+    Output
+        proj : np.float
+            projection of psia onto psib
+    """
+
+    return utils.my_simps(psia.conjugate() * psib, x, len(x))
+
+def braket(psia, psib, dx):
+    """Projects psia onto psib: <psia|psib>.
+
+    Input
+        psia : np.array
+            function to be projected
+        psib : np.array
+            function to be projected onto
+        dx : np.float
+            grid spacing
+
+    Output
+        proj : np.float
+            projection of psia onto psib
+    """
+
+    return integrate.simps(psia.conjugate() * psib, dx=dx)
+
+def project_off(psi1, psi2, x):
+	"""Subtracts of the component of psi1 along psi2. Thus, the result
+	is the component of psi1 that is orthogonal to psi2.
+
+	Input
+	    psi1 : np.array
+	        state to be subtracted off of
+	    psi2 : np.array
+	        state to which we want the result orthogonal to
+	    x : np.array
+	        spatial array
+
+	Output
+	    psi3 : np.array
+	        component of psi1 that is orthogonal to psi2.
+	"""
+	return psi1 - braket_jit(psi1, psi2, x) * psi2 / braket_jit(psi2, psi2, x)
+	
+def norm2(psia, dx):
+    return integrate.simps(abs(psia)**2, dx=dx)
+
+def make_orthogonal(psi, dx):
+    """Returns a set of orthonormal eigenvectors via QR decomposition.
+
+    Input
+        psi : np.array
+            array whose rows are eigenvectors that aren't
+            mutually orthogonal
+        dx : np.float
+            grid spacing. Used to make state normal in the usual sense
+
+    Output
+        psi : np.array
+            array whose rows are orthonormal vectors
+    """
+
+    Q, R = np.linalg.qr(psi.transpose())
+
+    return -Q.transpose() / np.sqrt(dx)
+
+def gram_schmidt(psi, dx, units):
+    """Takes in a set of basis functions and returns an orthonormal basis.
+
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            array whose elements are the basis functions
+        units : Class
+            fundamental constants
+
+    Output
+        psi_gm : np.array
+            array of orthonormal basis functions
+    """
+    # Determine number of basis functions
+    N = len(psi)
+
+    # Initialize array to store new evctors
+    psi_gm = np.zeros(psi.shape, dtype=complex)
+
+    # First vector doesn't change
+    psi_gm[0] = psi[0]
+
+    # Loop through each function and orthogonalize
+    for k in range(N):
+        psi_gm[k] = psi[k]
+        for j in range(k):
+            psi_gm[k] -= (braket(psi[k], psi_gm[j], dx) / braket(psi_gm[j], psi_gm[j], dx)) * psi_gm[j]
+        psi_gm[k] /= np.sqrt(braket(psi_gm[k], psi_gm[k], dx))
+    return psi_gm
+
+@jit(nopython=True)
+def gram_schmidt_jit(psi : complex, x : float)->complex:
+    """Takes in a set of basis functions and returns an orthonormal basis.
+
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            array whose elements are the basis functions
+        units : Class
+            fundamental constants
+
+    Output
+        psi_gm : np.array
+            array of orthonormal basis functions
+    """
+    # Determine number of basis functions
+    N : int = len(psi)
+
+    # Initialize array to store new evctors
+    psi_gm : complex = np.zeros(psi.shape) + 0j
+
+    # First vector doesn't change
+    psi_gm[0] = psi[0]
+
+    # Loop through each function and orthogonalize
+    for k in range(N):
+        psi_gm[k] = psi[k]
+        for j in range(k):
+            psi_gm[k] -= (braket_jit(psi[k], psi_gm[j], x) 
+                / braket_jit(psi_gm[j], psi_gm[j], x)) * psi_gm[j]
+        psi_gm[k] /= np.sqrt(braket_jit(psi_gm[k], psi_gm[k], x))
+    return psi_gm
+
+@jit(nopython=True)
+def subtract_lagrange_jit(fpsi : complex, psi : complex, x : float, Ne : int)->complex:
+    """Takes as input the result of f action on psi, and returns the result
+    with the lagrange multipliers subtracted off.
+
+    Input
+        fpsi : np.array
+            action of f on state psi
+        psi : np.arra
+            orbitals
+        x : np.array
+            spatial array
+
+    Output
+        Fpsi : np.array
+            fpsi - lagrange_multipliers
+    """
+
+    Fpsi : complex = fpsi
+    for b in range(Ne):
+        Fpsi -= (braket_jit(psi[b], fpsi, x) / braket_jit(psi[b], psi[b], x)) * psi[b]
+    return Fpsi
+
+def overlap_matrix(psi, dx):
+    """ Returns the overlap of all states contained in psi. For orthonormal
+    states, this should be equal to the idential operator.
+
+    Input
+        psi : np.array
+            collection of states
+        ds : np.float
+            grid spacing
+
+    Output
+        S : np.array
+            overlap matrix <n|m>
+    """
+    Ne = len(psi)
+    S = np.zeros((Ne, Ne)) + 0j
+    for i in range(Ne):
+        for j in range(Ne):
+            S[i,j] = braket(psi[i], psi[j], dx)
+    return S
+
+@jit(nopython=True)
+def overlap_matrix_jit(psi : complex, x : float)->complex:
+    """ Returns the overlap of all states contained in psi. For orthonormal
+    states, this should be equal to the idential operator.
+
+    Input
+        psi : np.array
+            collection of states
+        ds : np.float
+            grid spacing
+
+    Output
+        S : np.array
+            overlap matrix <n|m>
+    """
+    Ne : int = len(psi)
+    S : complex = np.zeros((Ne, Ne)) + 0j
+    for i in range(Ne):
+        for j in range(Ne):
+            S[i,j] = braket_jit(psi[i], psi[j], x)
+    return S
+#==============================================================================
+# Utilities specific to Hartree Method
+#==============================================================================
+def get_1D_coulomb_int(x, q, rho_charge):
+    """Compute the 1D coulomb interaction energy between charge q and charge
+    density rho_charge. Note that this is in gaussian units.
+    
+    Input
+        x : np.array
+            position space
+        q : np.float
+            test charge
+        rho_charge : np.array
+            charge density that
+    
+    Output
+        U : np.float
+            interaction energy for ith electron.
+    """
+    
+    # Determine grid spacing
+    dx = x[1] - x[0]
+    
+    # Create array whose ij element is xi - xj
+    Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
+    
+    # Compute corresponding 1D Coulomb interaction energies
+    U_coul = -2 * np.pi * q * integrate.simps(rho_charge * abs(Deltax), dx=dx, axis=1)
+
+    return U_coul     
+
+def get_Jb_1D(x, psib, units):
+    """Return the pairwise direct integral of Hartree-Fock theory. This is basically the
+    Coulomb energy associated with the electron in the bth state. This is 
+    defined as the integral Jb = 2pi * q * Int[|psi_b|^2 r12]
+    
+    Input
+        x : np.array
+            spatial array
+        psib : np.array
+            wavefunction
+        q : np.float
+            charge associated with particle
+        units : Class
+            fundamental constants
+            
+    Output
+        J : np.array
+            the direct integral as defined above.
+    """
+
+    # Compute charge density associated with psib
+    rho_el = -units.e * abs(psib)**2
+    
+    # Compute direct integral
+    Jb = get_1D_coulomb_int(x, -units.e, rho_el)
+    
+    return Jb
+
+def get_Jbpsi_1D(x, psia, psib, units):
+    """Returns the action of the pairwise direct integral on the state due 
+    to single state psib.
+    
+    Input
+        x : np.array
+            spatial array
+        psia : np.array
+            wavefunction. state to be acted on
+        psib : np.array
+            wavefunction. state creating coulomb potential
+    """
+    
+    # Compute direct integral
+    Jb = get_Jb_1D(x, psib, units)
+    
+    return Jb * psia
+
+def direct_integral(x, psi, a, Ne, units):
+    """Returns the direct integral from Hartree Fock theory in 1D.
+    This is just the sum of the pairwise direct integrals.
+
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            states
+        a : int
+            state to be acted on
+        Ne : int
+            number of electrons
+        units : Class
+            fundamental constants
+
+    Output
+        J : np.array
+            the direct integral
+    """
+    
+    # Compute charge density that ath electron sees
+    rho_el = -units.e * prob_density(psi, x, Ne, a)
+
+    # Compute Coulomb interaction
+    J = get_1D_coulomb_int(x, -units.e, rho_el)
+
+    return J * psi[a]
+
+@jit(nopython=True)
+def direct_integral_jit(x : float, psi : complex, a : int, Ne : int, q : float)->complex:
+    """Returns the direction integral from Hartree Fock theory in 1D.
+
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            states
+        a : int
+            state to be acted on
+        Ne : int
+            number of electrons
+        q : float
+            electron charge
+
+    Output
+        J : np.array
+            direct integral
+    """
+    N : int = len(x)
+    rho : complex = (np.sum(psi[:a] * psi[:a].conjugate(), axis=0) 
+    	+ np.sum(psi[a+1:] * psi[a+1:].conjugate(), axis=0))
+    J: complex = np.zeros(N) + 1j * np.zeros(N) 
+    for i in range(len(x)):
+        f : complex = rho * np.abs(x - x[i])
+        J[i] = -2 * np.pi * q * utils.my_simps(f, x, N)        
+    return -J * psi[a]
+
+def get_Kbpsi_1D(x, psia, psib, units):
+    """Returns the action of the pairwise exchange operator on the state.
+    
+    Input
+        x : np.array
+            spatial array
+        psia : np.array
+            wavefunction. state to be acted on
+        psib : np.array
+            wavefunction. state giving rise to exchange operator
+        units : Class
+            fundamental constants
+    
+    Output
+        Kb_psi : np.array
+            action of the exchange operator on the state.
+    """
+    
+    # Determine grid spacing
+    dx = x[1]-x[0]
+    
+    # Compute array who's ij element is xi - xj
+    Deltax = np.outer(x, np.ones(len(x))) - np.outer(np.ones(len(x)), x)
+    
+    # Evaluate integral
+    Kb = -2*np.pi*integrate.simps(psib.conjugate() * abs(Deltax) * psia, dx=dx, axis=1)
+    
+    # Act on state psib
+    Kb_psi = Kb * psib
+    
+    return Kb_psi
+
+@jit(nopython=True)
+def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, q : float)->complex:
+    """Returns the action of the pairwise exchange operator on the state. This is jit compiled.
+    
+    Input
+        x : np.array
+            spatial array
+        psia : np.array
+            wavefunction. state to be acted on
+        psib : np.array
+            wavefunction. state giving rise to exchange operator
+        N : int
+            length of position array
+        e : float
+            electric charge
+    
+    Output
+        Kb_psi : np.array
+            action of the exchange operator on the state.
+    """
+    K: complex = np.zeros(N) + 1j * np.zeros(N) 
+    for i in range(len(x)):
+        f : complex = psib.conjugate() * np.abs(x - x[i]) * psia
+        K[i] = -2 * np.pi * q * utils.my_simps(f, x, N)        
+    return K * psib
+    
+def exchange_integral(x, psi, a, Ne, units):
+    """Returns the exchange integral from Hartree Fock theory in 1D.
+    This is just the sum of the pairwise exchange integrals.
+
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            states
+        a : int
+            state to be acted on
+        Ne : int
+            number of electrons
+        units : Class
+            fundamental constants
+
+    Output
+        J : np.array
+            the direct integral
+    """
+    
+    # Initialize array for memory
+    K = np.zeros(len(x), dtype=complex)
+
+    # Compute the direct integral
+    for b in np.delete(range(Ne), a):
+        K += get_Kbpsi_1D(x, psi[a], psi[b], units)
+
+    return K
+
+@jit(nopython=True)
+def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, q : float)->complex:
+    """Returns the exchange integral from Hartree Fock theory in 1D.
+    This is just the sum of the pairwise exchange integrals.
+
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            states
+        a : int
+            state to be acted on
+        Ne : int
+            number of electrons
+        N : int 
+            length of position array
+        e : float
+            electron charge
+
+    Output
+        J : np.array
+            the direct integral
+    """
+    K: complex = np.zeros(N) + 0j*np.zeros(N)
+    for b in range(Ne):
+        if b != a:
+            integral: complex = get_Kbpsi_1D_jit(x, psi[a], psi[b], len(x), q)
+            K = K + integral
+    return K
+
+def apply_F(Psi, Vx, spin):
+	"""Returns the action of HF operator on orbitals for paritcular
+	spin state.
+
+	Input
+	    Psi : class
+	        state of system
+	    Vx : np.array
+	        external potential
+	    spin : string
+	        'u' or 'd': string indicating spin of electron. 
+
+	Output
+	    Fpsi : the action of HF operator on orbitals of given spin.
+	"""
+
+    if spin is 'u':
+    	psia = Psi.psiu
+    	psib = Psi.psid
+    if spin is 'd':
+    	psia = Psi.psid
+    	psib = Psi.psiu
+    Hpsia = apply_H(psia, x, Vx, Psi.hbar, Psi.m, Psi.e)
+	Jpsia = direct_integrals(psia, x, q)
+	Jpsib = direct_integrals(psib, x, q)
+	Kpsia = exchange_integrals(psia, x, q)
+	return Hpsia + Jpsia - Kpsia + Jpsib
+
+
+def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False, fft=False):
+    """Returns the action of the Hartree-Fock operator on the state psi[a]. The
+    HF operator is s.t. 
+        F psia = h psia + sum(2Jb - Kb, b not a) psia
+    where h is just the kinetic energy plus external potential.
+    
+    Input
+        x : np.array
+            spatial array
+        psia : np.array
+            state to which F is applied. (technically redundant, but makes RK easier)
+        psi : np.array
+            set of states
+        a : np.array
+            state to be acted on
+        Ne : np.int
+            number of electrons
+        units : Class
+            fundamental constants
+        lagrange : bool
+            if True, use lagrange multipliers to keep states orthogonal
+        exchange : bool
+            if True, include exchange term.
+        fft : bool
+            if True, use fourier methods for the derivatives. Otherwise, use 
+            finite differences.
+    
+    Output
+        f_psi : np.array
+            array resulting from acting on psi[a] with HF operator.
+    """
+
+    # Determine grid spacing
+    dx = x[1] - x[0]
+    
+    
+    fpsia = (solver_utils.apply_H(psia, x, V_arr, units, fft) 
+        + 2 * direct_integral_jit(x, psi, a, Ne, -units.e))
+
+    if exchange==True:
+        fpsia = fpsia - exchange_integral_jit(x, psi, a, Ne, len(x), -units.e)
+    
+    if lagrange==False:
+        return fpsia
+    else:
+        Fpsia = subtract_lagrange_jit(fpsia, psi, x, Ne)
+        return Fpsia
+
+def get_HF_energy(x, psi, Varr, Ne, units, exchange=False, fft=False):
+    """Returns the Hartree Fock energt for Ne electrons.
+    
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            psi[i] is the ith electron orbital
+        Varr : np.array
+            Array of external potential energy
+        Ne : np.int
+            number of electrons
+        units : Class
+            fundamental constants
+        exchange : bool
+            if True, include the exchange integral
+        fft : bool
+            if true, use fourier methods for derivatives
+    
+    Output
+        E : np.float
+            HF energy
+    """
+
+    if exchange==True:
+        coeff = 1
+    else:
+        coeff = 0
+
+    # initialize energy to zero
+    E = 0
+    
+    # Determine grid spacing
+    dx = x[1] - x[0]
+
+    for a in range(Ne):
+        # For each particle, compute fpsi (note the factor of 2 in apply_H)
+        fpsi = 2 * (solver_utils.apply_H(psi[a], x, Varr, units, fft=fft) 
+            + direct_integral_jit(x, psi, a, Ne, -units.e))
+
+        if exchange==True:
+            fpsi -= exchange_integral_jit(x, psi, a, Ne, len(x), -units.e)
+
+        E += integrate.simps(psi[a].conjugate() * fpsi, dx=dx)
+    
+    assert np.allclose(E.imag, 0), "Energy is not real valued" 
+    return E
+
+def get_next_psi(psi_current, x, V, Ne, units):
+    """For each state, determine the state corresponding to the next iteration.
+    
+    Input
+        psi_current : np.array
+            wavefunctions from current iteration
+        x : np.array
+            position array
+        V : np.array
+            external potential
+        Ne : np.float
+            number of electrons
+        units : Class
+            fundamental constants
+    
+    Output
+        psi_next : np.array
+            wavefunction for next iteration
+        E_next : np.array
+            energies associated with each electronic state
+    """
+
+    # Initialize arrays that will store results after iteration
+    #psi_next = np.zeros((Ne, len(x)))
+    psi_next = psi_current
+    E_next = np.zeros(Ne)
+    
+    # For each electron, solve Hartree SE
+    for i in range(Ne):
+
+        # Generate charge density that electron i sees due to other electrons
+        #rho_i = -units.e * prob_density(psi_current, x, Ne, i)
+        rho_i = -units.e * prob_density((psi_next+psi_current)/2, x, Ne, i)
+        
+        # Generate effective interaction energy
+        U_i = get_1D_coulomb_int(x, -units.e, rho_i)
+        
+        # Solve corresponding Hartree equation
+        temp_psi, temp_Es = solver_1D.solver_1D(x, V + U_i, units, num_states=Ne)
+        
+        psi_next[i] = temp_psi[i]
+        E_next[i] = temp_Es[i]
+        
+    return psi_next, E_next
+
+def get_hartree_states(psi0, E0, x, V, Ne, etol, units):
+    """Compute the single electron states whose direct product forms the 
+    many electron Hartree state.
+    
+    Input
+        psi0 : np.array
+            noninteracting single particle states
+        E0 : np.array
+            noninteracting single particle eigenenergies
+        x : np.array
+            position space
+        V : np.array
+            external potential
+        Ne : np.int
+            number of electrons
+        etol : np.float
+            convergence criterian for hartree method. Iterations will cease
+            when percent difference in energy between iterations is less than
+            this.
+        units : Class
+            fundamental constants
+    
+    Output
+        psi : np.array
+            single electrons states whose direct product is the many electron
+            state.
+        E : np.array
+            single electron energies whose sum is the many electron energy
+    """
+    
+    # initialize some value for the percent difference
+    percent_diff = 1
+    
+    # Create count variable that will count number of iterations
+    count = 0
+    
+    # Loop needs previous energy, so must define this for first loop
+    psi = psi0[:Ne]
+    E = E0[:Ne]
+    
+    
+    
+    # While percent diff is bigger than tolerance, continue with iterations:
+    flag = False
+    while flag == False:
+    #while percent_diff > etol:
+        print(count)
+        Eprev = E
+        psi, E = get_next_psi(psi, x, V, Ne, units)
+        percent_diff = abs(np.sum(E) - np.sum(Eprev))
+        
+        if np.allclose(percent_diff, 0, etol) == True:
+            flag = True
+        
+        percent_diff = np.max(abs(E - Eprev))
+        count += 1
+
+    
+    return psi, E
+
+def assert_iteration_lim(n, max_iter):
+    """This is to prevent excessively long loops. Once a maximum number
+    of iterations has been reached, the current states are saved and the
+    loop is closed.
+
+    Input
+        n : int
+            current iterations number
+        max_iter
+            max allowed iterations.
+
+    Output
+        None
+    """
+
+    if n > max_iter:
+        print('Maximum number of iterations ('+str(max_iter)+') exceeded.')
+        np.save('../data_files/hartree_full_box/hartree_'+str(Ne)+'_max_iter', Es)
+        np.save('../data_files/hartree_full_box/hartree_'+str(Ne)+'_max_iter', psi) 
+        quit()
+
+def update_dt(dt, updown, delta=0.1):
+    """Updates the time step
+
+    Input
+        dt : np.float
+            current step size
+        delta : np.float
+            small number by which to change dt. The percent change
+            in dt is given by 100 * delta. 
+        updown : string
+            Increase time step by factor delta if "increase"
+            Decrease time step by factor delta if "decrease"
+
+    Output
+        dt : np.float
+            updated time step
+    """
+    if updown=="increase":
+        dt *= (1 + delta)
+        #print("Increasing time step - dt = "+str(dt))
+    elif updown=="decrease":
+        dt *= (1 - delta)
+        #print("Decreasing time step - dt = "+str(dt))
+    return dt
