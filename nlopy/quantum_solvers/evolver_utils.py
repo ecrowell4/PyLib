@@ -36,3 +36,31 @@ def apply_F(Psi, Vx, spin):
 	Kpsia = exchange_integrals(psia, x, q)
 	return Hpsia + Jpsia - Kpsia + Jpsib
 
+@jit(nopython=True)
+def apply_H(psi:complex, x:float, Vx:float, hbar:float, m:float, e:float)->complex:
+	"""Returns the action of single particle hamiltonian on
+	set of orbitals.
+
+	Input
+	    psi : np.array
+	        collection of orbitals of same spin type.
+	        psi[i] is ith orbital
+	    x : np.array
+	        spatial array
+	    Vx : np.array
+	        external potential
+	    hbar, m, e : float
+	        planck'c constant, particle mass, particle charge.
+	        All equal to 1 in atomic units.
+
+	Output
+	    Hpsi : np.array
+	        Hpsi[i] is action of H on ith orbital psi[i]
+	"""
+    
+    dx:float = x[1] - x[0]
+    Hpsi:complex = np.zeros(psi.shape) + 0j
+    Norb:int = len(psi)
+    for n in range(Norb):
+    	Hpsi[n] = -(hbar**2/2/m) * laplacian(psi[n], dx) + Vx*psi[n]
+    return Hpsi
