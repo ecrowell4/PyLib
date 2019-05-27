@@ -200,6 +200,29 @@ def gram_schmidt_jit(psi : complex, x : float)->complex:
         psi_gm[k] /= np.sqrt(braket_jit(psi_gm[k], psi_gm[k], x))
     return psi_gm
 
+@jit(nopython=True)
+def subtract_lagrange_jit(fpsi : complex, psi : complex, x : float, Ne : int)->complex:
+    """Takes as input the result of f action on psi, and returns the result
+    with the lagrange multipliers subtracted off.
+
+    Input
+        fpsi : np.array
+            action of f on state psi
+        psi : np.arra
+            orbitals
+        x : np.array
+            spatial array
+
+    Output
+        Fpsi : np.array
+            fpsi - lagrange_multipliers
+    """
+
+    Fpsi : complex = fpsi
+    for b in range(Ne):
+        Fpsi -= (braket_jit(psi[b], fpsi, x) / braket_jit(psi[b], psi[b], x)) * psi[b]
+    return Fpsi
+
 def overlap_matrix(psi, dx):
     """ Returns the overlap of all states contained in psi. For orthonormal
     states, this should be equal to the idential operator.
@@ -427,7 +450,8 @@ def direct_integral_jit(x : float, psi : complex, a : int, Ne : int, q : float)-
             direct integral
     """
     N : int = len(x)
-    rho : complex = np.sum(psi[:a] * psi[:a].conjugate(), axis=0) + np.sum(psi[a+1:] * psi[a+1:].conjugate(), axis=0)
+    rho : complex = (np.sum(psi[:a] * psi[:a].conjugate(), axis=0) 
+    	+ np.sum(psi[a+1:] * psi[a+1:].conjugate(), axis=0))
     J: complex = np.zeros(N) + 1j * np.zeros(N) 
     for i in range(len(x)):
         f : complex = rho * np.abs(x - x[i])
@@ -494,28 +518,34 @@ def exchange_integral_jit(x : float, psi : complex, a : int, Ne : int, N : int, 
             K = K + integral
     return K
 
-@jit(nopython=True)
-def subtract_lagrange_jit(fpsi : complex, psi : complex, x : float, Ne : int)->complex:
-    """Takes as input the result of f action on psi, and returns the result
-    with the lagrange multipliers subtracted off.
+def apply_F(Psi, Vx, spin):
+	"""Returns the action of HF operator on orbitals for paritcular
+	spin state.
 
-    Input
-        fpsi : np.array
-            action of f on state psi
-        psi : np.arra
-            orbitals
-        x : np.array
-            spatial array
+	Input
+	    Psi : class
+	        state of system
+	    Vx : np.array
+	        external potential
+	    spin : string
+	        'u' or 'd': string indicating spin of electron. 
 
-    Output
-        Fpsi : np.array
-            fpsi - lagrange_multipliers
-    """
+	Output
+	    Fpsi : the action of HF operator on orbitals of given spin.
+	"""
 
-    Fpsi : complex = fpsi
-    for b in range(Ne):
-        Fpsi -= (braket_jit(psi[b], fpsi, x) / braket_jit(psi[b], psi[b], x)) * psi[b]
-    return Fpsi
+    if spin is 'u':
+    	psia = Psi.psiu
+    	psib = Psi.psid
+    if spin is 'd':
+    	psia = Psi.psid
+    	psib = Psi.psiu
+    Hpsia = apply_H(psia, x, Vx, Psi.hbar, Psi.m, Psi.e)
+	Jpsia = direct_integrals(psia, x, q)
+	Jpsib = direct_integrals(psib, x, q)
+	Kpsia = exchange_integrals(psia, x, q)
+	return Hpsia + Jpsia - Kpsia + Jpsib
+
 
 def apply_f(x, psia, psi, V_arr, a, Ne, units, lagrange=False, exchange=False, fft=False):
     """Returns the action of the Hartree-Fock operator on the state psi[a]. The
