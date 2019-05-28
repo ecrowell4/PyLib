@@ -93,7 +93,7 @@ def direct_integrals(psi:complex, Uc:float, x:float, q:float)->complex:
 
     Norb:int = len(psi)
     rho:float = np.sum(psi.conjugate() * psi, axis=0)
-    coulomb_operator:complex = math_utils.coulomb_convolve(rho, Uc, x)
+    coulomb_operator:complex = q**2 * math_utils.coulomb_convolve(rho, Uc, x)
     J:complex = np.zeros(psi.shape) + 0j
     for n in range(Norb): 
         J[n] = coulomb_operator * psi[n]
@@ -122,6 +122,6 @@ def exchange_integrals(psi:complex, Uc:float, x:float, q:float)->complex:
 	K:complex = np.zeros(psi.shape) + 0j
 	for i in range(Norb):
 		for j in range(Norb):
-			K[i] = K[i] + math_utils.coulomb_convolve(psi[j].conjugate()*psi[i], Uc, x) * psi[j]
+			K[i] = K[i] + q**2 * math_utils.coulomb_convolve(psi[j].conjugate()*psi[i], Uc, x) * psi[j]
 	return K
 
