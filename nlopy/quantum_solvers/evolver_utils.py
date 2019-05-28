@@ -5,7 +5,7 @@ import scipy
 from scipy import integrate
 
 import nlopy
-from nlopy import utils
+from nlopy import utils, math_utils
 from nlopy.quantum_solvers import solver_1D, solver_utils
 
 def apply_F(Psi, Vx, spin):

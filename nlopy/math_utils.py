@@ -58,9 +58,10 @@ def subtract_lagrange(f:complex, y:complex, x:float)->complex:
     """
 
     Norb:int = len(f)
+    F:complex = f
     for i in range(Norb):
         for j in range(Norb):
-            F[i] -= braket(psi[j], f[i], x) * psi[j] / braket(psi[j], psi[j], x)
+            F[i] -= braket(y[j], f[i], x) * y[j] / braket(y[j], y[j], x)
     return F
 
 @jit(nopython=True)
