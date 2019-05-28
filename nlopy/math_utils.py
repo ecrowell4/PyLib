@@ -48,7 +48,7 @@ def project(f:complex, y:complex, x:float):
         The component of f along y: <f|y>/<y|y>
     """
 
-    return braket(y, f, x)*y / braket(y, y, x)
+    return braket(y, f, x) * y / braket(y, y, x)
 
 @jit(nopython=True)
 def subtract_lagrange(f:complex, y:complex, x:float)->complex:
