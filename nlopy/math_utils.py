@@ -65,7 +65,29 @@ def subtract_lagrange(f:complex, y:complex, x:float)->complex:
     return F
 
 @jit(nopython=True)
-def gram_schmidt_jit(psi:complex, x:float)->complex:
+def overlap(psi:complex, x:float)->complex:
+    """ Returns the overlap of all states contained in psi. For orthonormal
+    states, this should be equal to the idential operator.
+
+    Input
+        psi : np.array
+            collection of states
+        x : np.array
+            spatial array
+
+    Output
+        S : np.array
+            overlap matrix <n|m>
+    """
+    Norb:int = len(psi)
+    S:complex = np.zeros((Norb, Norb)) + 0j
+    for i in range(Norb):
+        for j in range(Norb):
+            S[i,j] = braket(psi[i], psi[j], x)
+    return S
+
+@jit(nopython=True)
+def gram_schmidt(psi:complex, x:float)->complex:
     """Takes in a set of basis functions and returns an orthonormal basis.
 
     Input
