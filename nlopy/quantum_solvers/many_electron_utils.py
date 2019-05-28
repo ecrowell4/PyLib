@@ -5,7 +5,7 @@ import scipy
 from scipy import integrate
 
 import nlopy
-from nlopy import utils
+from nlopy import utils, math_utils
 from nlopy.quantum_solvers import solver_1D, solver_utils
 
 #==============================================================================
@@ -74,7 +74,7 @@ def braket_jit(psia : complex, psib : complex, x : float)-> complex:
             projection of psia onto psib
     """
 
-    return utils.my_simps(psia.conjugate() * psib, x, len(x))
+    return math_utils.my_simps(psia.conjugate() * psib, x)
 
 def braket(psia, psib, dx):
     """Projects psia onto psib: <psia|psib>.
