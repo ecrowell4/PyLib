@@ -24,7 +24,6 @@ def apply_F(Psi, Vx, spin):
         Fpsi : array
             the action of HF operator on orbitals of given spin.
     """
-
     if spin is 'u':
         psia = Psi.psiu
         psib = Psi.psid
@@ -37,7 +36,7 @@ def apply_F(Psi, Vx, spin):
     Kpsia = exchange_integrals(psia, Psi.Uc, Psi.x, Psi.e)
     Fpsia = Hpsia + Jpsia - Kpsia + Jpsib
     if Psi.lagrange is True:
-    	Fpsia = math_utils.subtract_lagrange(Fpsia, psia, Psi.x)
+        Fpsia = math_utils.subtract_lagrange(Fpsia, psia, Psi.x)
     return Fpsia
 
 @jit(nopython=True)
@@ -101,27 +100,27 @@ def direct_integrals(psi:complex, Uc:float, x:float, q:float)->complex:
 
 @jit(nopython=True)
 def exchange_integrals(psi:complex, Uc:float, x:float, q:float)->complex:
-	"""Returns action of exchange operator on each orbital of given
-	type.
+    """Returns action of exchange operator on each orbital of given
+    type.
 
-	Input
-	    psi : np.array
-	        psi[i] is ith orbital
-	    Uc : np.array
-	        Coulomb kernel in position space
-	    x : np.array
-	        spatial array
-	    q : float
-	        charge of particle
+    Input
+        psi : np.array
+            psi[i] is ith orbital
+        Uc : np.array
+            Coulomb kernel in position space
+        x : np.array
+            spatial array
+        q : float
+            charge of particle
     Output 
         Kpsi : np.array
             Kpsi[i] is action of exchange operator on orbital psi[i]
-	"""
+    """
 
-	Norb:int = len(psi)
-	K:complex = np.zeros(psi.shape) + 0j
-	for i in range(Norb):
-		for j in range(Norb):
-			K[i] = K[i] + q**2 * math_utils.coulomb_convolve(psi[j].conjugate()*psi[i], Uc, x) * psi[j]
-	return K
+    Norb:int = len(psi)
+    K:complex = np.zeros(psi.shape) + 0j
+    for i in range(Norb):
+        for j in range(Norb):
+            K[i] = K[i] + q**2 * math_utils.coulomb_convolve(psi[j].conjugate()*psi[i], Uc, x) * psi[j]
+    return K
 
