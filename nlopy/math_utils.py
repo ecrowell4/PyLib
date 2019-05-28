@@ -37,6 +37,18 @@ def coulomb_convolve(y:complex, Uc:complex, x:float)->complex:
         res[i] = my_simps(y * Uc_roll[::-1], x)
     return res
 
+@jit(nopython=True)
+def project(f:complex, y:complex, x:float):
+    """Returns component of f that is along y.
+
+    Input
+        f, y : np.array
+
+    Output
+        The component of f along y: <f|y>/<y|y>
+    """
+
+    return braket(y, f, x)*y / braket(y, y, x)
 
 @jit(nopython=True)
 def subtract_lagrange(f:complex, y:complex, x:float)->complex:
