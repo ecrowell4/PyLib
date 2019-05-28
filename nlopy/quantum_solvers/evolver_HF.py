@@ -1,4 +1,7 @@
 import numpy as np
+
+import nlopy
+from nlopy import math_utils
 from nlopy.quantum_solvers import evolver_utils
 
 def take_RK_step(Psi, Vfunc, t, dt):
@@ -72,25 +75,25 @@ def get_HF_energy(Psi, Vx):
     E = 0 + 0j
     Hpsiu = evolver_utils.apply_H(Psi.psiu, Psi.x, Vx, Psi.hbar, Psi.m, Psi.e)
     for a in range(Psi.Nu):
-        E += math_utils.braket(Psi.psiu[a]*Hpsiu[a], x)
+        E += math_utils.braket(Psi.psiu[a], Hpsiu[a], Psi.x)
 
     Hpsid = evolver_utils.apply_H(Psi.psid, Psi.x, Vx, Psi.hbar, Psi.m, Psi.e)
     for a in range(Psi.Nd):
-        E += math_utils.braket(Psi.psid[a]*Hpsid[a], x)
-
+        E += math_utils.braket(Psi.psid[a], Hpsid[a], Psi.x)
+    
     Jpsiu = evolver_utils.direct_integrals(Psi.psiu, Psi.Uc, Psi.x, Psi.e)
     Kpsiu = evolver_utils.exchange_integrals(Psi.psiu, Psi.Uc, Psi.x, Psi.e)
     for a in range(Psi.Nu):
-        E += 0.5 * math_utils.braket(Psi.psiu[a]*(Jpsiu[a] - Kpsiu[a]), x)
-        
+        E += 0.5 * math_utils.braket(Psi.psiu[a], (Jpsiu[a] - Kpsiu[a]), Psi.x)
+
     Jpsid = evolver_utils.direct_integrals(Psi.psid, Psi.Uc, Psi.x, Psi.e)
     Kpsid = evolver_utils.exchange_integrals(Psi.psid, Psi.Uc, Psi.x, Psi.e)
     for a in range(Psi.Nd):
-        E += 0.5 * math_utils.braket(Psi.psid[a]*(Jpsid[a] - Kpsid[a]), x)
+        E += 0.5 * math_utils.braket(Psi.psid[a], (Jpsid[a] - Kpsid[a]), Psi.x)
 
-    rhou = np.sum(Psi.u.conjugate() * Psi.u, axis=0)
-    Ucud = math_utils.coulomb_convolve(rhou, Psi.Uc, Psi.x)
+    rhou = np.sum(Psi.psiu.conjugate() * Psi.psiu, axis=0)
+    Ucud = Psi.e**2 * math_utils.coulomb_convolve(rhou, Psi.Uc, Psi.x)
     for a in range(Psi.Nd):
-        E += 0.5 * math_utils.braket(Psi.psid.conjugate() * Psi.psid * Ucud, x)
+        E += 0.5 * math_utils.braket(Psi.psid[a],  Psi.psid[a] * Ucud, Psi.x)
 
     return E
