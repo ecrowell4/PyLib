@@ -31,13 +31,13 @@ def apply_F(Psi, Vx, spin):
     if spin is 'd':
         psia = Psi.psid
         psib = Psi.psiu
-    Hpsia = apply_H(psia, x, Vx, Psi.hbar, Psi.m, Psi.e)
-    Jpsia = direct_integrals(psia, Psi.Uc, Psi.e, Psi.dx)
-    Jpsib = direct_integrals(psib, Psi.Uc, Psi.e, Psi.dx)
-    Kpsia = exchange_integrals(psia, Psi.Uc, Psi.e, Psi.dx)
+    Hpsia = apply_H(psia, Psi.x, Vx, Psi.hbar, Psi.m, Psi.e)
+    Jpsia = direct_integrals(psia, Psi.Uc, Psi.x, Psi.e)
+    Jpsib = direct_integrals(psib, Psi.Uc, Psi.x, Psi.e)
+    Kpsia = exchange_integrals(psia, Psi.Uc, Psi.x, Psi.e)
     Fpsia = Hpsia + Jpsia - Kpsia + Jpsib
     if Psi.lagrange is True:
-    	Fpsia = math_utils.subtract_lagrange(Fpsia, Psi.psia, Psi.x)
+    	Fpsia = math_utils.subtract_lagrange(Fpsia, psia, Psi.x)
     return Fpsia
 
 @jit(nopython=True)

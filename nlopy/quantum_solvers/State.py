@@ -30,7 +30,7 @@ class State(object):
         get_copy()
             returns a deep copy of the class"""
 
-    def __init__(self, psiu, psid, L, Nx, state, unit_type='atomic',
+    def __init__(self, psiu, psid, L, Nx, Uc, state, unit_type='atomic',
     	         lagrange=True, exchange=True, centered=True):
  
         if unit_type is 'atomic':
@@ -62,6 +62,7 @@ class State(object):
         self.psid = psid
         self.Nu = len(psiu)
         self.Nd = len(psid)
+        self.Uc = Uc
         self.state = state
         self.lagrange = lagrange
         self.exchange = exchange

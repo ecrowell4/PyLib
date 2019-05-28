@@ -397,7 +397,7 @@ def direct_integral_jit(x : float, psi : complex, a : int, Ne : int, q : float)-
     J: complex = np.zeros(N) + 1j * np.zeros(N) 
     for i in range(len(x)):
         f : complex = rho * np.abs(x - x[i])
-        J[i] = -2 * np.pi * q * utils.my_simps(f, x, N)        
+        J[i] = -2 * np.pi * q * math_utils.my_simps(f, x)        
     return -J * psi[a]
 
 def get_Kbpsi_1D(x, psia, psib, units):
@@ -455,7 +455,7 @@ def get_Kbpsi_1D_jit(x : float, psia : complex, psib : complex, N : int, q : flo
     K: complex = np.zeros(N) + 1j * np.zeros(N) 
     for i in range(len(x)):
         f : complex = psib.conjugate() * np.abs(x - x[i]) * psia
-        K[i] = -2 * np.pi * q * utils.my_simps(f, x, N)        
+        K[i] = -2 * np.pi * q * math_utils.my_simps(f, x)        
     return K * psib
     
 def exchange_integral(x, psi, a, Ne, units):
