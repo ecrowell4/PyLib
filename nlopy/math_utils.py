@@ -137,3 +137,42 @@ def my_simps(f: complex, x:float)->complex:
         result = result + f[-1]
         result = result * dx / 3
         return result
+
+def smooth_func(x, n, periodic=False):
+    """ Generate smooth function by selecting n random Fourier coefficients.
+    The function is assumed
+    
+    Input
+        x : np.array
+            Our spatial interval
+        n : int
+            desired number of Fourier terms
+            
+    Output
+        f : np.array
+            values of the generated function on x
+            
+    Optional
+        periodic : bool
+            if false, then a linear offset is added to break symmetry
+    """
+    
+    # Length of interval
+    L = x[len(x)-1] - x[0]
+
+    # Create an array to store our function
+    f = np.zeros(len(x))
+    
+    # Array of Fourier coeffs
+    c1 = np.random.randn(n)
+    c2 = np.random.randn(n)
+    m = np.random.uniform(-10, 10)
+    
+    for i in range(n):
+        f += c1[i] * np.sin(2*i*np.pi*x / L) + c2[i] * np.cos(2*i*np.pi*x / L)
+    
+    # We add a linear portion to break the symmetry
+    if periodic == False:
+        f += m * x
+
+    return f
