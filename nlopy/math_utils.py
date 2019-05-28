@@ -65,6 +65,31 @@ def subtract_lagrange(f:complex, y:complex, x:float)->complex:
     return F
 
 @jit(nopython=True)
+def gram_schmidt_jit(psi:complex, x:float)->complex:
+    """Takes in a set of basis functions and returns an orthonormal basis.
+
+    Input
+        x : np.array
+            spatial array
+        psi : np.array
+            array whose elements are the basis functions
+
+    Output
+        psi_gm : np.array
+            array of orthonormal basis functions
+    """
+    N:int = len(psi)
+    psi_gm:complex = np.zeros(psi.shape) + 0j
+    psi_gm[0] = psi[0]
+    for k in range(N):
+        psi_gm[k] = psi[k]
+        for j in range(k):
+            psi_gm[k] -= (braket_jit(psi[k], psi_gm[j], x) 
+                / braket_jit(psi_gm[j], psi_gm[j], x)) * psi_gm[j]
+        psi_gm[k] /= np.sqrt(braket_jit(psi_gm[k], psi_gm[k], x))
+    return psi_gm
+
+@jit(nopython=True)
 def braket(y:complex, f:complex, x:float)->complex:
     """Computes integral <y|f> = <f|y>*.
 
