@@ -1,8 +1,5 @@
 import numpy as np
-from nlopy.quantum_solvers import solver_utils
 from nlopy.quantum_solvers import evolver_utils
-from concurrent import futures
-import functools
 
 def take_RK_step(Psi, Vfunc, t, dt):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta, using
@@ -58,4 +55,42 @@ def take_RK_step(Psi, Vfunc, t, dt):
     
     return newPsi
 
+def get_HF_energy(Psi, Vx):
+    """Compute the total energy from the State Psi.
+
+    Input
+        Psi : class
+            state of the system
+        Vx : np.array
+            external potential at time t
+
+    Output
+        E : float
+            total energy
+    """
     
+    E = 0 + 0j
+    Hpsiu = evolver_utils.apply_H(Psi.psiu, Psi.x, Vx, Psi.hbar, Psi.m, Psi.e)
+    for a in range(Psi.Nu):
+        E += math_utils.braket(Psi.psiu[a]*Hpsiu[a], x)
+
+    Hpsid = evolver_utils.apply_H(Psi.psid, Psi.x, Vx, Psi.hbar, Psi.m, Psi.e)
+    for a in range(Psi.Nd):
+        E += math_utils.braket(Psi.psid[a]*Hpsid[a], x)
+
+    Jpsiu = evolver_utils.direct_integrals(Psi.psiu, Psi.Uc, Psi.x, Psi.e)
+    Kpsiu = evolver_utils.exchange_integrals(Psi.psiu, Psi.Uc, Psi.x, Psi.e)
+    for a in range(Psi.Nu):
+        E += 0.5 * math_utils.braket(Psi.psiu[a]*(Jpsiu[a] - Kpsiu[a]), x)
+        
+    Jpsid = evolver_utils.direct_integrals(Psi.psid, Psi.Uc, Psi.x, Psi.e)
+    Kpsid = evolver_utils.exchange_integrals(Psi.psid, Psi.Uc, Psi.x, Psi.e)
+    for a in range(Psi.Nd):
+        E += 0.5 * math_utils.braket(Psi.psid[a]*(Jpsid[a] - Kpsid[a]), x)
+
+    rhou = np.sum(Psi.u.conjugate() * Psi.u, axis=0)
+    Ucud = math_utils.coulomb_convolve(rhou, Psi.Uc, Psi.x)
+    for a in range(Psi.Nd):
+        E += 0.5 * math_utils.braket(Psi.psid.conjugate() * Psi.psid * Ucud, x)
+
+    return E
