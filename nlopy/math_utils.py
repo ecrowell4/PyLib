@@ -118,9 +118,9 @@ def gram_schmidt(psi:complex, x:float)->complex:
     for k in range(N):
         psi_gm[k] = psi[k]
         for j in range(k):
-            psi_gm[k] -= (braket_jit(psi[k], psi_gm[j], x) 
-                / braket_jit(psi_gm[j], psi_gm[j], x)) * psi_gm[j]
-        psi_gm[k] /= np.sqrt(braket_jit(psi_gm[k], psi_gm[k], x))
+            psi_gm[k] -= (braket(psi[k], psi_gm[j], x) 
+                / braket(psi_gm[j], psi_gm[j], x)) * psi_gm[j]
+        psi_gm[k] /= np.sqrt(braket(psi_gm[k], psi_gm[k], x))
     return psi_gm
 
 @jit(nopython=True)

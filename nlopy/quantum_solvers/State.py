@@ -31,7 +31,7 @@ class State(object):
             returns a deep copy of the class"""
 
     def __init__(self, psiu, psid, L, Nx, Uc, state, unit_type='atomic',
-    	         lagrange=True, exchange=True, centered=True):
+    	         lagrange=True, centered=True):
  
         if unit_type is 'atomic':
             self.hbar = 1
@@ -65,7 +65,6 @@ class State(object):
         self.Uc = Uc
         self.state = state
         self.lagrange = lagrange
-        self.exchange = exchange
 
     def get_copy(self):
         """Returns a copy of the current state. We will need
