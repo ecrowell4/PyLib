@@ -95,8 +95,9 @@ def overlap(psi:complex, x:float)->complex:
     Norb:int = len(psi)
     S:complex = np.zeros((Norb, Norb)) + 0j
     for i in range(Norb):
-        for j in range(Norb):
+        for j in range(i,Norb):
             S[i,j] = braket(psi[i], psi[j], x)
+            S[j,i] = S[i,j].conjugate()
     return S
 
 @jit(nopython=True)
