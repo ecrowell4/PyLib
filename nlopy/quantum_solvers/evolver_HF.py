@@ -96,6 +96,6 @@ def get_HF_energy(Psi, Vx):
     rhou = np.sum(Psi.psiu.conjugate() * Psi.psiu, axis=0)
     Ucud = Psi.e**2 * math_utils.coulomb_convolve(rhou, Psi.Uc, Psi.x)
     for a in range(Psi.Nd):
-        E += 0.5 * math_utils.braket(Psi.psid[a],  Psi.psid[a] * Ucud, Psi.x)
+        E +=  math_utils.braket(Psi.psid[a],  Psi.psid[a] * Ucud, Psi.x)
 
     return E
