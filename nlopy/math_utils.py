@@ -13,7 +13,7 @@ def laplacian(f:complex, dx:float)->complex:
 
 
 @jit(nopython=True)
-def coulomb_convolve(y:complex, Uc:complex, x:float)->complex:
+def coulomb_convolve(y:complex, Uc:float, x:float)->complex:
     """Returns the convolution of two complex valued functions
     y*h.
 
@@ -32,7 +32,7 @@ def coulomb_convolve(y:complex, Uc:complex, x:float)->complex:
     N:int = len(x)
     res:complex = np.zeros(N) + 0j
     for i in range(N):
-        Uc_:complex = np.zeros(N) + 0j
+        Uc_:complex = np.zeros(N)
         Uc_[:i] = Uc[1:i+1][::-1]
         Uc_[i:] = Uc[:N-i]
         res[i] = my_simps(y * Uc_[::-1], x)
