@@ -35,7 +35,7 @@ def coulomb_convolve(y:complex, Uc:float, x:float)->complex:
         Uc_:complex = np.zeros(N)
         Uc_[:i] = Uc[1:i+1][::-1]
         Uc_[i:] = Uc[:N-i]
-        res[i] = my_simps(y * Uc_[::-1], x)
+        res[i] = my_simps(y * Uc_, x)
     return res
 
 @jit(nopython=True)
