@@ -32,9 +32,10 @@ def coulomb_convolve(y:complex, Uc:complex, x:float)->complex:
     N:int = len(x)
     res:complex = np.zeros(N) + 0j
     for i in range(N):
-        Uc_roll:complex = np.roll(Uc, i)
-        Uc_roll[:i] = Uc[1:i+1][::-1]
-        res[i] = my_simps(y * Uc_roll[::-1], x)
+        Uc_:complex = np.zeros(N) + 0j
+        Uc_[:i] = Uc[1:i+1][::-1]
+        Uc_[i:] = Uc[:N-i]
+        res[i] = my_simps(y * Uc_[::-1], x)
     return res
 
 @jit(nopython=True)
