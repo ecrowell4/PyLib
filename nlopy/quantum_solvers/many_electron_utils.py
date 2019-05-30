@@ -394,6 +394,7 @@ def direct_integral_jit(x : float, psi : complex, a : int, Ne : int, q : float)-
     N : int = len(x)
     rho : complex = (np.sum(psi[:a] * psi[:a].conjugate(), axis=0) 
     	+ np.sum(psi[a+1:] * psi[a+1:].conjugate(), axis=0))
+    #rho:complex = np.sum(psi.conjugate()*psi, axis=0)
     J: complex = np.zeros(N) + 1j * np.zeros(N) 
     for i in range(len(x)):
         f : complex = rho * np.abs(x - x[i])
