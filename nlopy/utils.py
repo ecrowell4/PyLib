@@ -5,6 +5,24 @@ of application."""
 import numpy as np
 from numba import jit
 
+def save_class(obj, filename):
+    """A method for saving class objects.
+
+    Input
+        obj : class
+            class to be saved
+        filename : string
+            name of file, should end with .pkl. Also include
+            path
+
+    To open the class, use
+    with open('filename', 'rb') as input:
+        class_instance = pickle.load(input)
+    
+    """
+    with open(filename, 'wb') as output:  # Overwrites any existing file.
+        pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
+
 def position_space(L, N, centered=False, periodic=False):
     """Returns an array that represents a discretized representation of
     the interval [L_min, L_min + L], enpoints included. 
