@@ -4,6 +4,7 @@ of application."""
 
 import numpy as np
 from numba import jit
+import pickle
 
 def save_class(obj, filename):
     """A method for saving class objects.
