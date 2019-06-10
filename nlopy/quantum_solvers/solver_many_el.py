@@ -7,9 +7,45 @@ import functools; import time
 import nlopy
 from nlopy import utils
 from nlopy.quantum_solvers import solver_1D, solver_utils, evolver_1D, many_electron_utils
+from nlopy.quantum_solvers import evolver_HF, math_utils
 
 units = utils.Units('atomic')
 etol = 1e-8
+
+def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
+	"""Uses a diffusive Hartree-Fock method (imaginary time) to 
+	compute the lowest energy state.
+
+	Input
+	    Psi0 : class
+	        initial state of the system
+	    Vfunc : function
+	        function which returns potential at given time and position
+
+	Output
+	    Psif : class
+	        final state of system
+	    Es : np.array
+	        energie at each step in imaginary time.
+	"""
+	ediff = 1
+	Es = np.zeros(0)
+	Es = np.append(Es, evolver_HF.get_HF_energy(Psi0, Vfunc(Psi0.x, t=0)))
+	tmpPsi = Psi0.get_copy()
+	Psif = Psi0.get_copy()
+	n=1
+	while np.allclose(0, ediff, atol=tol) is False:
+		tmpPsi = evolver_HF.take_step_RungeKutta_HF(Psif, Vfunc, -1j*n*dt, -1j*dt)
+		if Psi0.Nu != 0:
+			tmpPsi.psiu = math_utils.gram_schmidt(tmpPsi.psiu, tmpPsi.x)
+		if Psi0.Nd != 0:
+			tmpPsi.psid = math_utils.gram_schmidt(tmpPsi.psid, tmpPsi.x)
+		tmpE = evolver_HF.get_HF_energy(tmpPsi, Vfunc(tmpPsi.x, -1j*n*dt))
+		Es = np.append(Es, tmpE)
+		ediff = (Es[n] - Es[n-1])/dt
+		n +=1
+		assert n < max_iter, "Exceeded maximum number of iterations."
+
 
 def minimize_energy(psi0, x, V, Ne, units, lagrange=True, exchange=False, etol=1e-8, fft=False, exc_state=False, psi_grnd=None):
     """Returns the single particle orbitals whose direct product (or slater det

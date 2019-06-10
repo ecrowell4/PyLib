@@ -36,6 +36,7 @@ def apply_F(Psi, Vx, spin):
         Jpsib = direct_integrals(psib, Psi.Uc, Psi.x, Psi.e)
     else:
         Jpsib = np.zeros(Jpsia.shape)
+        
     Kpsia = exchange_integrals(psia, Psi.Uc, Psi.x, Psi.e)
     if Psi.int_type is 'repulsive':
         Fpsia = Hpsia + Jpsia + Jpsib - Kpsia
