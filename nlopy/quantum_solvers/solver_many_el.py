@@ -46,6 +46,7 @@ def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
         ediff = (Es[n] - Es[n-1])/dt
         n +=1
         assert n < max_iter, "Exceeded maximum number of iterations."
+    Psif.Energy = Es[-1]
     return Psif, Es
 
 

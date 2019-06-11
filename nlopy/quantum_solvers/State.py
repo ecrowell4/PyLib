@@ -30,7 +30,7 @@ class State(object):
         get_copy()
             returns a deep copy of the class"""
 
-    def __init__(self, psiu, psid, L, Nx, Uc, state, Field=0, unit_type='atomic',
+    def __init__(self, psiu, psid, L, Nx, Uc, state, Energy=None, Field=0, unit_type='atomic',
     	         lagrange=True, centered=True):
  
         if unit_type is 'atomic':
@@ -59,6 +59,7 @@ class State(object):
         self.Field = Field
 
         # Initialize Hartree Fock parameters
+        self.Energy = Energy
         self.psiu = psiu
         self.psid = psid
         self.Nu = len(psiu)
