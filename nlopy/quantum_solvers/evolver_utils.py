@@ -38,10 +38,7 @@ def apply_F(Psi, Vx, spin):
         Jpsib = np.zeros(Jpsia.shape)
         
     Kpsia = exchange_integrals(psia, Psi.Uc, Psi.x, Psi.e)
-    if Psi.int_type is 'repulsive':
-        Fpsia = Hpsia + Jpsia + Jpsib - Kpsia
-    elif Psi.int_type is 'attractive':
-        Fpsia = Hpsia - Jpsia - Jpsib + Kpsia
+    Fpsia = Hpsia + Jpsia + Jpsib - Kpsia
     if Psi.lagrange is True:
         Fpsia = math_utils.subtract_lagrange(Fpsia, psia, Psi.x)
     return Fpsia
