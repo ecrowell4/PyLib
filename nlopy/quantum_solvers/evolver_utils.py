@@ -31,9 +31,9 @@ def apply_F(Psi, Vx, spin):
         psia = Psi.psid
         psib = Psi.psiu
     Hpsia = apply_H(psia, Psi.x, Vx, Psi.hbar, Psi.m, Psi.e)
-    Jpsia = direct_integrals(psia, Psi.Uc, Psi.x, Psi.e)
+    Jpsia = direct_integrals(psia, psia, Psi.Uc, Psi.x, Psi.e)
     if len(psib) != 0:
-        Jpsib = direct_integrals(psib, Psi.Uc, Psi.x, Psi.e)
+        Jpsib = direct_integrals(psib, psia, Psi.Uc, Psi.x, Psi.e)
     else:
         Jpsib = np.zeros(Jpsia.shape)
         
@@ -76,15 +76,15 @@ def apply_H(psi:complex, x:float, Vx:float, hbar:float, m:float, e:float)->compl
     return Hpsi
 
 @jit(nopython=True)
-def direct_integrals(psi:complex, Uc:float, x:float, q:float)->complex:
+def direct_integrals(psi1:complex, psi2:complex, Uc:float, x:float, q:float)->complex:
     """Returns the direct integrals for orbitals of given type.
     Note that the direct integral for all of the orbitals is the same.
     This allows us to only compute a single integral, then broadcast
     the result.
 
     Input
-        psi : np.array
-            psi[i] is the ith orbital of specific spin type
+        psi1,2 : np.array
+            psi[i] is the ith orbital of specific spin type.
         Uc : np.array
             Coulomb kernel in position space (i.e. 1/r, |r|, log(r), etc.)
         x : np.array
@@ -97,12 +97,12 @@ def direct_integrals(psi:complex, Uc:float, x:float, q:float)->complex:
             Jpsi[i] is action of the Coulomb operator on orbital psi[i]
     """
 
-    Norb:int = len(psi)
-    rho:float = np.sum(psi.conjugate() * psi, axis=0)
-    coulomb_operator:complex = q**2 * math_utils.coulomb_convolve(rho, Uc, x)
-    J:complex = np.zeros(psi.shape) + 0j
+    Norb:int = len(psi2)
+    rho1:float = np.sum(psi1.conjugate() * psi1, axis=0)
+    coulomb_operator:complex = q**2 * math_utils.coulomb_convolve(rho1, Uc, x)
+    J:complex = np.zeros(psi2.shape) + 0j
     for n in range(Norb): 
-        J[n] = coulomb_operator * psi[n]
+        J[n] = coulomb_operator * psi2[n]
     return J
 
 @jit(nopython=True)

@@ -89,21 +89,20 @@ def get_HF_energy(Psi, Vx):
     for a in range(Psi.Nu):
         E += math_utils.braket(Psi.psiu[a], Hpsiu[a], Psi.x)
 
-    Jpsiu = evolver_utils.direct_integrals(Psi.psiu, Psi.Uc, Psi.x, Psi.e)
+    Jpsiuu = evolver_utils.direct_integrals(Psi.psiu, Psi.psiu, Psi.Uc, Psi.x, Psi.e)
     Kpsiu = evolver_utils.exchange_integrals(Psi.psiu, Psi.Uc, Psi.x, Psi.e)
     for a in range(Psi.Nu):
-        E += 0.5 * math_utils.braket(Psi.psiu[a], (Jpsiu[a] - Kpsiu[a]), Psi.x)
+        E += 0.5 * math_utils.braket(Psi.psiu[a], (Jpsiuu[a] - Kpsiu[a]), Psi.x)
 
     if Psi.Nd != 0:
         Hpsid = evolver_utils.apply_H(Psi.psid, Psi.x, Vx, Psi.hbar, Psi.m, Psi.e)
-        Jpsid = evolver_utils.direct_integrals(Psi.psid, Psi.Uc, Psi.x, Psi.e)
+        Jpsidd = evolver_utils.direct_integrals(Psi.psid, Psi.psid, Psi.Uc, Psi.x, Psi.e)
         Kpsid = evolver_utils.exchange_integrals(Psi.psid, Psi.Uc, Psi.x, Psi.e)
         for a in range(Psi.Nd):
-            E += 0.5 * math_utils.braket(Psi.psid[a], (Hpsid[a] + Jpsid[a] - Kpsid[a]), Psi.x)
+            E += 0.5 * math_utils.braket(Psi.psid[a], (Hpsid[a] + Jpsidd[a] - Kpsid[a]), Psi.x)
 
-        rhou = np.sum(Psi.psiu.conjugate() * Psi.psiu, axis=0)
-        Ucud = Psi.e**2 * math_utils.coulomb_convolve(rhou, Psi.Uc, Psi.x)
-        for a in range(Psi.Nd):
-            E +=  math_utils.braket(Psi.psid[a],  Psi.psid[a] * Ucud, Psi.x)
+        Jpsiud = evolver_utils.direct_integrals(Psi.psid, Psi.psiu, Psi.Uc, Psi.x, Psi.e)
+        for a in range(Psi.Nu):
+            E +=  math_utils.braket(Psi.psiu[a], Jpsiud[a], Psi.x)
 
     return E
