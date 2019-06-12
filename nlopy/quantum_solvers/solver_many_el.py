@@ -12,7 +12,7 @@ from nlopy.quantum_solvers import evolver_HF
 units = utils.Units('atomic')
 etol = 1e-8
 
-def URHF(Psi0, Vfunc, dt, tol, excited=False, Psi_grnd=None, max_iter=int(1e4)):
+def URHF(Psi0, Vfunc, dt, tol, excited=False, max_iter=int(1e4)):
     """Uses a diffusive Hartree-Fock method (imaginary time) to 
     compute the lowest energy state.
 
@@ -29,8 +29,10 @@ def URHF(Psi0, Vfunc, dt, tol, excited=False, Psi_grnd=None, max_iter=int(1e4)):
             energie at each step in imaginary time.
     """
     if excited is True:
-    	assert Psi_grnd is not None, "Must have ground state information to find excited state."
-
+    	Psi_grnd = utils.load_class('../data_files/unrestriced_HF/states_'+str(Psi0.Ne)+'_el_2a0_ground.pkl')
+        for i in range(Psi0.Nu):
+    	    Psi0.psiu[-1] -= math_utils.project(Psi0.psiu[-1], Psi_grnd.psiu[i], Psi0.x)
+    	Psi0.psiu[-1] /= np.sqrt(math_utils.braket(Psi0.psiu[-1], Psi0.psiu[-1], Psi0.x))
     ediff = 1
     Es = np.zeros(0)
     Es = np.append(Es, evolver_HF.get_HF_energy(Psi0, Vfunc(Psi0.x, t=0)))
@@ -39,6 +41,9 @@ def URHF(Psi0, Vfunc, dt, tol, excited=False, Psi_grnd=None, max_iter=int(1e4)):
     n=1
     while np.allclose(0, ediff, atol=tol) is False:
         tmpPsi = evolver_HF.take_RK_step(Psif, Vfunc, -1j*n*dt, -1j*dt)
+        if excited is True:
+        	for i in range(tmpPsi.Nu):
+        		tmpPsi.psiu[-1] -= math_utils.prjoect(tmpPsi.psiu[-1], Psi_grnd.psiu[i], tmpPsi.x)
         if Psi0.Nu != 0:
             tmpPsi.psiu = math_utils.gram_schmidt(tmpPsi.psiu, tmpPsi.x)
         if Psi0.Nd != 0:
