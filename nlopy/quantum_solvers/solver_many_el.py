@@ -12,7 +12,7 @@ from nlopy.quantum_solvers import evolver_HF
 units = utils.Units('atomic')
 etol = 1e-8
 
-def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
+def URHF(Psi0, Vfunc, dt, tol, excited=False, Psi_grnd=None, max_iter=int(1e4)):
     """Uses a diffusive Hartree-Fock method (imaginary time) to 
     compute the lowest energy state.
 
@@ -28,6 +28,9 @@ def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
         Es : np.array
             energie at each step in imaginary time.
     """
+    if excited is True:
+    	assert Psi_grnd is not None, "Must have ground state information to find excited state."
+
     ediff = 1
     Es = np.zeros(0)
     Es = np.append(Es, evolver_HF.get_HF_energy(Psi0, Vfunc(Psi0.x, t=0)))
