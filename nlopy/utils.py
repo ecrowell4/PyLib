@@ -6,6 +6,17 @@ import numpy as np
 from numba import jit
 import pickle
 
+def load_class(filename):
+    """A method for loading a class.
+
+    Input
+       filename : string
+           name of file, including path. Ends with .pkl"""
+
+    with open(filename, 'rb') as input:
+        class_instance = pickle.load(input)
+    return class_instance
+
 def save_class(obj, filename):
     """A method for saving class objects.
 
