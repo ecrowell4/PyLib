@@ -4,7 +4,7 @@ import nlopy
 from nlopy import math_utils
 from nlopy.quantum_solvers import evolver_utils
 
-def take_RK_step(Psi, Vfunc, t, dt):
+def take_RK_step(Psi, Vfunc, t, dt, Psi_grnd=None):
     """Evolves psi(t) to psi(t+dt) via fourth order Runge-Kutta, using
     the Hartree Fock operator to evolve.
 
@@ -34,33 +34,33 @@ def take_RK_step(Psi, Vfunc, t, dt):
 
     newPsi = Psi.get_copy()
 
-    k1u = (-1j/Psi.hbar) * evolver_utils.apply_F(Psi, Vfunc(Psi.x, t), 'u')
+    k1u = (-1j/Psi.hbar) * evolver_utils.apply_F(Psi, Vfunc(Psi.x, t), 'u', Psi.state, Psi_grnd)
     if Psi.Nd != 0:
-        k1d = (-1j/Psi.hbar) * evolver_utils.apply_F(Psi, Vfunc(Psi.x, t), 'd')
+        k1d = (-1j/Psi.hbar) * evolver_utils.apply_F(Psi, Vfunc(Psi.x, t), 'd', Psi.state, Psi_grnd)
     
     tmpPsi = Psi.get_copy()
     tmpPsi.psiu += dt * k1u / 2
     if Psi.Nd != 0:
         tmpPsi.psid += dt * k1d / 2
-    k2u = (-1j/Psi.hbar) * evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'u')
+    k2u = (-1j/Psi.hbar) * evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'u', Psi.state, Psi_grnd)
     if Psi.Nd != 0:
-        k2d = (-1j/Psi.hbar) * evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'd')
+        k2d = (-1j/Psi.hbar) * evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'd', Psi.state, Psi_grnd)
     
     tmpPsi = Psi.get_copy()
     tmpPsi.psiu += dt * k2u / 2
     if Psi.Nd != 0:
         tmpPsi.psid += dt * k2d / 2
-    k3u = (-1j/Psi.hbar) * evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'u')
+    k3u = (-1j/Psi.hbar) * evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'u', Psi.state, Psi_grnd)
     if Psi.Nd != 0:
-        k3d = (-1j/Psi.hbar) * evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'd')
+        k3d = (-1j/Psi.hbar) * evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt/2), 'd', Psi.state, Psi_grnd)
     
     tmpPsi = Psi.get_copy()
     tmpPsi.psiu += dt * k3u
     if Psi.Nd != 0:
         tmpPsi.psid += dt * k3d
-    k4u = (-1j/Psi.hbar) * evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt), 'u')
+    k4u = (-1j/Psi.hbar) * evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt), 'u', Psi.state, Psi_grnd)
     if Psi.Nd != 0:
-        k4d = (-1j/Psi.hbar) * evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt), 'd')
+        k4d = (-1j/Psi.hbar) * evolver_utils.apply_F(tmpPsi, Vfunc(Psi.x, t+dt), 'd', Psi.state, Psi_grnd)
  
     # Take time step
     newPsi.psiu = newPsi.psiu + (dt/6) * (k1u + 2*k2u + 2*k3u + k4u)
