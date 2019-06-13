@@ -64,6 +64,7 @@ class State(object):
         self.psid = psid
         self.Nu = len(psiu)
         self.Nd = len(psid)
+        self.Ne = self.Nu+self.Nd
         self.Uc = Uc
         self.state = state
         self.lagrange = lagrange

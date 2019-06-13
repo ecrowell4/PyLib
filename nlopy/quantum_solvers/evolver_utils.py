@@ -8,7 +8,7 @@ import nlopy
 from nlopy import utils, math_utils
 from nlopy.quantum_solvers import solver_1D, solver_utils
 
-def apply_F(Psi, Vx, spin):
+def apply_F(Psi, Vx, spin, state='ground', psi_grnd=None):
     """Returns the action of HF operator on orbitals for paritcular
     spin state.
 
@@ -19,11 +19,15 @@ def apply_F(Psi, Vx, spin):
             external potential
         spin : string
             'u' or 'd': string indicating spin of electron. 
+        state : string
+            'ground' or 'excited'
 
     Output
         Fpsi : array
             the action of HF operator on orbitals of given spin.
     """
+    if state is 'excited':
+        assert Psi_grnd is not None, "Must have ground state information to find excited states."
     if spin is 'u':
         psia = Psi.psiu
         psib = Psi.psid
@@ -41,6 +45,9 @@ def apply_F(Psi, Vx, spin):
     Fpsia = Hpsia + Jpsia + Jpsib - Kpsia
     if Psi.lagrange is True:
         Fpsia = math_utils.subtract_lagrange(Fpsia, psia, Psi.x)
+    if state is 'excited':
+        for i in range(Psi.Nu):
+            Fpsia[-1] -= math_utils.project(Fpsi[-1], Psi_grnd.psiu[i], Psi.x)
     return Fpsia
 
 @jit(nopython=True)
