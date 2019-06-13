@@ -33,6 +33,8 @@ def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
         for i in range(Psi0.Nu):
             Psi0.psiu[-1] -= math_utils.project(Psi0.psiu[-1], Psi_grnd.psiu[i], Psi0.x)
         Psi0.psiu[-1] /= np.sqrt(math_utils.braket(Psi0.psiu[-1], Psi0.psiu[-1], Psi0.x))
+    elif Psi0.state is 'ground':
+    	Psi_grnd = None
     ediff = 1
     Es = np.zeros(0)
     Es = np.append(Es, evolver_HF.get_HF_energy(Psi0, Vfunc(Psi0.x, t=0)))
@@ -40,11 +42,11 @@ def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
     Psif = Psi0.get_copy()
     n=1
     while np.allclose(0, ediff, atol=tol) is False:
-        tmpPsi = evolver_HF.take_RK_step(Psif, Vfunc, -1j*n*dt, -1j*dt)
-        if Psi0.state is 'excited':
-            for i in range(tmpPsi.Nu):
-                tmpPsi.psiu[-1] -= math_utils.project(tmpPsi.psiu[-1], Psi_grnd.psiu[i], tmpPsi.x)
-                tmpPsi.psiu[-1] /= np.sqrt(math_utils.braket(tmpPsi.psiu[-1], tmpPsi.psiu[-1], tmpPsi.x))
+        tmpPsi = evolver_HF.take_RK_step(Psif, Vfunc, -1j*n*dt, -1j*dt, Psi_grnd)
+        # if Psi0.state is 'excited':
+        #     for i in range(tmpPsi.Nu):
+        #         tmpPsi.psiu[-1] -= math_utils.project(tmpPsi.psiu[-1], Psi_grnd.psiu[i], tmpPsi.x)
+        #         tmpPsi.psiu[-1] /= np.sqrt(math_utils.braket(tmpPsi.psiu[-1], tmpPsi.psiu[-1], tmpPsi.x))
         if Psi0.Nu != 0:
             tmpPsi.psiu = math_utils.gram_schmidt(tmpPsi.psiu, tmpPsi.x)
         if Psi0.Nd != 0:
