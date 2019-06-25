@@ -45,7 +45,7 @@ def apply_F(Psi, Vx, spin, state='ground', Psi_grnd=None):
     Fpsia = Hpsia + Jpsia + Jpsib - Kpsia
     if Psi.lagrange is True:
         Fpsia = math_utils.subtract_lagrange(Fpsia, psia, Psi.x)
-    if state is 'excited':
+    if state is 'excited' and spin is 'up':
         for i in range(Psi_grnd.Nu):
             Fpsia[-1] -= math_utils.project(Fpsia[-1], Psi_grnd.psiu[i], Psi.x)
     return Fpsia

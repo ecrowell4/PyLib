@@ -99,7 +99,9 @@ def get_HF_energy(Psi, Vx):
         Jpsidd = evolver_utils.direct_integrals(Psi.psid, Psi.psid, Psi.Uc, Psi.x, Psi.e)
         Kpsid = evolver_utils.exchange_integrals(Psi.psid, Psi.Uc, Psi.x, Psi.e)
         for a in range(Psi.Nd):
-            E += math_utils.braket(Psi.psid[a], (Hpsid[a] + 0.5*Jpsidd[a] - 0.5*Kpsid[a]), Psi.x)
+        	E += math_utils.braket(Psi.psid[a], Hpsid[a], Psi.x)
+        for a in range(Psi.Nd):
+            E += 0.5 * math_utils.braket(Psi.psid[a], (Jpsidd[a] - Kpsid[a]), Psi.x)
 
         Jpsiud = evolver_utils.direct_integrals(Psi.psid, Psi.psiu, Psi.Uc, Psi.x, Psi.e)
         for a in range(Psi.Nu):
