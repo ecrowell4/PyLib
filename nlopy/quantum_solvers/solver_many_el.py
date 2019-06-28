@@ -30,7 +30,7 @@ def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
     """
 
     if Psi0.state == 'excited':
-        Psi_grnd = utils.load_class('../data_files/unrestricted_HF/states_'+str(Psi0.Nu)+'u_'+str(Psi0.Nd)+'d_el_2a0_ground_ohno.pkl')
+        Psi_grnd = utils.load_class('../data_files/unrestricted_HF/states_'+str(Psi0.Nu)+'u_'+str(Psi0.Nd)+'d_el_2a0_ground_ohno_fine.pkl')
         #Psi_grnd = utils.load_class('../data_files/unrestricted_HF/states_'+str(Psi0.Nu)+'u_'+str(Psi0.Nd)+'d_el_2a0_ground.pkl')
         #Psi_grnd = utils.load_class('../../nlopy_test/ground_state.pkl')
         for i in range(Psi0.Nu):
