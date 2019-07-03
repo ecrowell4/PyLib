@@ -51,6 +51,27 @@ def apply_F(Psi, Vx, spin, state='ground', Psi_grnd=None):
     return Fpsia
 
 @jit(nopython=True)
+def get_orbital_energies(psi:complex, fpsi:complex, x:float)->complex:
+    """Returns the orbital energy associated with orbital psia.
+
+    Input
+        psia : np.array
+            psi[i] is the ith orbital of given spin type
+        fpsi : np.array
+            fpsi[i] is the action of fock operator on psi[i]
+
+    Output
+        epsilons : np.array
+            epsilons[i] is the orbital energy for orbital psi[i]
+    """
+    Norb:int = len(psi)
+    epsilons:complex = np.zeros(Norb) + 0j
+    for i in range(Norb):
+        epsilons[i] = math_utils.braket(psi[i], fpsi[i], x)
+    return epsilons
+
+
+@jit(nopython=True)
 def apply_H(psi:complex, x:float, Vx:float, hbar:float, m:float, e:float)->complex:
     """Returns the action of single particle hamiltonian on
     set of orbitals.
