@@ -43,12 +43,13 @@ def apply_F(Psi, Vx, spin, state='ground', Psi_grnd=None):
         
     Kpsia = exchange_integrals(psia, Psi.Uc, Psi.x, Psi.e)
     Fpsia = Hpsia + Jpsia + Jpsib - Kpsia
+    epsilons = get_orbital_energies(psia, Fpsia, Psi.x)
     if Psi.lagrange is True:
         Fpsia = math_utils.subtract_lagrange(Fpsia, psia, Psi.x)
     if state is 'excited' and spin is 'up':
         for i in range(Psi_grnd.Nu):
             Fpsia[-1] -= math_utils.project(Fpsia[-1], Psi_grnd.psiu[i], Psi.x)
-    return Fpsia
+    return Fpsia, epsilons
 
 @jit(nopython=True)
 def get_orbital_energies(psi:complex, fpsi:complex, x:float)->complex:
