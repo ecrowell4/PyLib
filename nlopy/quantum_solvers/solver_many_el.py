@@ -30,12 +30,13 @@ def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
     """
 
     if Psi0.state == 'excited':
-        Psi_grnd = utils.load_class('../data_files/unrestricted_HF/states_'+str(Psi0.Nu)+'u_'+str(Psi0.Nd)+'d_el_2a0_ground_ohno_fine.pkl')
+        l = 0
+        Psi_grnd = utils.load_class('../data_files/unrestricted_HF/states_'+str(Psi0.Nu)+'u_'+str(Psi0.Nd)+'d_el_2a0_ground_ohno.pkl')
         #Psi_grnd = utils.load_class('../data_files/unrestricted_HF/states_'+str(Psi0.Nu)+'u_'+str(Psi0.Nd)+'d_el_2a0_ground.pkl')
         #Psi_grnd = utils.load_class('../../nlopy_test/ground_state.pkl')
         for i in range(Psi0.Nu):
-            Psi0.psiu[-1] -= math_utils.project(Psi0.psiu[-1], Psi_grnd.psiu[i], Psi0.x)
-        Psi0.psiu[-1] /= np.sqrt(math_utils.braket(Psi0.psiu[-1], Psi0.psiu[-1], Psi0.x))
+            Psi0.psiu[l] -= math_utils.project(Psi0.psiu[l], Psi_grnd.psiu[i], Psi0.x)
+        Psi0.psiu[l] /= np.sqrt(math_utils.braket(Psi0.psiu[l], Psi0.psiu[l], Psi0.x))
     elif Psi0.state == 'ground':
     	Psi_grnd = None
 
@@ -46,11 +47,14 @@ def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
     Psif = Psi0.get_copy()
     n=1
     while np.allclose(0, ediff, atol=tol) is False:
+        #print(n)
+        start = time.time()
         tmpPsi = evolver_HF.take_RK_step(Psif, Vfunc, -1j*n*dt, -1j*dt, Psi_grnd)
         if Psi0.state is 'excited':
+            l = 0
             for i in range(tmpPsi.Nu):
-                tmpPsi.psiu[-1] -= math_utils.project(tmpPsi.psiu[-1], Psi_grnd.psiu[i], tmpPsi.x)
-                tmpPsi.psiu[-1] /= np.sqrt(math_utils.braket(tmpPsi.psiu[-1], tmpPsi.psiu[-1], tmpPsi.x))
+                tmpPsi.psiu[l] -= math_utils.project(tmpPsi.psiu[l], Psi_grnd.psiu[i], tmpPsi.x)
+                tmpPsi.psiu[l] /= np.sqrt(math_utils.braket(tmpPsi.psiu[l], tmpPsi.psiu[l], tmpPsi.x))
         if Psi0.Nu != 0:
             tmpPsi.psiu = math_utils.gram_schmidt(tmpPsi.psiu, tmpPsi.x)
         if Psi0.Nd != 0:
@@ -60,6 +64,8 @@ def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
         Es = np.append(Es, tmpE)
         ediff = (Es[n] - Es[n-1])/dt
         n +=1
+        end = time.time()
+        #print('Process took %.3f seconds' % (end-start))
         if n >= max_iter:
             print("Exceeded maximum number of iterations.")
             break
