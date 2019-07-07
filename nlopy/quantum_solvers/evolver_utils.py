@@ -50,9 +50,11 @@ def apply_F(Psi, Vx, spin, state='ground', Psi_grnd=None):
             Fpsia[-1] -= math_utils.project(Fpsia[-1], Psi_grnd.psiu[i], Psi.x)
     return Fpsia
 
+
 @jit(nopython=True)
-def get_orbital_energies(psi:complex, fpsi:complex, x:float)->complex:
-    """Returns the orbital energy associated with orbital psia.
+def get_HF_matrix(psi:complex, fpsi:complex, x:float)->complex:
+    """Returns the matrix elements of the HF operator. Note
+    that these are just the lagrange multipliers.
 
     Input
         psia : np.array
@@ -65,9 +67,10 @@ def get_orbital_energies(psi:complex, fpsi:complex, x:float)->complex:
             epsilons[i] is the orbital energy for orbital psi[i]
     """
     Norb:int = len(psi)
-    epsilons:complex = np.zeros(Norb) + 0j
+    epsilons:complex = np.zeros((Norb, Norb)) + 0j
     for i in range(Norb):
-        epsilons[i] = math_utils.braket(psi[i], fpsi[i], x)
+        for j in range(Norb):
+            epsilons[i,j] = math_utils.braket(psi[i], fpsi[j], x)
     return epsilons
 
 

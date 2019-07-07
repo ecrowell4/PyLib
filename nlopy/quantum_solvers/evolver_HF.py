@@ -69,6 +69,33 @@ def take_RK_step(Psi, Vfunc, t, dt, Psi_grnd=None):
     
     return newPsi
 
+def get_orbital_energies(Psi, Vx):
+    """Compute the orbital energies.
+
+    Input
+        Psi : class
+            state object
+        Vx : np.array
+            external potential
+
+    Output
+        Esu, Esd : np.array
+            orbital energies of the spin up and down orbitals, respectively
+    """
+    tmpPsi = Psi.get_copy()
+    tmpPsi.lagrange = False
+    Esu = np.zeros((Psi.Nu, Psi.Nu)) + 0j
+    Esd = np.zeros((Psi.Nd, Psi.Nd)) + 0j
+    Fpsiu = evolver_utils.apply_F(tmpPsi, Vx, 'u')
+    Fpsid = evolver_utils.apply_F(tmpPsi, Vx, 'd')
+    for i in range(tmpPsi.Nu):
+        for j in range(tmpPsi.Nd):
+            Esu[i, j] = math_utils.braket(tmpPsi.psiu[i], Fpsiu[j], tmpPsi.x)
+    for i in range(tmpPsi.Nd):
+        for j in range(tmpPsi.Nd):
+            Esd[i, j] = math_utils.braket(tmpPsi.psid[i], Fpsid[j], tmpPsi.x)
+    return Esu, Esd
+
 def get_HF_energy(Psi, Vx):
     """Compute the total energy from the State Psi.
 
