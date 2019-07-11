@@ -1,4 +1,5 @@
 import numpy as np
+import scipy
 from numba import jit
 
 @jit(nopython=True)
@@ -198,6 +199,31 @@ def my_simps(f: complex, x:float)->complex:
         result = result + f[-1]
         result = result * dx / 3
         return result
+
+def refine_grid(x, f, N_):
+    """Takes a an array f that is a function sampled over the domain x,
+    and interpolates to a finer grid of N_points.
+
+    Input
+        x : np.array
+            initial spatial grid
+        f : np.array
+            function sampled over grid
+        N_ : np.array
+            desired number of points in refined grid
+
+    Output
+        x_ : np.array
+            refined spatial array over same domain, but with N_ points sampled
+        f_ : np.array
+            function interpolated to refined domain.
+    """
+    assert N_ >= len(x), "You're trying to refine to a coarser grid!"
+    f = scipy.interpolate.interp1D(x, f, 'cubic')
+    L = x[-1] - x[0]
+    dx_ = L / (N_ - 1)
+    x_ = np.arange(N_) * dx_
+    return x_, f(x_)
 
 def smooth_func(x, n, periodic=False):
     """ Generate smooth function by selecting n random Fourier coefficients.
