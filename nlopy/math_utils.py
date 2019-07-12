@@ -1,5 +1,5 @@
 import numpy as np
-import scipy
+from scipy import interpolate
 from numba import jit
 
 @jit(nopython=True)
@@ -219,11 +219,11 @@ def refine_grid(x, f, N_):
             function interpolated to refined domain.
     """
     assert N_ >= len(x), "You're trying to refine to a coarser grid!"
-    f = scipy.interpolate.interp1D(x, f, 'cubic')
+    f = interpolate.interp1d(x, f, 'cubic')
     L = x[-1] - x[0]
     dx_ = L / (N_ - 1)
     x_ = np.arange(N_) * dx_
-    return x_, f(x_)
+    return x_, f(x_) + 0j
 
 def smooth_func(x, n, periodic=False):
     """ Generate smooth function by selecting n random Fourier coefficients.

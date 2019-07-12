@@ -63,7 +63,7 @@ def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
         Psif = tmpPsi.get_copy()
         Es = np.append(Es, tmpE)
         ediff = (Es[n] - Es[n-1])/dt
-        print(ediff)
+        #print(ediff)
         n +=1
         end = time.time()
         #print('Process took %.3f seconds' % (end-start))
