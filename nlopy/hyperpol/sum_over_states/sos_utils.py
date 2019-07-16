@@ -127,6 +127,53 @@ def alpha_term(E, delta, xx, ij, xi, omega):
              + xx[ij[0],2:].dot(xx[2:,ij[1]] / (2*(E[2:] - E[0]) + sgn2*delta)))
 
 
+def return_operators(type, X, L):
+	"""Given the type of (hyper) polarizability to be computed,
+	returns the operators corresponding to dH/dFi. 
+
+	For example, if type='eeem', then it is assumed we are computing the electric
+	dipole moment along i due to electric fields along j,k and a magnetic
+	field along r. 
+
+	If type=='memm', then we are computing the magnetic dipole moment along i due to 
+	and electric field along j and magnetic fields along k,r.
+
+	Input
+	    type : string
+	        specifieds which (hyper) polarizability to compute.
+	        E.g. 'eeee' would imply the all electric gamma
+	    X : np.array
+	        transition matrix
+	    L : np.array
+	        angular momentum matrix
+
+	Output
+	    Ai, Aj, Ak, Ar : np.arrays
+	        Appropriate operators along the cartesian directions that appear
+	        in the experssions for gamma.
+	"""
+	Types ='em'
+	for i in range(4):
+		assert type[i] in Types, "The character '"+a[i]+"'' is not a valid type. The only types are electric (e) and magnetic (m)."
+	assert type[]
+    if type[0]=='e':
+    	Ai = X
+    elif type[0]=='m':
+    	Ai = L
+    if type[1]=='e':
+    	Aj = X
+    elif type[1]=='m':
+    	Aj = L
+    if type[2]=='e':
+    	Ak = X
+    elif type[2]=='m':
+    	Ak = L
+    if type[3]=='e':
+    	Ar = X
+    elif type[3]=='m':
+    	Ar = L
+    return Ai, Aj, Ak, Ar
+
    
 def gamma_term11_m(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the first summand in SOS expression
@@ -146,6 +193,7 @@ def gamma_term11_m(L, I, E, omega1, omega2, omega3, units, n=0):
         gamma_term : complex
             the first sum in the first set of terms of gamma_mmmm
     """
+    
 
     term11 = units.g**4 * (Del(L[n,:], n) * D3(Del(E,n), omega1, omega2, omega3, units)).dot(
         (Del(Del(L, n, 0), n, 1) * D2(Del(E, n), omega1, omega2, units)).dot(
