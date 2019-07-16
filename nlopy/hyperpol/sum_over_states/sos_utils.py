@@ -634,14 +634,14 @@ def permute_gamma_terms(gamma_term, L, I, E, omega, units,n=0):
             The average of the term over all frequency permutations
         """
 
-    gamma_term = (1 / 6) * (gamma_term(L, I, E, omega[0], omega[1], omega[2], units,n=0)
+    Gamma_term = (1 / 6) * (gamma_term(L, I, E, omega[0], omega[1], omega[2], units,n=0)
         + gamma_term(L, I, E, omega[0], omega[2], omega[1], units,n=0)
         + gamma_term(L, I, E, omega[1], omega[0], omega[2], units,n=0)
         + gamma_term(L, I, E, omega[1], omega[2], omega[0], units,n=0)
         + gamma_term(L, I, E, omega[2], omega[1], omega[0], units,n=0)
         + gamma_term(L, I, E, omega[2], omega[0], omega[1], units,n=0)) 
 
-    return gamma_term
+    return Gamma_term
 
 def get_F_DL(x, psi0, units):
     """Returns the operator F_0(x) as defined in DalGarno Lewis

@@ -12,7 +12,7 @@ from nlopy.quantum_solvers import evolver_HF
 units = utils.Units('atomic')
 etol = 1e-8
 
-def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
+def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4), refine=False):
     """Uses a diffusive Hartree-Fock method (imaginary time) to 
     compute the lowest energy state.
 
@@ -21,6 +21,16 @@ def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
             initial state of the system
         Vfunc : function
             function which returns potential at given time and position
+        dt : float
+            time step
+        tol : float
+            tolerance for convergence
+        refine : bool
+            if True, then after the calculation converges, the grid is refined (dx -> dx/2)
+            and the system is cooled again.
+        max_iter : int
+            max number of allowed iteration. This is to prevent the calculation from
+            going on forever.
 
     Output
         Psif : class
@@ -70,7 +80,24 @@ def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4)):
         if n >= max_iter:
             print("Exceeded maximum number of iterations.")
             break
-    Psif.Energy = Es[-1]
+    if refine==True:
+        print("Refining grid")
+        N_ = 2*Psif.Nx - 1
+        Psi_ = Psif.get_copy()
+        Psi_.Nx = N_
+        Psi_.dx = Psi_.L / (Psi_.Nx - 1)
+        dt = Psi_.dx**2 / 2
+        Psi_.psiu = np.zeros((Psi_.Nu, Psi_.Nx)) + 0j
+        Psi_.psid = np.zeros((Psi_.Nd, Psi_.Nx)) + 0j
+        for i in range(Psi_.Nu):
+            x_, Psi_.psiu[i] = math_utils.refine_grid(Psif.x, Psif.psiu[i], Psi_.Nx)
+        for i in range(Psi_.Nd):
+            x_, Psi_.psid[i] = math_utils.refine_grid(Psif.x, Psif.psid[i], Psi_.Nx)
+        Psi_.x = x_
+        Uc_ = 1 / np.sqrt(x_**2 + 1)
+        Psi_.Uc = Uc_
+        Psif.Energy = Es[-1]
+        Psif, Es = URHF(Psi_, Vfunc, dt, tol, max_iter, refine=False)
     return Psif, Es
 
 
