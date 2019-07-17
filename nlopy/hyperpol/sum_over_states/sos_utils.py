@@ -168,7 +168,7 @@ def get_SOS_operators(gamma_type, X, L, units):
     return A
 
    
-def gamma_term11(X, L, E, omega1, omega2, omega3, units, n=0, gamma_type='eeee'):
+def gamma_term11(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the first summand in SOS expression
     for gamma, as written [FILL IN LOCATION]
 
@@ -183,6 +183,10 @@ def gamma_term11(X, L, E, omega1, omega2, omega3, units, n=0, gamma_type='eeee')
             incident field frequencies
         units : class
             fundamental constants
+        gamma_type : string
+            which gamma to compute, of the form 'xxxx', where x = m,e.
+        n : int
+            which state system is in. Default is ground state (n=0)
 
     Output
         gamma_term : complex
@@ -197,7 +201,7 @@ def gamma_term11(X, L, E, omega1, omega2, omega3, units, n=0, gamma_type='eeee')
     
     return term11
 
-def gamma_term12_m(L, I, E, omega1, omega2, omega3, units, n=0):
+def gamma_term12(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the second term of the first summand in SOS expression
     for gamma_eee, as written [FILL IN LOCATION]
 
@@ -210,16 +214,21 @@ def gamma_term12_m(L, I, E, omega1, omega2, omega3, units, n=0):
             incident field frequencies
         units : class
             fundamental constants
+        gamma_type : string
+            which gamma to compute, of the form 'xxxx', where x = m,e.
+        n : int
+            which state system is in. Default is ground state (n=0)
 
     Output
         gamma_term : complex
             the second sum in the first set of terms of gamma_eeee
     """
 
-    term12 = units.g**4 * (Del(L[n,:], n) * D1(Del(E.conjugate(),n), -omega1, units)).dot(
-        (Del(Del(L, n, 0), n, 1) * D2(Del(E, n), omega2, omega3, units)).dot(
-            Del(Del(L, n, 0), n, 1).dot(
-                (Del(L[:,n], n) * D1(Del(E, n), omega3, units))
+    Ai, Aj, Ak, Ar = get_SOS_operators(gamma_type, X, L, units)
+    term12 = (Del(Aj[n,:], n) * D1(Del(E.conjugate(),n), -omega1, units)).dot(
+        (Del(Del(Ai, n, 0), n, 1) * D2(Del(E, n), omega2, omega3, units)).dot(
+            Del(Del(Ar, n, 0), n, 1).dot(
+                (Del(Ak[:,n], n) * D1(Del(E, n), omega3, units))
                 )
             )
         )
