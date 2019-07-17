@@ -273,7 +273,6 @@ def gamma_term14(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     for gamma_eee, as written [FILL IN LOCATION]
 
     Input
-    Input
         X : np.array
             transition matrix
         E : np.array
@@ -303,12 +302,12 @@ def gamma_term14(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     
     return term14
 
-def gamma_term21_m(L, I, E, omega1, omega2, omega3, units, n=0):
+def gamma_term21(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the second summand in sos expression
     for gamma_eeee
 
     Input
-        xx : np.array
+         X : np.array
             transition matrix
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
@@ -316,24 +315,28 @@ def gamma_term21_m(L, I, E, omega1, omega2, omega3, units, n=0):
             incident field frequencies
         units : class
             fundamental constants
+        gamma_type : string
+            which gamma to compute, of the form 'xxxx', where x = m,e.
+        n : int
+            which state system is in. Default is ground state (n=0)
 
     Output
         gamma_term : complex
             the first sum in the second set of terms of gamma_eeee
     """
-
-    term21 = units.g**4 * ((Del(L[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
-        (Del(L[:,n], n) * D1(Del(E, n), omega3, units)))) * Del(L[n,:], n).dot(
-    Del(L[:,n], n) * D1(Del(E, n), omega1, units))
-
+    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
+    Ai, Aj, Ak, Ar = get_SOS_operators(gamma_type, X, L, units)
+    term21 = ((Del(Ai[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
+        (Del(Ar[:,n], n) * D1(Del(E, n), omega3, units)))) * Del(Ak[n,:], n).dot(
+    Del(Aj[:,n], n) * D1(Del(E, n), omega1, units))
     return term21
 
-def gamma_term22_m(L, I, E, omega1, omega2, omega3, units, n=0):
+def gamma_term22(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the second term of the second summand in sos expression
     for gamma_eeee
 
     Input
-        xx : np.array
+        X : np.array
             transition matrix
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
@@ -341,24 +344,28 @@ def gamma_term22_m(L, I, E, omega1, omega2, omega3, units, n=0):
             incident field frequencies
         units : class
             fundamental constants
+        gamma_type : string
+            which gamma to compute, of the form 'xxxx', where x = m,e.
+        n : int
+            which state system is in. Default is ground state (n=0)
 
     Output
         gamma_term : complex
             the second sum in the second set of terms of gamma_eeee
     """
-
-    term22 = units.g**4 * ((Del(L[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
-        (Del(L[:,n], n) * D1(Del(E, n), omega1, units)))) * Del(L[n,:], n).dot(
-    Del(L[:,n], n) * D1(Del(E, n), omega3, units))
-
+    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
+    Ai, Aj, Ak, Ar = get_SOS_operators(gamma_type, X, L, units)
+    term22 = ((Del(Ai[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
+        (Del(Ar[:,n], n) * D1(Del(E, n), omega1, units)))) * Del(Ak[n,:], n).dot(
+    Del(Aj[:,n], n) * D1(Del(E, n), omega3, units))
     return term22
 
-def gamma_term23_m(L, I, E, omega1, omega2, omega3, units, n=0):
+def gamma_term23(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the third term of the second summand in sos expression
     for gamma_eeee
 
     Input
-        xx : np.array
+        X : np.array
             transition matrix
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
@@ -366,24 +373,28 @@ def gamma_term23_m(L, I, E, omega1, omega2, omega3, units, n=0):
             incident field frequencies
         units : class
             fundamental constants
+        gamma_type : string
+            which gamma to compute, of the form 'xxxx', where x = m,e.
+        n : int
+            which state system is in. Default is ground state (n=0)
 
     Output
         gamma_term : complex
             the third sum in the second set of terms of gamma_eeee
     """
-
-    term23 = units.g**4 * ((Del(L[n,:], n) * D3(Del(E.conjugate(), n), -omega1,-omega2, -omega3, units)).dot(
-        (Del(L[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units)))) * Del(L[n,:], n).dot(
-    Del(L[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
-
+    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
+    Ai, Aj, Ak, Ar = get_SOS_operators(gamma_type, X, L, units)
+    term23 = ((Del(Aj[n,:], n) * D3(Del(E.conjugate(), n), -omega1,-omega2, -omega3, units)).dot(
+        (Del(Ak[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units)))) * Del(Ar[n,:], n).dot(
+    Del(Ai[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
     return term23
 
-def gamma_term24_m(L, I, E, omega1, omega2, omega3, units, n=0):
+def gamma_term24(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the fourth term of the second summand in sos expression
     for gamma_eeee
 
     Input
-        xx : np.array
+        X : np.array
             transition matrix
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
@@ -391,16 +402,19 @@ def gamma_term24_m(L, I, E, omega1, omega2, omega3, units, n=0):
             incident field frequencies
         units : class
             fundamental constants
-
+        gamma_type : string
+            which gamma to compute, of the form 'xxxx', where x = m,e.
+        n : int
+            which state system is in. Default is ground state (n=0)
     Output
         gamma_term : complex
             the fourth sum in the second set of terms of gamma_eeee
     """
-
-    term24 = units.g**4 * ((Del(L[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
-        (Del(L[:,n], n) * D1(Del(E, n), omega2, units)))) * Del(L[n,:], n).dot(
-    Del(L[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
-
+    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
+    Ai, Aj, Ak, Ar = get_SOS_operators(gamma_type, X, L, units)
+    term24 = ((Del(Ar[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
+        (Del(Ai[:,n], n) * D1(Del(E, n), omega2, units)))) * Del(Aj[n,:], n).dot(
+    Del(Ak[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
     return term24
 
 def gamma_term31_m(L, I, E, omega1, omega2, omega3, units, n=0):
