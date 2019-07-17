@@ -206,7 +206,7 @@ def gamma_term12(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     for gamma_eee, as written [FILL IN LOCATION]
 
     Input
-        xx : np.array
+        X : np.array
             transition matrix
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
@@ -240,7 +240,7 @@ def gamma_term13(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     for gamma_eee, as written [FILL IN LOCATION]
 
     Input
-        xx : np.array
+        X : np.array
             transition matrix
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
@@ -264,15 +264,16 @@ def gamma_term13(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
                 )
             )
         )
-         
+
     return term13
 
-def gamma_term14_m(L, I, E, omega1, omega2, omega3, units, n=0):
+def gamma_term14(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the fourth term of the first summand in SOS expression
     for gamma_eee, as written [FILL IN LOCATION]
 
     Input
-        xx : np.array
+    Input
+        X : np.array
             transition matrix
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
@@ -280,16 +281,20 @@ def gamma_term14_m(L, I, E, omega1, omega2, omega3, units, n=0):
             incident field frequencies
         units : class
             fundamental constants
+        gamma_type : string
+            which gamma to compute, of the form 'xxxx', where x = m,e.
+        n : int
+            which state system is in. Default is ground state (n=0)
 
     Output
         gamma_term : complex
             the fourth sum in the first set of terms of gamma_eeee
     """
-
-    term14 = units.g**4 *(Del(L[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
-        (Del(Del(L, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega1, -omega2, units)).dot(
-            Del(Del(L, n, 0), n, 1).dot(
-                (Del(L[:,n], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units))
+    Ai, Aj, Ak, Ar = get_SOS_operators(gamma_type, X, L, units)
+    term14 = (Del(Ak[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
+        (Del(Del(Aj, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega1, -omega2, units)).dot(
+            Del(Del(Ar, n, 0), n, 1).dot(
+                (Del(Ai[:,n], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units))
                 )
             )
         )
