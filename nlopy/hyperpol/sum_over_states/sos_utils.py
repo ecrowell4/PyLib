@@ -192,7 +192,7 @@ def gamma_term11(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the first sum in the first set of terms of gamma
     """
-
+    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
     Ai, Aj, Ak, Ar = get_SOS_operators(gamma_type, X, L, units)
     term11 =  (Del(Ai[n,:], n) * D3(Del(E,n), omega1, omega2, omega3, units)).dot(
         (Del(Del(Ar, n, 0), n, 1) * D2(Del(E, n), omega1, omega2, units)).dot(
@@ -223,7 +223,7 @@ def gamma_term12(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the second sum in the first set of terms of gamma_eeee
     """
-
+    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
     Ai, Aj, Ak, Ar = get_SOS_operators(gamma_type, X, L, units)
     term12 = (Del(Aj[n,:], n) * D1(Del(E.conjugate(),n), -omega1, units)).dot(
         (Del(Del(Ai, n, 0), n, 1) * D2(Del(E, n), omega2, omega3, units)).dot(
@@ -256,6 +256,7 @@ def gamma_term13(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the third sum in the first set of terms of gamma_eeee
     """
+    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
     Ai, Aj, Ak, Ar = get_SOS_operators(gamma_type, X, L, units)
     term13 = (Del(Ak[n,:], n) * D1(Del(E.conjugate(),n), -omega3, units)).dot(
         (Del(Del(Ar, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega3, -omega2, units)).dot(
@@ -290,6 +291,7 @@ def gamma_term14(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the fourth sum in the first set of terms of gamma_eeee
     """
+    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
     Ai, Aj, Ak, Ar = get_SOS_operators(gamma_type, X, L, units)
     term14 = (Del(Ak[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
         (Del(Del(Aj, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega1, -omega2, units)).dot(
