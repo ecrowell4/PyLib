@@ -411,9 +411,9 @@ def gamma_term22(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """
     assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
     Ai, Aj, Ak, Ar = get_SOS_operators_summand12(gamma_type, X, L, units)
-    term22 = ((Del(Ai[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
-        (Del(Ar[:,n], n) * D1(Del(E, n), omega1, units)))) * Del(Ak[n,:], n).dot(
-    Del(Aj[:,n], n) * D1(Del(E, n), omega3, units))
+    term22 = ((Del(Ak[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
+        (Del(Aj[:,n], n) * D1(Del(E, n), omega1, units)))) * Del(Ai[n,:], n).dot(
+    Del(Ar[:,n], n) * D1(Del(E, n), omega3, units))
     return term22
 
 def gamma_term23(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
@@ -442,9 +442,9 @@ def gamma_term23(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """
     assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
     Ai, Aj, Ak, Ar = get_SOS_operators_summand12(gamma_type, X, L, units)
-    term23 = ((Del(Aj[n,:], n) * D3(Del(E.conjugate(), n), -omega1,-omega2, -omega3, units)).dot(
-        (Del(Ak[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units)))) * Del(Ar[n,:], n).dot(
-    Del(Ai[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
+    term23 = ((Del(Ar[n,:], n) * D3(Del(E.conjugate(), n), -omega1,-omega2, -omega3, units)).dot(
+        (Del(Ai[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units)))) * Del(Aj[n,:], n).dot(
+    Del(Ak[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
     return term23
 
 def gamma_term24(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
@@ -473,9 +473,9 @@ def gamma_term24(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """
     assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
     Ai, Aj, Ak, Ar = get_SOS_operators_summand12(gamma_type, X, L, units)
-    term24 = ((Del(Ar[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
-        (Del(Ai[:,n], n) * D1(Del(E, n), omega2, units)))) * Del(Aj[n,:], n).dot(
-    Del(Ak[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
+    term24 = ((Del(Aj[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
+        (Del(Ak[:,n], n) * D1(Del(E, n), omega2, units)))) * Del(Ar[n,:], n).dot(
+    Del(Ai[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
     return term24
 
 def gamma_term31(X, L, I, E, omega1, omega2, omega3, units, gamma_type, n=0):
