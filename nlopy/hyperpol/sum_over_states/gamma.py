@@ -1,4 +1,5 @@
 import numpy as np
+from numba import jit
 from nlopy.hyperpol.sum_over_states import sos_utils
 
 def gamma_eeee(E, xx, ein=[0,0,0]):
@@ -152,7 +153,8 @@ def gamma_mmmm(L, I, E, omega, units, n=0, includeA2=True, includeCovar=True, da
     return gamma
 
 
-def gamma_eeee_densityMatrix(rho0, X, E, omega, gamma_damp, units):
+@jit(nopython=True)
+def gamma_eeee_densityMatrix(rho0:float, X:complex, E:float, omega:float, gamma_damp:float)->complex:
     """Returns the second hyperpolarizability as computed from the
     density matrix formalism. See Boyd's text for the equations.
 
@@ -174,23 +176,25 @@ def gamma_eeee_densityMatrix(rho0, X, E, omega, gamma_damp, units):
         gamma_eeee : complex
             diagonal element of gamma
     """
-    N = len(rho)
-    gamma = 0+0j
+    N:float = len(rho0)
+    gamma:complex = 0+0j
     for l in range(N):
         for n in range(N):
             for m in range(N):
                 for v in range(N):
-                    if m != l:
-                        gamma += ((rho0[m,m] - rho0[l,l])*(
-                            X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[v]-E[m]-1j*gamma_damp[v,m])/(E[l]-E[m]-1j(gamma_damp[l,m]))))
-                    if l != v:
-                        gamma -= ((rho0[l,l] - rho0[v,v])*(
-                            X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[v]-E[m]-1j*gamma_damp[v,m])/(E[v]-E[l]-1j(gamma_damp[v,l])))
-                        - (rho0[v,v] - rho0[l,l])*(
-                            X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[n]-E[v]-1j*gamma_damp[n,v])/(E[l]-E[v]-1j(gamma_damp[l,v]))))
-                    if l != n:
-                        gamma += ((rho0[l,l] - rho0[n,n])*(
-                            X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[n]-E[v]-1j*gamma_damp[n,v])/(E[n]-E[l]-1j(gamma_damp[n,l])))
-                        )
+                    if n!=m and m!=v and v!=n:
+                        if m != l:
+                            #print(l,n,m,v)
+                            gamma += ((rho0[m,m] - rho0[l,l])*(
+                                X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[v]-E[m]-1j*gamma_damp[v,m])/(E[l]-E[m]-1j*gamma_damp[l,m])))
+                        if l != v:
+                            gamma -= ((rho0[l,l] - rho0[v,v])*(
+                                X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[v]-E[m]-1j*gamma_damp[v,m])/(E[v]-E[l]-1j*gamma_damp[v,l])))
+                            - (rho0[v,v] - rho0[l,l])*(
+                                X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[n]-E[v]-1j*gamma_damp[n,v])/(E[l]-E[v]-1j*gamma_damp[l,v]))
+                        if l != n:
+                            gamma += ((rho0[l,l] - rho0[n,n])*(
+                                X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[n]-E[v]-1j*gamma_damp[n,v])/(E[n]-E[l]-1j*gamma_damp[n,l])))
+                        
     return gamma
     
