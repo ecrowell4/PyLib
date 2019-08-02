@@ -98,6 +98,7 @@ def URHF(Psi0, Vfunc, dt, tol, max_iter=int(1e4), refine=False):
         Psi_.Uc = Uc_
         Psif.Energy = Es[-1]
         Psif, Es = URHF(Psi_, Vfunc, dt, tol, max_iter, refine=False)
+    Psif.Energy = Es[-1]
     return Psif, Es
 
 
