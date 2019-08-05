@@ -127,7 +127,7 @@ def alpha_term(E, delta, xx, ij, xi, omega):
              + xx[ij[0],2:].dot(xx[2:,ij[1]] / (2*(E[2:] - E[0]) + sgn2*delta)))
 
 
-def get_SOS_operators_summand12(gamma_type, X, L, units):
+def get_SOS_operators_summand1and2(gamma_type, X, L, units):
     """Given the type of (hyper) polarizability to be computed,
     returns the operators corresponding to dH/dFi for the first two summands
     in gamma_xxxx.
@@ -206,7 +206,7 @@ def get_SOS_operators_summand3(gamma_type, X, L, I, units):
     for i in range(4):
         assert gamma_type[i] in Types, "The character '"+gamma_type[i]+"'' is not a valid type. The only types are electric (e) and magnetic (m)."
     if gamma_type[0]=='e':
-    	A[0] = units.e * X
+    	A[0] = -units.e * X
     elif gamma_type[0]=='m':
     	A[0] = units.g * L
     if gamma_type[1:].count('e')==0:
@@ -242,7 +242,7 @@ def gamma_term11(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
             the first sum in the first set of terms of gamma
     """
     assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand12(gamma_type, X, L, units)
+    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
     term11 =  (Del(Ai[n,:], n) * D3(Del(E,n), omega1, omega2, omega3, units)).dot(
         (Del(Del(Ar, n, 0), n, 1) * D2(Del(E, n), omega1, omega2, units)).dot(
             Del(Del(Ak, n, 0), n, 1).dot(
@@ -274,7 +274,7 @@ def gamma_term12(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
             the second sum in the first set of terms of gamma_eeee
     """
     assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand12(gamma_type, X, L, units)
+    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
     term12 = (Del(Aj[n,:], n) * D1(Del(E.conjugate(),n), -omega1, units)).dot(
         (Del(Del(Ai, n, 0), n, 1) * D2(Del(E, n), omega2, omega3, units)).dot(
             Del(Del(Ar, n, 0), n, 1).dot(
@@ -309,7 +309,7 @@ def gamma_term13(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
             the third sum in the first set of terms of gamma_eeee
     """
     assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand12(gamma_type, X, L, units)
+    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
     term13 = (Del(Ak[n,:], n) * D1(Del(E.conjugate(),n), -omega3, units)).dot(
         (Del(Del(Ar, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega3, -omega2, units)).dot(
             Del(Del(Ai, n, 0), n, 1).dot(
@@ -344,7 +344,7 @@ def gamma_term14(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
             the fourth sum in the first set of terms of gamma_eeee
     """
     assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand12(gamma_type, X, L, units)
+    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
     term14 = (Del(Ak[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
         (Del(Del(Aj, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega1, -omega2, units)).dot(
             Del(Del(Ar, n, 0), n, 1).dot(
@@ -379,7 +379,7 @@ def gamma_term21(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
             the first sum in the second set of terms of gamma_eeee
     """
     assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand12(gamma_type, X, L, units)
+    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
     term21 = ((Del(Ai[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
         (Del(Ar[:,n], n) * D1(Del(E, n), omega3, units)))) * Del(Ak[n,:], n).dot(
     Del(Aj[:,n], n) * D1(Del(E, n), omega1, units))
@@ -410,7 +410,7 @@ def gamma_term22(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
             the second sum in the second set of terms of gamma_eeee
     """
     assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand12(gamma_type, X, L, units)
+    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
     term22 = ((Del(Ak[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
         (Del(Aj[:,n], n) * D1(Del(E, n), omega1, units)))) * Del(Ai[n,:], n).dot(
     Del(Ar[:,n], n) * D1(Del(E, n), omega3, units))
@@ -441,7 +441,7 @@ def gamma_term23(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
             the third sum in the second set of terms of gamma_eeee
     """
     assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand12(gamma_type, X, L, units)
+    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
     term23 = ((Del(Ar[n,:], n) * D3(Del(E.conjugate(), n), -omega1,-omega2, -omega3, units)).dot(
         (Del(Ai[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units)))) * Del(Aj[n,:], n).dot(
     Del(Ak[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
@@ -472,11 +472,45 @@ def gamma_term24(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
             the fourth sum in the second set of terms of gamma_eeee
     """
     assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand12(gamma_type, X, L, units)
+    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
     term24 = ((Del(Aj[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
         (Del(Ak[:,n], n) * D1(Del(E, n), omega2, units)))) * Del(Ar[n,:], n).dot(
     Del(Ai[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
     return term24
+
+def permute_gamma_terms_summand1and2(gamma_term, X, L, E, omega, units, gamma_type, n=0):
+    """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
+
+    Input
+        gamma_term : function
+            function that returns one of the terms in sos expression for 
+            gamma_eeee
+        xx : np.array
+            transition matrix
+        E : np.array
+            eigenenergies Emn
+        omega : np.array
+            incident field frequencies
+        units : class
+            fundamental constants
+        gamma_type : string
+            string specifying which gamma we are computiner ('eeee', 'meem', 'mmme', etc.)
+        n : int
+            starting state
+
+    Output
+        gamma_term : complex
+            The average of the term over all frequency permutations
+        """
+
+    Gamma_term = (1 / 6) * (gamma_term(X, L, E, omega[0], omega[1], omega[2], gamma_type, units,n)
+        + gamma_term(X, L, E, omega[0], omega[2], omega[1], units, gamma_type, n)
+        + gamma_term(X, L, E, omega[1], omega[0], omega[2], units, gamma_type, n)
+        + gamma_term(X, L, E, omega[1], omega[2], omega[0], units, gamma_type, n)
+        + gamma_term(X, L, E, omega[2], omega[1], omega[0], units, gamma_type, n)
+        + gamma_term(X, L, E, omega[2], omega[0], omega[1], units, gamma_type, n)) 
+
+    return Gamma_term
 
 def gamma_term31(X, L, I, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the third summand in sos expression

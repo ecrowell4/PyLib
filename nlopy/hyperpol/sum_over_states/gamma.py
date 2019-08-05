@@ -2,6 +2,7 @@ import numpy as np
 from numba import jit
 from nlopy.hyperpol.sum_over_states import sos_utils
 
+
 def gamma_eeee(E, xx, ein=[0,0,0]):
     """Calculates the first hyperpolarizability, beta, as a function of two 
     input photon energies and complex molecular transition and energy 
@@ -41,7 +42,7 @@ def gamma_eeee(E, xx, ein=[0,0,0]):
     
     
     #Take all mu -> bar{mu}
-    xx = xx - xx[0,0] * np.eye(NumStates)
+    #xx = xx - xx[0,0] * np.eye(NumStates)
     
     #Take all E -> E - E[0]
     E = E - E[0]
@@ -82,8 +83,52 @@ def gamma_eeee(E, xx, ein=[0,0,0]):
     
     return gamma
 
+def gamma_eeee(E, X, omega, n=0):
+    """Compute the all electric second order hyperpolarizability for
+    a system "in nth state".
+
+    Input
+        E : np.array
+            eigenenergies of unperturbed system
+        X : np.array
+            transition matrix of unperturbed system
+        omega : np.array(3)
+            incident field frequencies
+        n : int
+            "state of system". Specifically, it is the unperturbed state
+            that is closest to the actual eigenstate in presence of field.
+
+    Output
+    """
+    num_states = len(E)
+    X = X - X[n,n]*np.ones((num_states, num_states))
+    E = E - E[n]
+    if damping == True:
+        Gamma = (units.c**3 /10)*(2 / 3 / units.hbar) * (E / units.c)**3 * units.e**2 * abs(xx[:,0])**2
+        E = E - 1j * Gamma / units.hbar
+    gamma_eeee = (
+        sos_utils.permute_gamma_terms_summand1and2(
+            sos_utils.gamma_term11, X, L, E, omega, units, gamma_type='eeee', n)
+        + sos_utils.permute_gamma_terms_summand1and2(
+            sos_utils.gamma_term12, X, L, E, omega, units, gamma_type='eeee', n)
+        + sos_utils.permute_gamma_terms_summand1and2(
+            sos_utils.gamma_term13, X, L, E, omega, units, gamma_type='eeee', n)
+        + sos_utils.permute_gamma_terms_summand1and2(
+            sos_utils.gamma_term14, X, L, E, omega, units, gamma_type='eeee', n)
+        - sos_utils.permute_gamma_terms_summand1and2(
+            sos_utilsgamma_term21, X, L, E, omega, units, gamma_type='eeee', n)
+        - sos_utils.permute_gamma_terms_summand1and2(
+            sos_utilsgamma_term22, X, L, E, omega, units, gamma_type='eeee', n)
+        - sos_utils.permute_gamma_terms_summand1and2(
+            sos_utilsgamma_term23, X, L, E, omega, units, gamma_type='eeee', n)
+        - sos_utils.permute_gamma_terms_summand1and2(
+            sos_utilsgamma_term24, X, L, E, omega, units, gamma_type='eeee', n)
+        )
+    return gamma 
+
+
 def gamma_mmmm(L, I, E, omega, units, n=0, includeA2=True, includeCovar=True, damping=False):
-    """Compute diagonal component of gamma_eeee with or without A^2 term. 
+    """Compute diagonal component of gamma_mmmm with or without A^2 term. 
     
     Input
         E : np.array
@@ -109,9 +154,9 @@ def gamma_mmmm(L, I, E, omega, units, n=0, includeA2=True, includeCovar=True, da
     num_states = len(E)
     
     # Take all mu -> bar{mu}
-    L = L - L[0,0]*np.eye(15)
-    I = I - I[0,0]*np.eye(15)
-    
+    L = L - L[0,0]*np.eye(num_states)
+    I = I - I[0,0]*np.eye(num_states)
+    s
     # Take all Em -> Enm
     E = E - E[0]
     
