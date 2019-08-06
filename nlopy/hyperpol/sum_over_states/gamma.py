@@ -3,87 +3,8 @@ from numba import jit
 from nlopy.hyperpol.sum_over_states import sos_utils
 
 
-def gamma_eeee(E, xx, ein=[0,0,0]):
-    """Calculates the first hyperpolarizability, beta, as a function of two 
-    input photon energies and complex molecular transition and energy 
-    information. Calculates the one tensor component specified.
-    Input: 
-        xx = [ mu_x, mu_y, mu_z ] the dipole moment matrices in cartesian
-            coordinates normalized to the maximum transition strength x_10(max)
-            where mu_x = [<i|e x|j>]
-        E = [E_nm - i/2 Gamma_nm] the electronic eigen frequencies 
-            corresponding to the transitions from the ith eigen state to the
-            ground state 
-            OR
-            [E_n0] as a vector
-        *The sizes of xx and E represent the number of states considered in
-            this calculation and therefore must be consistant.*
-        ijk = [0,1,2] the tensor components of beta where x=0, y=1, z=2
-    Option:
-        Calculate dispersion:
-        ein = hbar*[w_j, w_k] input photon energies, which implies output 
-            energy of (ein[0] + ein[1])
-        Start and end in a given quantum state
-        start = int some integer state which is represented by the xi and E info
-    Output:
-        beta = beta_ijk(-w_sigma; w[0], w[1])
-    """
 
-    e = 1
-    hbar = 1
-
-    #Find the number of electronic states supplied
-    NumStates = len(xx[0])
-    
-    #Check for consistancy between transitions and energies
-    if NumStates != len(E):
-        print('Err: Inconsistant electronic state information.')
-        return 0
-    
-    
-    #Take all mu -> bar{mu}
-    #xx = xx - xx[0,0] * np.eye(NumStates)
-    
-    #Take all E -> E - E[0]
-    E = E - E[0]
-    
-    # get rid of elements that should be zero
-    for i in range(NumStates):
-        if np.allclose(xx[i,i], 0)==True:
-            xx[i,i] = 0
-       
-    ein_sigma = sum(ein)
-    
-    #Calculate beta
-    gamma = e**4 / 6 / hbar**3 * ( (xx[0,1:] / (E[1:] - ein_sigma)).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[0] - ein[1])).dot(xx[1:,0]/(E[1:] - ein[0]))))
-    + (xx[0,1:] / (E[1:] - ein_sigma)).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[0] - ein[2])).dot(xx[1:,0]/(E[1:] - ein[0]))))
-    + (xx[0,1:] / (E[1:] - ein_sigma)).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[1] - ein[0])).dot(xx[1:,0]/(E[1:] - ein[1]))))
-    + (xx[0,1:] / (E[1:] - ein_sigma)).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[1] - ein[2])).dot(xx[1:,0]/(E[1:] - ein[1]))))
-    + (xx[0,1:] / (E[1:] - ein_sigma)).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[2] - ein[0])).dot(xx[1:,0]/(E[1:] - ein[2]))))
-    + (xx[0,1:] / (E[1:] - ein_sigma)).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[2] - ein[1])).dot(xx[1:,0]/(E[1:] - ein[2]))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[2])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[1])).dot(xx[1:,0]/(E[1:] - ein[1]))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[0])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[2])).dot(xx[1:,0]/(E[1:] - ein[2]))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[0])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() - ein[1] + ein_sigma)).dot(xx[1:,0]/(E[1:] - ein[1]))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[2])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() - ein[0] + ein_sigma)).dot(xx[1:,0]/(E[1:] - ein[0]))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[1])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() - ein[0] + ein_sigma)).dot(xx[1:,0]/(E[1:] - ein[0]))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[1])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() - ein[2] + ein_sigma)).dot(xx[1:,0]/(E[1:] - ein[2]))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[0])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[1] - ein[2])).dot(xx[1:,0]/(E[1:] - ein[1]))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[0])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[2] - ein[1])).dot(xx[1:,0]/(E[1:] - ein[2]))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[1])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[0] - ein[2])).dot(xx[1:,0]/(E[1:] - ein[0]))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[1])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[2] - ein[0])).dot(xx[1:,0]/(E[1:] - ein[2]))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[2])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[0] - ein[1])).dot(xx[1:,0]/(E[1:] - ein[0]))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[2])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[1] - ein[0])).dot(xx[1:,0]/(E[1:] - ein[1]))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[0])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[2])).dot(xx[1:,0]/(E[1:].conjugate() + ein_sigma))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[0])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[1])).dot(xx[1:,0]/(E[1:].conjugate() + ein_sigma))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[2])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[0])).dot(xx[1:,0]/(E[1:].conjugate() + ein_sigma))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[2])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[1])).dot(xx[1:,0]/(E[1:].conjugate() + ein_sigma))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[1])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[2])).dot(xx[1:,0]/(E[1:].conjugate() + ein_sigma))))
-    + (xx[0,1:] / (E[1:].conjugate() + ein[1])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[0])).dot(xx[1:,0]/(E[1:].conjugate() + ein_sigma))))
-    )
-    
-    return gamma
-
-def gamma_eeee(E, X, omega, n=0):
+def gamma_eeee(E, X, omega, units, n=0, damping=False):
     """Compute the all electric second order hyperpolarizability for
     a system "in nth state".
 
@@ -99,32 +20,35 @@ def gamma_eeee(E, X, omega, n=0):
             that is closest to the actual eigenstate in presence of field.
 
     Output
+        gamma : complex
+            All electric second hyperpolarizability
     """
     num_states = len(E)
     X = X - X[n,n]*np.ones((num_states, num_states))
     E = E - E[n]
+    L = None
     if damping == True:
         Gamma = (units.c**3 /10)*(2 / 3 / units.hbar) * (E / units.c)**3 * units.e**2 * abs(xx[:,0])**2
         E = E - 1j * Gamma / units.hbar
     gamma_eeee = (
         sos_utils.permute_gamma_terms_summand1and2(
-            sos_utils.gamma_term11, X, L, E, omega, units, gamma_type='eeee', n)
+            sos_utils.gamma_term11, X, L, E, omega, units, gamma_type='eeee', n=n)
         + sos_utils.permute_gamma_terms_summand1and2(
-            sos_utils.gamma_term12, X, L, E, omega, units, gamma_type='eeee', n)
+            sos_utils.gamma_term12, X, L, E, omega, units, gamma_type='eeee', n=n)
         + sos_utils.permute_gamma_terms_summand1and2(
-            sos_utils.gamma_term13, X, L, E, omega, units, gamma_type='eeee', n)
+            sos_utils.gamma_term13, X, L, E, omega, units, gamma_type='eeee', n=n)
         + sos_utils.permute_gamma_terms_summand1and2(
-            sos_utils.gamma_term14, X, L, E, omega, units, gamma_type='eeee', n)
+            sos_utils.gamma_term14, X, L, E, omega, units, gamma_type='eeee', n=n)
         - sos_utils.permute_gamma_terms_summand1and2(
-            sos_utilsgamma_term21, X, L, E, omega, units, gamma_type='eeee', n)
+            sos_utils.gamma_term21, X, L, E, omega, units, gamma_type='eeee', n=n)
         - sos_utils.permute_gamma_terms_summand1and2(
-            sos_utilsgamma_term22, X, L, E, omega, units, gamma_type='eeee', n)
+            sos_utils.gamma_term22, X, L, E, omega, units, gamma_type='eeee', n=n)
         - sos_utils.permute_gamma_terms_summand1and2(
-            sos_utilsgamma_term23, X, L, E, omega, units, gamma_type='eeee', n)
+            sos_utils.gamma_term23, X, L, E, omega, units, gamma_type='eeee', n=n)
         - sos_utils.permute_gamma_terms_summand1and2(
-            sos_utilsgamma_term24, X, L, E, omega, units, gamma_type='eeee', n)
+            sos_utils.gamma_term24, X, L, E, omega, units, gamma_type='eeee', n=n)
         )
-    return gamma 
+    return gamma_eeee 
 
 
 def gamma_mmmm(L, I, E, omega, units, n=0, includeA2=True, includeCovar=True, damping=False):
@@ -227,19 +151,105 @@ def gamma_eeee_densityMatrix(rho0:float, X:complex, E:float, omega:float, gamma_
         for n in range(N):
             for m in range(N):
                 for v in range(N):
-                    if n!=m and m!=v and v!=n:
-                        if m != l:
-                            #print(l,n,m,v)
-                            gamma += ((rho0[m,m] - rho0[l,l])*(
-                                X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[v]-E[m]-1j*gamma_damp[v,m])/(E[l]-E[m]-1j*gamma_damp[l,m])))
-                        if l != v:
-                            gamma -= ((rho0[l,l] - rho0[v,v])*(
-                                X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[v]-E[m]-1j*gamma_damp[v,m])/(E[v]-E[l]-1j*gamma_damp[v,l])))
-                            - (rho0[v,v] - rho0[l,l])*(
-                                X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[n]-E[v]-1j*gamma_damp[n,v])/(E[l]-E[v]-1j*gamma_damp[l,v]))
-                        if l != n:
-                            gamma += ((rho0[l,l] - rho0[n,n])*(
-                                X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[n]-E[v]-1j*gamma_damp[n,v])/(E[n]-E[l]-1j*gamma_damp[n,l])))
+                    if n!=m and m!=v and m!=l:
+                        if rho0[m,m]-rho0[l,l]!= 0:
+                            print(l,n,m,v)
+                        gamma += ((rho0[m,m] - rho0[l,l])*(
+                            X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[v]-E[m]-1j*gamma_damp[v,m])/(E[l]-E[m]-1j*gamma_damp[l,m])))
+                    if n!=m and m!=v and l!=v:
+                        if rho0[l,l]-rho0[v,v]!=0:
+                            print(l,n,m,v)
+                        gamma -= ((rho0[l,l] - rho0[v,v])*(
+                            X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[v]-E[m]-1j*gamma_damp[v,m])/(E[v]-E[l]-1j*gamma_damp[v,l])))
+                    if n!=m and n!=v and l!=v:
+                        if rho0[v,v]-rho0[l,l]!= 0:
+                            print(l,n,m,v)
+                        gamma -= (rho0[v,v] - rho0[l,l])*(
+                            X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[n]-E[v]-1j*gamma_damp[n,v])/(E[l]-E[v]-1j*gamma_damp[l,v]))
+                    if n!=m and v!=n and l != n:
+                        if rho0[l,l]-rho0[n,n]!=0:
+                            print('third', l,n,m,v)
+                        gamma += ((rho0[l,l] - rho0[n,n])*(
+                            X[m,n]*X[n,v]*X[v,l]*X[l,m]/(E[n]-E[m]-1j*gamma_damp[n,m])/(E[n]-E[v]-1j*gamma_damp[n,v])/(E[n]-E[l]-1j*gamma_damp[n,l])))
                         
     return gamma
     
+def gamma_eeee_(E, xx, ein=[0,0,0]):
+    """Calculates the first hyperpolarizability, beta, as a function of two 
+    input photon energies and complex molecular transition and energy 
+    information. Calculates the one tensor component specified.
+    Input: 
+        xx = [ mu_x, mu_y, mu_z ] the dipole moment matrices in cartesian
+            coordinates normalized to the maximum transition strength x_10(max)
+            where mu_x = [<i|e x|j>]
+        E = [E_nm - i/2 Gamma_nm] the electronic eigen frequencies 
+            corresponding to the transitions from the ith eigen state to the
+            ground state 
+            OR
+            [E_n0] as a vector
+        *The sizes of xx and E represent the number of states considered in
+            this calculation and therefore must be consistant.*
+        ijk = [0,1,2] the tensor components of beta where x=0, y=1, z=2
+    Option:
+        Calculate dispersion:
+        ein = hbar*[w_j, w_k] input photon energies, which implies output 
+            energy of (ein[0] + ein[1])
+        Start and end in a given quantum state
+        start = int some integer state which is represented by the xi and E info
+    Output:
+        beta = beta_ijk(-w_sigma; w[0], w[1])
+    """
+
+    e = 1
+    hbar = 1
+
+    #Find the number of electronic states supplied
+    NumStates = len(xx[0])
+    
+    #Check for consistancy between transitions and energies
+    if NumStates != len(E):
+        print('Err: Inconsistant electronic state information.')
+        return 0
+    
+    
+    #Take all mu -> bar{mu}
+    #xx = xx - xx[0,0] * np.eye(NumStates)
+    
+    #Take all E -> E - E[0]
+    E = E - E[0]
+    
+    # get rid of elements that should be zero
+    for i in range(NumStates):
+        if np.allclose(xx[i,i], 0)==True:
+            xx[i,i] = 0
+       
+    ein_sigma = sum(ein)
+    
+    #Calculate beta
+    gamma = e**4 / 6 / hbar**3 * ( (xx[0,1:] / (E[1:] - ein_sigma)).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[0] - ein[1])).dot(xx[1:,0]/(E[1:] - ein[0]))))
+    + (xx[0,1:] / (E[1:] - ein_sigma)).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[0] - ein[2])).dot(xx[1:,0]/(E[1:] - ein[0]))))
+    + (xx[0,1:] / (E[1:] - ein_sigma)).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[1] - ein[0])).dot(xx[1:,0]/(E[1:] - ein[1]))))
+    + (xx[0,1:] / (E[1:] - ein_sigma)).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[1] - ein[2])).dot(xx[1:,0]/(E[1:] - ein[1]))))
+    + (xx[0,1:] / (E[1:] - ein_sigma)).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[2] - ein[0])).dot(xx[1:,0]/(E[1:] - ein[2]))))
+    + (xx[0,1:] / (E[1:] - ein_sigma)).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[2] - ein[1])).dot(xx[1:,0]/(E[1:] - ein[2]))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[2])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[1])).dot(xx[1:,0]/(E[1:] - ein[1]))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[0])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[2])).dot(xx[1:,0]/(E[1:] - ein[2]))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[0])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() - ein[1] + ein_sigma)).dot(xx[1:,0]/(E[1:] - ein[1]))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[2])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() - ein[0] + ein_sigma)).dot(xx[1:,0]/(E[1:] - ein[0]))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[1])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() - ein[0] + ein_sigma)).dot(xx[1:,0]/(E[1:] - ein[0]))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[1])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() - ein[2] + ein_sigma)).dot(xx[1:,0]/(E[1:] - ein[2]))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[0])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[1] - ein[2])).dot(xx[1:,0]/(E[1:] - ein[1]))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[0])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[2] - ein[1])).dot(xx[1:,0]/(E[1:] - ein[2]))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[1])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[0] - ein[2])).dot(xx[1:,0]/(E[1:] - ein[0]))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[1])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[2] - ein[0])).dot(xx[1:,0]/(E[1:] - ein[2]))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[2])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[0] - ein[1])).dot(xx[1:,0]/(E[1:] - ein[0]))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[2])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:] - ein[1] - ein[0])).dot(xx[1:,0]/(E[1:] - ein[1]))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[0])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[2])).dot(xx[1:,0]/(E[1:].conjugate() + ein_sigma))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[0])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[1])).dot(xx[1:,0]/(E[1:].conjugate() + ein_sigma))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[2])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[0])).dot(xx[1:,0]/(E[1:].conjugate() + ein_sigma))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[2])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[1])).dot(xx[1:,0]/(E[1:].conjugate() + ein_sigma))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[1])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[2])).dot(xx[1:,0]/(E[1:].conjugate() + ein_sigma))))
+    + (xx[0,1:] / (E[1:].conjugate() + ein[1])).dot(xx[1:,1:].dot((xx[1:,1:]/(E[1:].conjugate() + ein_sigma - ein[0])).dot(xx[1:,0]/(E[1:].conjugate() + ein_sigma))))
+    )
+    
+    return gamma

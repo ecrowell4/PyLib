@@ -206,7 +206,7 @@ def get_SOS_operators_summand3(gamma_type, X, L, I, units):
     for i in range(4):
         assert gamma_type[i] in Types, "The character '"+gamma_type[i]+"'' is not a valid type. The only types are electric (e) and magnetic (m)."
     if gamma_type[0]=='e':
-    	A[0] = -units.e * X
+    	A[0] = units.e * X
     elif gamma_type[0]=='m':
     	A[0] = units.g * L
     if gamma_type[1:].count('e')==0:
@@ -503,7 +503,7 @@ def permute_gamma_terms_summand1and2(gamma_term, X, L, E, omega, units, gamma_ty
             The average of the term over all frequency permutations
         """
 
-    Gamma_term = (1 / 6) * (gamma_term(X, L, E, omega[0], omega[1], omega[2], gamma_type, units,n)
+    Gamma_term = (1 / 6) * (gamma_term(X, L, E, omega[0], omega[1], omega[2], units, gamma_type, n)
         + gamma_term(X, L, E, omega[0], omega[2], omega[1], units, gamma_type, n)
         + gamma_term(X, L, E, omega[1], omega[0], omega[2], units, gamma_type, n)
         + gamma_term(X, L, E, omega[1], omega[2], omega[0], units, gamma_type, n)
