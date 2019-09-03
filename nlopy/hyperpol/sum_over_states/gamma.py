@@ -24,7 +24,7 @@ def gamma_eeee(E, X, omega, units, n=0, damping=False):
             All electric second hyperpolarizability
     """
     num_states = len(E)
-    X = X - X[n,n]*np.ones((num_states, num_states))
+    X = X - X[n,n]*np.eye(num_states)
     E = E - E[n]
     L = None
     if damping == True:
