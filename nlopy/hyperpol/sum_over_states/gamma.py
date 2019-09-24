@@ -4,7 +4,7 @@ from nlopy.hyperpol.sum_over_states import sos_utils
 
 
 
-def gamma_eeee(E, X, omega, units, n=0, damping=False):
+def gamma_eeee(E, X, units, omega=np.zeros(3), n=0, damping=False):
     """Compute the all electric second order hyperpolarizability for
     a system "in nth state".
 
@@ -51,7 +51,7 @@ def gamma_eeee(E, X, omega, units, n=0, damping=False):
     return gamma_eeee 
 
 
-def gamma_mmmm(L, I, E, omega, units, n=0, includeA2=True, includeCovar=True, damping=False):
+def gamma_mmmm(E, L, I, omega, units, n=0, includeA2=True, includeCovar=True, damping=False):
     """Compute diagonal component of gamma_mmmm with or without A^2 term. 
     
     Input
