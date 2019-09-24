@@ -217,7 +217,7 @@ def get_SOS_operators_summand3(gamma_type, X, L, I, units):
     return A
 
    
-def gamma_term11(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term11(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the first summand in SOS expression
     for gamma, as written [FILL IN LOCATION]
 
@@ -249,7 +249,7 @@ def gamma_term11(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
                 (Del(Aj[:,n], n) * D1(Del(E, n), omega1, units)))))
     return term11
 
-def gamma_term12(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term12(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the second term of the first summand in SOS expression
     for gamma_eee, as written [FILL IN LOCATION]
 
@@ -284,7 +284,7 @@ def gamma_term12(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
         ) 
     return term12
 
-def gamma_term13(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term13(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the thrid term of the first summand in SOS expression
     for gamma_eee, as written [FILL IN LOCATION]
 
@@ -319,7 +319,7 @@ def gamma_term13(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
         )
     return term13
 
-def gamma_term14(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term14(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the fourth term of the first summand in SOS expression
     for gamma_eee, as written [FILL IN LOCATION]
 
@@ -354,7 +354,7 @@ def gamma_term14(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
         ) 
     return term14
 
-def gamma_term21(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term21(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the second summand in sos expression
     for gamma_eeee
 
@@ -385,7 +385,7 @@ def gamma_term21(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     Del(Aj[:,n], n) * D1(Del(E, n), omega1, units))
     return term21
 
-def gamma_term22(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term22(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the second term of the second summand in sos expression
     for gamma_eeee
 
@@ -416,7 +416,7 @@ def gamma_term22(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     Del(Ar[:,n], n) * D1(Del(E, n), omega3, units))
     return term22
 
-def gamma_term23(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term23(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the third term of the second summand in sos expression
     for gamma_eeee
 
@@ -447,7 +447,7 @@ def gamma_term23(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     Del(Ak[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
     return term23
 
-def gamma_term24(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term24(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the fourth term of the second summand in sos expression
     for gamma_eeee
 
@@ -512,7 +512,7 @@ def permute_gamma_terms_123(gamma_term, E, X, L, I, omega, units, gamma_type, n=
 
     return Gamma_term
 
-def gamma_term31(X, L, I, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term31(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the third summand in sos expression
     for gamma_eeee
 
@@ -544,7 +544,7 @@ def gamma_term31(X, L, I, E, omega1, omega2, omega3, units, gamma_type, n=0):
         ))
     return term31
 
-def gamma_term32(X, L, I, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term32(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the second term of the third summand in sos expression
     for gamma_eeee
 
@@ -569,7 +569,7 @@ def gamma_term32(X, L, I, E, omega1, omega2, omega3, units, gamma_type, n=0):
 
     return term32
 
-def gamma_term33(X, L, I, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term33(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the third summand in sos expression
     for gamma_eeee
 
@@ -593,7 +593,7 @@ def gamma_term33(X, L, I, E, omega1, omega2, omega3, units, gamma_type, n=0):
         ))
     return term33
 
-def gamma_term34(X, L, I, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term34(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the third summand in sos expression
     for gamma_eeee
 
@@ -617,7 +617,7 @@ def gamma_term34(X, L, I, E, omega1, omega2, omega3, units, gamma_type, n=0):
         ))
     return term34
 
-def gamma_term35(X, L, I, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term35(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the third summand in sos expression
     for gamma_eeee
 
@@ -642,7 +642,7 @@ def gamma_term35(X, L, I, E, omega1, omega2, omega3, units, gamma_type, n=0):
 
     return term35
 
-def gamma_term36(X, L, I, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term36(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the second term of the third summand in sos expression
     for gamma_eeee
 
