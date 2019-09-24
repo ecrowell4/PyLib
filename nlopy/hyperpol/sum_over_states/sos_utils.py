@@ -478,7 +478,7 @@ def gamma_term24(X, L, E, omega1, omega2, omega3, units, gamma_type, n=0):
     Del(Ai[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
     return term24
 
-def permute_gamma_terms_summand1and2(gamma_term, X, L, E, omega, units, gamma_type, n=0):
+def permute_gamma_terms_123(gamma_term, E, X, L, I, omega, units, gamma_type, n=0):
     """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
 
     Input
