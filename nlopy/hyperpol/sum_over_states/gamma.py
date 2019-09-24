@@ -78,9 +78,9 @@ def gamma_mmmm(L, I, E, omega, units, n=0, includeA2=True, includeCovar=True, da
     num_states = len(E)
     
     # Take all mu -> bar{mu}
-    L = L - L[0,0]*np.eye(num_states)
-    I = I - I[0,0]*np.eye(num_states)
-    s
+    L = L - L[n,n]*np.eye(num_states)
+    I = I - I[n,n]*np.eye(num_states)
+    
     # Take all Em -> Enm
     E = E - E[0]
     
