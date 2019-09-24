@@ -38,7 +38,7 @@ def beta_eee(E, xx, units, omega=[0,0], intrinsic=False, n=0):
     num_states = len(E)
 
     #Take all mu -> bar{mu}
-    xx = xx - xx[0,0] * np.eye(num_states)
+    xx = xx - xx[n,n] * np.eye(num_states)
 
     #Take all Em -> Emn
     E = E - E[n]
