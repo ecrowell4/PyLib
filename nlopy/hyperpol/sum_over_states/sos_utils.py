@@ -202,7 +202,7 @@ def get_SOS_operators_summand3(gamma_type, X, L, I, units):
             in the experssions for gamma. Ai, Ax are either eX or gL and AI = g^2 I / 2
     """
     Types ='em'
-    A = np.zeros((0, len(X), len(X))) + 0j
+    A = np.zeros((3, len(X), len(X))) + 0j
     for i in range(4):
         assert gamma_type[i] in Types, "The character '"+gamma_type[i]+"'' is not a valid type. The only types are electric (e) and magnetic (m)."
     if gamma_type[0]=='e':
@@ -219,7 +219,7 @@ def get_SOS_operators_summand3(gamma_type, X, L, I, units):
    
 def gamma_term11(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the first summand in SOS expression
-    for gamma, as written [FILL IN LOCATION]
+    for gamma_xxxx
 
     Input
         X : np.array
@@ -251,7 +251,7 @@ def gamma_term11(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
 
 def gamma_term12(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the second term of the first summand in SOS expression
-    for gamma_eee, as written [FILL IN LOCATION]
+    for gamma_xxxx
 
     Input
         X : np.array
@@ -286,7 +286,7 @@ def gamma_term12(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
 
 def gamma_term13(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the thrid term of the first summand in SOS expression
-    for gamma_eee, as written [FILL IN LOCATION]
+    for gamma_xxxx
 
     Input
          X : np.array
@@ -321,7 +321,7 @@ def gamma_term13(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
 
 def gamma_term14(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the fourth term of the first summand in SOS expression
-    for gamma_eee, as written [FILL IN LOCATION]
+    for gamma_xxxx
 
     Input
         X : np.array
@@ -356,7 +356,7 @@ def gamma_term14(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
 
 def gamma_term21(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the second summand in sos expression
-    for gamma_eeee
+    for gamma_xxxx
 
     Input
         X : np.array
@@ -387,7 +387,7 @@ def gamma_term21(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
 
 def gamma_term22(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the second term of the second summand in sos expression
-    for gamma_eeee
+    for gamma_xxxx
 
     Input
         X : np.array
@@ -418,7 +418,7 @@ def gamma_term22(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
 
 def gamma_term23(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the third term of the second summand in sos expression
-    for gamma_eeee
+    for gamma_xxxx
 
     Input
         X : np.array
@@ -449,7 +449,7 @@ def gamma_term23(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
 
 def gamma_term24(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the fourth term of the second summand in sos expression
-    for gamma_eeee
+    for gamma_xxxx
 
     Input
         X : np.array
@@ -514,7 +514,7 @@ def permute_gamma_terms_123(gamma_term, E, X, L, I, omega, units, gamma_type, n=
 
 def gamma_term31(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the third summand in sos expression
-    for gamma_eeee
+    for gamma_xxxx
 
     Input
         X : np.array
@@ -546,7 +546,7 @@ def gamma_term31(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
 
 def gamma_term32(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the second term of the third summand in sos expression
-    for gamma_eeee
+    for gamma_xxxx
 
     Input
         xx : np.array
@@ -570,8 +570,8 @@ def gamma_term32(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     return term32
 
 def gamma_term33(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
-    """Returns the first term of the third summand in sos expression
-    for gamma_eeee
+    """Returns the third term of the third summand in sos expression
+    for gamma_xxxx
 
     Input
         xx : np.array
@@ -594,8 +594,8 @@ def gamma_term33(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     return term33
 
 def gamma_term34(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
-    """Returns the first term of the third summand in sos expression
-    for gamma_eeee
+    """Returns the fourth term of the third summand in sos expression
+    for gamma_xxxx
 
     Input
         xx : np.array
@@ -618,8 +618,8 @@ def gamma_term34(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     return term34
 
 def gamma_term35(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
-    """Returns the first term of the third summand in sos expression
-    for gamma_eeee
+    """Returns the fifth term of the third summand in sos expression
+    for gamma_xxxx
 
     Input
         xx : np.array
@@ -643,8 +643,8 @@ def gamma_term35(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     return term35
 
 def gamma_term36(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
-    """Returns the second term of the third summand in sos expression
-    for gamma_eeee
+    """Returns the sixth term of the third summand in sos expression
+    for gamma_xxxx
 
     Input
         xx : np.array
@@ -667,9 +667,9 @@ def gamma_term36(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
 
     return term36
 
-def gamma_term41_m(L, I, E, omega1, omega2, omega3, units, n=0):
-    """Returns the second term of the third summand in sos expression
-    for gamma_eeee
+def gamma_term411(L, I, E, omega1, omega2, omega3, units, n=0):
+    """Returns the first term of the fourth summand in sos expression
+    for gamma_mxxxx
 
     Input
         xx : np.array
@@ -685,6 +685,7 @@ def gamma_term41_m(L, I, E, omega1, omega2, omega3, units, n=0):
         gamma_term : complex
             the second sum in the third set of terms of gamma_eeee
     """
+    get = I
 
     term41 = units.g**4 * (Del(I[n,:], n) * D2(Del(E, n), omega2, omega3, units)).dot(
         Del(Del(L, n, 0), n, 1).dot((Del(L[:,n], n) * D1(Del(E, n), omega3, units))
