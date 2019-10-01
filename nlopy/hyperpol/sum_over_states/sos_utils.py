@@ -527,6 +527,40 @@ def gamma_term24(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     Del(Ai[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
     return term24
 
+def permute_gamma_terms_123_(gamma_term, O1, O2, O3, O4, E, omega, units, gamma_type, n=0):
+    """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
+
+    Input
+        gamma_term : function
+            function that returns one of the terms in sos expression for 
+            gamma_eeee
+        xx : np.array
+            transition matrix
+        E : np.array
+            eigenenergies Emn
+        omega : np.array
+            incident field frequencies
+        units : class
+            fundamental constants
+        gamma_type : string
+            string specifying which gamma we are computiner ('eeee', 'meem', 'mmme', etc.)
+        n : int
+            starting state
+
+    Output
+        gamma_term : complex
+            The average of the term over all frequency permutations
+        """
+
+    Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, O4, E, omega[0], omega[1], omega[2], units, gamma_type, n)
+        + gamma_term(O1, O3, O4, O2, E, omega[1], omega[2], omega[0], units, gamma_type, n)
+        + gamma_term(O1, O4, O2, O3, E, omega[2], omega[0], omega[1], units, gamma_type, n)
+        + gamma_term(O1, O3, O2, O4, E, omega[1], omega[0], omega[2], units, gamma_type, n)
+        + gamma_term(O1, O2, O4, O3, E, omega[0], omega[2], omega[1], units, gamma_type, n)
+        + gamma_term(O1, O4, O3, O2, E, omega[2], omega[1], omega[0], units, gamma_type, n)
+        ) 
+    return Gamma_term
+
 def permute_gamma_terms_123(gamma_term, E, X, L, I, omega, units, gamma_type, n=0):
     """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
 
@@ -558,7 +592,6 @@ def permute_gamma_terms_123(gamma_term, E, X, L, I, omega, units, gamma_type, n=
         + gamma_term(X, L, E, omega[1], omega[2], omega[0], units, gamma_type, n)
         + gamma_term(X, L, E, omega[2], omega[1], omega[0], units, gamma_type, n)
         + gamma_term(X, L, E, omega[2], omega[0], omega[1], units, gamma_type, n)) 
-
     return Gamma_term
 
 def gamma_term31(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):

@@ -31,21 +31,21 @@ def gamma_eeee_(E, X, units, omega=np.zeros(3), n=0, damping=False):
         E = E - 1j * Gamma / units.hbar
     gamma_eeee = (
         sos_utils.permute_gamma_terms_123(
-            sos_utils.gamma_term11, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+            sos_utils.gamma_term11, X, X, X, X, E, omega, units, gamma_type='eeee', n=n)
         + sos_utils.permute_gamma_terms_123(
-            sos_utils.gamma_term12, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+            sos_utils.gamma_term12, X, X, X, X, E, omega, units, gamma_type='eeee', n=n)
         + sos_utils.permute_gamma_terms_123(
-            sos_utils.gamma_term13, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+            sos_utils.gamma_term13, X, X, X, X, E, omega, units, gamma_type='eeee', n=n)
         + sos_utils.permute_gamma_terms_123(
-            sos_utils.gamma_term14, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+            sos_utils.gamma_term14, X, X, X, X, E, omega, units, gamma_type='eeee', n=n)
         - sos_utils.permute_gamma_terms_123(
-            sos_utils.gamma_term21, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+            sos_utils.gamma_term21, X, X, X, X, E, omega, units, gamma_type='eeee', n=n)
         - sos_utils.permute_gamma_terms_123(
-            sos_utils.gamma_term22, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+            sos_utils.gamma_term22, X, X, X, X, E, omega, units, gamma_type='eeee', n=n)
         - sos_utils.permute_gamma_terms_123(
-            sos_utils.gamma_term23, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+            sos_utils.gamma_term23, X, X, X, X, E, omega, units, gamma_type='eeee', n=n)
         - sos_utils.permute_gamma_terms_123(
-            sos_utils.gamma_term24, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+            sos_utils.gamma_term24, X, X, X, X, E, omega, units, gamma_type='eeee', n=n)
         )
     return gamma_eeee 
 
