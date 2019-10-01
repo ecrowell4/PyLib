@@ -567,13 +567,17 @@ def permute_gamma_terms_123(gamma_term, E, X, L, I, omega, units, gamma_type, n=
         + gamma_term(X, L, E, omega[2], omega[0], omega[1], units, gamma_type, n)) 
     return Gamma_term
 
-def gamma_term31(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term31(Oi, Ox, OI, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the third summand in sos expression
     for gamma_xxxx
 
     Input
-        X : np.array
-            transition matrix
+        Oi : np.array
+            operator corresponding to ith cartesian index
+        Ox : np.array
+            operator corresponding to X or L
+        OI : np.array
+            moment of intertia
         L : np.array
             angular momentum matrix
         I : np.array
@@ -593,9 +597,8 @@ def gamma_term31(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the first sum in the third set of terms of gamma_eeee
     """
-    Ai, Ax, AI = get_SOS_operators_summand3(gamma_type, X, L, I, units) 
-    term31 = (Del(Ai[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
-        Del(Del(Ax, n, 0), n, 1).dot((Del(AI[:,n], n) * D2(Del(E, n), omega1, omega2, units))
+    term31 = (Del(Oi[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
+        Del(Del(Ox, n, 0), n, 1).dot((Del(OI[:,n], n) * D2(Del(E, n), omega1, omega2, units))
         ))
     return term31
 
@@ -722,7 +725,41 @@ def gamma_term36(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
 
     return term36
 
-def gamma_term41(Oi, O2, O3, E, omega1, omega2, omega3, units, n=0):
+def permute_gamma_summand4_terms(gamma_term, O1, O2, O3, E, omega, units, gamma_type, n=0):
+    """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
+
+    Input
+        gamma_term : function
+            function that returns one of the terms in sos expression for 
+            gamma_eeee
+        xx : np.array
+            transition matrix
+        E : np.array
+            eigenenergies Emn
+        omega : np.array
+            incident field frequencies
+        units : class
+            fundamental constants
+        gamma_type : string
+            string specifying which gamma we are computiner ('eeee', 'meem', 'mmme', etc.)
+        n : int
+            starting state
+
+    Output
+        gamma_term : complex
+            The average of the term over all frequency permutations
+        """
+    if gamma_type=='mmmm':
+        Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, E, omega[0], omega[1], omega[2], units, n)
+            + gamma_term(O1, O2, O3, E, omega[1], omega[2], omega[0], units, n)
+            + gamma_term(O1, O2, O3, E, omega[2], omega[0], omega[1], units, n)
+            + gamma_term(O1, O2, O3, E, omega[1], omega[0], omega[2], units, n)
+            + gamma_term(O1, O2, O3, E, omega[0], omega[2], omega[1], units, n)
+            + gamma_term(O1, O2, O3, E, omega[2], omega[1], omega[0], units, n)
+            ) 
+    return Gamma_term
+
+def gamma_term41(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the fourth summand in sos expression
     for gamma_mxxxx. 
 
@@ -747,7 +784,7 @@ def gamma_term41(Oi, O2, O3, E, omega1, omega2, omega3, units, n=0):
 
     return term41
 
-def gamma_term42(Oi, O2, O3, E, omega1, omega2, omega3, units, n=0):
+def gamma_term42(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the third summand in sos expression
     for gamma_eeee
 
@@ -772,7 +809,7 @@ def gamma_term42(Oi, O2, O3, E, omega1, omega2, omega3, units, n=0):
 
     return term42
 
-def gamma_term43(Oi, O2, O3, E, omega1, omega2, omega3, units, n=0):
+def gamma_term43(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the third summand in sos expression
     for gamma_eeee
 
