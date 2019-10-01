@@ -215,7 +215,7 @@ def get_SOS_operators_summand3(gamma_type, X, L, I, units):
     	A[1] = units.e * X
     A[2] = 0.5 * units.g**2 * I
     return A
-    
+
 def get_SOS_operators_summand4(gamma_type, X, L, I, units):
     """Given the type of (hyper) polarizability to be computed,
     returns the operators corresponding to dH/dFi for the first two summands
@@ -291,7 +291,6 @@ def gamma_term11(O1, O2, O3, O4, E, omega1, omega2, omega3, units, n=0):
         gamma_term : complex
             the first sum in the first set of terms of gamma
     """
-    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
     term11 =  (Del(O1[n,:], n) * D3(Del(E,n), omega1, omega2, omega3, units)).dot(
         (Del(Del(O4, n, 0), n, 1) * D2(Del(E, n), omega1, omega2, units)).dot(
             Del(Del(O3, n, 0), n, 1).dot(
@@ -526,12 +525,12 @@ def permute_gamma_4op_terms(gamma_term, O1, O2, O3, O4, E, omega, units, gamma_t
             The average of the term over all frequency permutations
         """
 
-    Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, O4, E, omega[0], omega[1], omega[2], units, gamma_type, n)
-        + gamma_term(O1, O3, O4, O2, E, omega[1], omega[2], omega[0], units, gamma_type, n)
-        + gamma_term(O1, O4, O2, O3, E, omega[2], omega[0], omega[1], units, gamma_type, n)
-        + gamma_term(O1, O3, O2, O4, E, omega[1], omega[0], omega[2], units, gamma_type, n)
-        + gamma_term(O1, O2, O4, O3, E, omega[0], omega[2], omega[1], units, gamma_type, n)
-        + gamma_term(O1, O4, O3, O2, E, omega[2], omega[1], omega[0], units, gamma_type, n)
+    Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, O4, E, omega[0], omega[1], omega[2], units, n)
+        + gamma_term(O1, O3, O4, O2, E, omega[1], omega[2], omega[0], units, n)
+        + gamma_term(O1, O4, O2, O3, E, omega[2], omega[0], omega[1], units, n)
+        + gamma_term(O1, O3, O2, O4, E, omega[1], omega[0], omega[2], units, n)
+        + gamma_term(O1, O2, O4, O3, E, omega[0], omega[2], omega[1], units, n)
+        + gamma_term(O1, O4, O3, O2, E, omega[2], omega[1], omega[0], units, n)
         ) 
     return Gamma_term
 
@@ -723,13 +722,13 @@ def gamma_term36(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
 
     return term36
 
-def gamma_term411(L, I, E, omega1, omega2, omega3, units, n=0):
+def gamma_term41(Oi, O2, O3, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the fourth summand in sos expression
     for gamma_mxxxx. 
 
     Input
-        xx : np.array
-            transition matrix
+        O : np.array
+            operators
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
         omega1-3 : np.float
@@ -741,21 +740,20 @@ def gamma_term411(L, I, E, omega1, omega2, omega3, units, n=0):
         gamma_term : complex
             the second sum in the third set of terms of gamma_eeee
     """
-    get = I
 
-    term41 = units.g**4 * (Del(I[n,:], n) * D2(Del(E, n), omega2, omega3, units)).dot(
-        Del(Del(L, n, 0), n, 1).dot((Del(L[:,n], n) * D1(Del(E, n), omega3, units))
+    term41 = units.g**4 * (Del(OI[n,:], n) * D2(Del(E, n), omega2, omega3, units)).dot(
+        Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D1(Del(E, n), omega3, units))
         ))
 
     return term41
 
-def gamma_term42_m(L, I, E, omega1, omega2, omega3, units, n=0):
+def gamma_term42(Oi, O2, O3, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the third summand in sos expression
     for gamma_eeee
 
     Input
-        xx : np.array
-            transition matrix
+        O : np.array
+            operators
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
         omega1-3 : np.float
@@ -768,19 +766,19 @@ def gamma_term42_m(L, I, E, omega1, omega2, omega3, units, n=0):
             the second sum in the third set of terms of gamma_eeee
     """
 
-    term42 = units.g**4 * (Del(L[n,:], n) * D2(Del(E.conjugate(), n), omega2, omega3, units)).dot(
-        Del(Del(L, n, 0), n, 1).dot((Del(I[:,n], n) * D1(Del(E.conjugate(), n), omega3, units))
+    term42 = units.g**4 * (Del(O3[n,:], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units)).dot(
+        Del(Del(O2, n, 0), n, 1).dot((Del(Oi[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
         ))
 
     return term42
 
-def gamma_term43_m(L, I, E, omega1, omega2, omega3, units, n=0):
+def gamma_term43(Oi, O2, O3, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the third summand in sos expression
     for gamma_eeee
 
     Input
-        xx : np.array
-            transition matrix
+        O : np.array
+            operators
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
         omega1-3 : np.float
@@ -793,8 +791,8 @@ def gamma_term43_m(L, I, E, omega1, omega2, omega3, units, n=0):
             the second sum in the third set of terms of gamma_eeee
     """
 
-    term43 = units.g**4 * (Del(L[n,:], n) * D1(Del(E.conjugate(), n), omega1, units)).dot(
-        Del(Del(I, n, 0), n, 1).dot((Del(L[:,n], n) * D1(Del(E, n), omega3, units))
+    term43 = units.g**4 * (Del(O2[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
+        Del(Del(Oi, n, 0), n, 1).dot((Del(O3[:,n], n) * D1(Del(E, n), omega3, units))
         ))
 
     return term43
