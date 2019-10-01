@@ -2,7 +2,52 @@ import numpy as np
 from numba import jit
 from nlopy.hyperpol.sum_over_states import sos_utils
 
+def gamma_eeee_(E, X, units, omega=np.zeros(3), n=0, damping=False):
+    """Compute the all electric second order hyperpolarizability for
+    a system "in nth state".
 
+    Input
+        E : np.array
+            eigenenergies of unperturbed system
+        X : np.array
+            transition matrix of unperturbed system
+        omega : np.array(3)
+            incident field frequencies
+        n : int
+            "state of system". Specifically, it is the unperturbed state
+            that is closest to the actual eigenstate in presence of field.
+
+    Output
+        gamma : complex
+            All electric second hyperpolarizability
+    """
+    num_states = len(E)
+    X = X - X[n,n]*np.eye(num_states)
+    E = E - E[n]
+    L = None
+    I = None
+    if damping == True:
+        Gamma = (units.c**3 /10)*(2 / 3 / units.hbar) * (E / units.c)**3 * units.e**2 * abs(xx[:,0])**2
+        E = E - 1j * Gamma / units.hbar
+    gamma_eeee = (
+        sos_utils.permute_gamma_terms_123(
+            sos_utils.gamma_term11, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+        + sos_utils.permute_gamma_terms_123(
+            sos_utils.gamma_term12, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+        + sos_utils.permute_gamma_terms_123(
+            sos_utils.gamma_term13, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+        + sos_utils.permute_gamma_terms_123(
+            sos_utils.gamma_term14, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+        - sos_utils.permute_gamma_terms_123(
+            sos_utils.gamma_term21, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+        - sos_utils.permute_gamma_terms_123(
+            sos_utils.gamma_term22, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+        - sos_utils.permute_gamma_terms_123(
+            sos_utils.gamma_term23, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+        - sos_utils.permute_gamma_terms_123(
+            sos_utils.gamma_term24, E, X, L, I, omega, units, gamma_type='eeee', n=n)
+        )
+    return gamma_eeee 
 
 def gamma_eeee(E, X, units, omega=np.zeros(3), n=0, damping=False):
     """Compute the all electric second order hyperpolarizability for
