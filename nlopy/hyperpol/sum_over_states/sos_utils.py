@@ -215,6 +215,7 @@ def get_SOS_operators_summand3(gamma_type, X, L, I, units):
     	A[1] = units.e * X
     A[2] = 0.5 * units.g**2 * I
     return A
+    
 def get_SOS_operators_summand4(gamma_type, X, L, I, units):
     """Given the type of (hyper) polarizability to be computed,
     returns the operators corresponding to dH/dFi for the first two summands
