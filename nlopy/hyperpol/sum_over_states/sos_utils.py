@@ -561,7 +561,7 @@ def permute_gamma_terms_123(gamma_term, E, X, L, I, omega, units, gamma_type, n=
 
     return Gamma_term
 
-def gamma_term31(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term311(O1, O2, O3, E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the third summand in sos expression
     for gamma_xxxx
 
@@ -587,9 +587,8 @@ def gamma_term31(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the first sum in the third set of terms of gamma_eeee
     """
-    Ai, Ax, AI = get_SOS_operators_summand3(gamma_type, X, L, I, units) 
-    term31 = (Del(Ai[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
-        Del(Del(Ax, n, 0), n, 1).dot((Del(AI[:,n], n) * D2(Del(E, n), omega1, omega2, units))
+    term31 = (Del(O1[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
+        Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D2(Del(E, n), omega1, omega2, units))
         ))
     return term31
 
