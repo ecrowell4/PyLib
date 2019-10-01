@@ -567,7 +567,7 @@ def permute_gamma_terms_123(gamma_term, E, X, L, I, omega, units, gamma_type, n=
         + gamma_term(X, L, E, omega[2], omega[0], omega[1], units, gamma_type, n)) 
     return Gamma_term
 
-def gamma_term31(Oi, Ox, OI, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term31(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the third summand in sos expression
     for gamma_xxxx
 
@@ -597,8 +597,8 @@ def gamma_term31(Oi, Ox, OI, L, I, omega1, omega2, omega3, units, gamma_type, n=
         gamma_term : complex
             the first sum in the third set of terms of gamma_eeee
     """
-    term31 = (Del(Oi[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
-        Del(Del(Ox, n, 0), n, 1).dot((Del(OI[:,n], n) * D2(Del(E, n), omega1, omega2, units))
+    term31 = (Del(O1[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
+        Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D2(Del(E, n), omega1, omega2, units))
         ))
     return term31
 
@@ -725,7 +725,7 @@ def gamma_term36(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
 
     return term36
 
-def permute_gamma_summand4_terms(gamma_term, O1, O2, O3, E, omega, units, gamma_type, n=0):
+def permute_gamma_summand3_terms(gamma_term, O1, O2, O3, E, omega, units, gamma_type, n=0):
     """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
 
     Input
@@ -757,7 +757,24 @@ def permute_gamma_summand4_terms(gamma_term, O1, O2, O3, E, omega, units, gamma_
             + gamma_term(O1, O2, O3, E, omega[0], omega[2], omega[1], units, n)
             + gamma_term(O1, O2, O3, E, omega[2], omega[1], omega[0], units, n)
             ) 
-    return Gamma_term
+        return Gamma_term
+    if gamma_type=='mmme':
+        Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, E, omega[2], omega[0], omega[1], units, n)
+            + gamma_term(O1, O2, O3, E, omega[2], omega[1], omega[2], units, n)
+            ) 
+        return Gamma_term
+    if gamma_type=='mmem':
+        Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, E, omega[1], omega[2], omega[0], units, n)
+            + gamma_term(O1, O2, O3, E, omega[1], omega[0], omega[2], units, n)
+            ) 
+        return Gamma_term
+    if gamma_type=='memm':
+        Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, E, omega[0], omega[1], omega[2], units, n)
+            + gamma_term(O1, O2, O3, E, omega[0], omega[2], omega[1], units, n)
+            ) 
+        return Gamma_term
+    else:
+        assert False, gamma_type+"Not implemented yet."
 
 def gamma_term41(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the fourth summand in sos expression
