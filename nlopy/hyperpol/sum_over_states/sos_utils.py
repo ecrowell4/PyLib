@@ -215,7 +215,56 @@ def get_SOS_operators_summand3(gamma_type, X, L, I, units):
     	A[1] = units.e * X
     A[2] = 0.5 * units.g**2 * I
     return A
+def get_SOS_operators_summand4(gamma_type, X, L, I, units):
+    """Given the type of (hyper) polarizability to be computed,
+    returns the operators corresponding to dH/dFi for the first two summands
+    in gamma_xxxx.
 
+    For example, if type='eeem', then it is assumed we are computing the electric
+    dipole moment along i due to electric fields along j,k and a magnetic
+    field along r. 
+
+    If type=='memm', then we are computing the magnetic dipole moment along i due to 
+    and electric field along j and magnetic fields along k,r.
+
+    Note that the coupling constants are included as well, so there will be no
+    factors of e^n g^m in from of the gamma_terms.
+
+    Input
+        gamma_type : string
+            specifieds which (hyper) polarizability to compute.
+            E.g. 'eeee' would imply the all electric gamma
+        X : np.array
+            transition matrix
+        L : np.array
+            angular momentum matrix
+        I : np.array
+            matrix elements of Izz
+        units : class
+            fundamental constants
+
+    Output
+        AI, A1, A2 : np.arrays
+            Appropriate operators along the cartesian directions that appear
+            in the experssions for gamma. AI is g^2 I / 2, A1 and A2 are either eX or gL
+    """
+    Types ='em'
+    A = np.zeros((3, len(X), len(X))) + 0j
+    for i in range(4):
+        assert gamma_type[i] in Types, "The character '"+gamma_type[i]+"'' is not a valid type. The only types are electric (e) and magnetic (m)."
+    assert gamma_type[0]=='m', "The fourth summand doesn't appear for induced electric dipole."
+    assert gamma_type.count('m')>=2, "Fourth summand must have at least one incident magnetic field"
+    A[0] = 0.5 * units.g**2 * I
+    if gamma_type.count('e')==2:
+        A[1] = units.e * X
+        A[2] = units.e * X
+    elif gamma_type.count('e')==1:
+        A[1] = units.g * L
+        A[2] = units.e * X
+    else:
+        A[1] = units.g * L
+        A[2] = units.g * L 
+    return A
    
 def gamma_term11(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the first summand in SOS expression
@@ -669,7 +718,7 @@ def gamma_term36(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
 
 def gamma_term411(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the fourth summand in sos expression
-    for gamma_mxxxx
+    for gamma_mxxxx. 
 
     Input
         xx : np.array
