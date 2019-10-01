@@ -266,7 +266,7 @@ def get_SOS_operators_summand4(gamma_type, X, L, I, units):
         A[2] = units.g * L 
     return A
 
-def gamma_term11(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term11(O1, O2, O3, O4, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the first summand in SOS expression
     for gamma_xxxx
 
@@ -298,7 +298,7 @@ def gamma_term11(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n
     return term11
    
 
-def gamma_term12(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term12(O1, O2, O3, O4, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the first summand in SOS expression
     for gamma_xxxx
 
@@ -330,7 +330,7 @@ def gamma_term12(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n
     return term12
 
 
-def gamma_term13(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term13(O1, O2, O3, O4, E, omega1, omega2, omega3, units, n=0):
     """Returns the thrid term of the first summand in SOS expression
     for gamma_xxxx
 
@@ -361,7 +361,7 @@ def gamma_term13(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n
         )
     return term13
 
-def gamma_term14(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term14(O1, O2, O3, O4, E, omega1, omega2, omega3, units, n=0):
     """Returns the fourth term of the first summand in SOS expression
     for gamma_xxxx
 
@@ -392,7 +392,7 @@ def gamma_term14(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n
         ) 
     return term14
 
-def gamma_term21(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term21(O1, O2, O3, O4, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the second summand in sos expression
     for gamma_xxxx
 
@@ -419,7 +419,7 @@ def gamma_term21(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n
     Del(O2[:,n], n) * D1(Del(E, n), omega1, units))
     return term21
 
-def gamma_term22(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term22(O1, O2, O3, O4, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the second summand in sos expression
     for gamma_xxxx
 
@@ -446,7 +446,7 @@ def gamma_term22(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n
     Del(O4[:,n], n) * D1(Del(E, n), omega3, units))
     return term22
 
-def gamma_term23(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term23(O1, O2, O3, O4, E, omega1, omega2, omega3, units, n=0):
     """Returns the third term of the second summand in sos expression
     for gamma_xxxx
 
@@ -473,7 +473,7 @@ def gamma_term23(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n
     Del(O3[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
     return term23
 
-def gamma_term24(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term24(O1, O2, O3, O4, E, omega1, omega2, omega3, units, n=0):
     """Returns the fourth term of the second summand in sos expression
     for gamma_xxxx
 
@@ -500,7 +500,7 @@ def gamma_term24(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
     Del(O1[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
     return term24
 
-def permute_gamma_terms_123_(gamma_term, O1, O2, O3, O4, E, omega, units, gamma_type, n=0):
+def permute_gamma_4op_terms(gamma_term, O1, O2, O3, O4, E, omega, units, gamma_type, n=0):
     """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
 
     Input
