@@ -265,8 +265,8 @@ def get_SOS_operators_summand4(gamma_type, X, L, I, units):
         A[1] = units.g * L
         A[2] = units.g * L 
     return A
-   
-def gamma_term11(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
+
+def gamma_term11(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the first summand in SOS expression
     for gamma_xxxx
 
@@ -291,22 +291,20 @@ def gamma_term11(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
             the first sum in the first set of terms of gamma
     """
     assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
-    term11 =  (Del(Ai[n,:], n) * D3(Del(E,n), omega1, omega2, omega3, units)).dot(
-        (Del(Del(Ar, n, 0), n, 1) * D2(Del(E, n), omega1, omega2, units)).dot(
-            Del(Del(Ak, n, 0), n, 1).dot(
-                (Del(Aj[:,n], n) * D1(Del(E, n), omega1, units)))))
+    term11 =  (Del(O1[n,:], n) * D3(Del(E,n), omega1, omega2, omega3, units)).dot(
+        (Del(Del(O4, n, 0), n, 1) * D2(Del(E, n), omega1, omega2, units)).dot(
+            Del(Del(O3, n, 0), n, 1).dot(
+                (Del(O2[:,n], n) * D1(Del(E, n), omega1, units)))))
     return term11
+   
 
-def gamma_term12(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term12(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the second term of the first summand in SOS expression
     for gamma_xxxx
 
     Input
-        X : np.array
-            transition matrix
-        L : np.array
-            angular momentum matrix
+        Oi : np.array
+            array corresponding to ith index
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
         omega1-3 : np.float
@@ -322,26 +320,23 @@ def gamma_term12(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the second sum in the first set of terms of gamma_eeee
     """
-    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
-    term12 = (Del(Aj[n,:], n) * D1(Del(E.conjugate(),n), -omega1, units)).dot(
-        (Del(Del(Ai, n, 0), n, 1) * D2(Del(E, n), omega2, omega3, units)).dot(
-            Del(Del(Ar, n, 0), n, 1).dot(
-                (Del(Ak[:,n], n) * D1(Del(E, n), omega3, units))
+    term12 = (Del(O2[n,:], n) * D1(Del(E.conjugate(),n), -omega1, units)).dot(
+        (Del(Del(O1, n, 0), n, 1) * D2(Del(E, n), omega2, omega3, units)).dot(
+            Del(Del(O4, n, 0), n, 1).dot(
+                (Del(O3[:,n], n) * D1(Del(E, n), omega3, units))
                 )
             )
         ) 
     return term12
 
-def gamma_term13(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
+
+def gamma_term13(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the thrid term of the first summand in SOS expression
     for gamma_xxxx
 
     Input
-         X : np.array
-            transition matrix
-        L : np.array
-            angular momentum matrix
+        Oi : np.array
+            array corresponding to ith index
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
         omega1-3 : np.float
@@ -357,26 +352,22 @@ def gamma_term13(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the third sum in the first set of terms of gamma_eeee
     """
-    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
-    term13 = (Del(Ak[n,:], n) * D1(Del(E.conjugate(),n), -omega3, units)).dot(
-        (Del(Del(Ar, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega3, -omega2, units)).dot(
-            Del(Del(Ai, n, 0), n, 1).dot(
-                (Del(Aj[:,n], n) * D1(Del(E, n), omega1, units))
+    term13 = (Del(O3[n,:], n) * D1(Del(E.conjugate(),n), -omega3, units)).dot(
+        (Del(Del(O4, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega3, -omega2, units)).dot(
+            Del(Del(O1, n, 0), n, 1).dot(
+                (Del(O2[:,n], n) * D1(Del(E, n), omega1, units))
                 )
             )
         )
     return term13
 
-def gamma_term14(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term14(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the fourth term of the first summand in SOS expression
     for gamma_xxxx
 
     Input
-        X : np.array
-            transition matrix
-        L : np.array
-            angular momentum matrix
+        Oi : np.array
+            array corresponding to ith index
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
         omega1-3 : np.float
@@ -392,26 +383,22 @@ def gamma_term14(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the fourth sum in the first set of terms of gamma_eeee
     """
-    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
-    term14 = (Del(Ak[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
-        (Del(Del(Aj, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega1, -omega2, units)).dot(
-            Del(Del(Ar, n, 0), n, 1).dot(
-                (Del(Ai[:,n], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units))
+    term14 = (Del(O3[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
+        (Del(Del(O2, n, 0), n, 1) * D2(Del(E.conjugate(), n), -omega1, -omega2, units)).dot(
+            Del(Del(O4, n, 0), n, 1).dot(
+                (Del(O1[:,n], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units))
                 )
             )
         ) 
     return term14
 
-def gamma_term21(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term21(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the first term of the second summand in sos expression
     for gamma_xxxx
 
     Input
-        X : np.array
-            transition matrix
-        L : np.array
-            angular momentum matrix
+        Oi : np.array
+            array corresponding to ith index
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
         omega1-3 : np.float
@@ -427,22 +414,18 @@ def gamma_term21(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the first sum in the second set of terms of gamma_eeee
     """
-    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
-    term21 = ((Del(Ai[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
-        (Del(Ar[:,n], n) * D1(Del(E, n), omega3, units)))) * Del(Ak[n,:], n).dot(
-    Del(Aj[:,n], n) * D1(Del(E, n), omega1, units))
+    term21 = ((Del(O1[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
+        (Del(O4[:,n], n) * D1(Del(E, n), omega3, units)))) * Del(O3[n,:], n).dot(
+    Del(O2[:,n], n) * D1(Del(E, n), omega1, units))
     return term21
 
-def gamma_term22(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term22(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the second term of the second summand in sos expression
     for gamma_xxxx
 
     Input
-        X : np.array
-            transition matrix
-        L : np.array
-            angular momentum matrix
+        Oi : np.array
+            array corresponding to ith index
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
         omega1-3 : np.float
@@ -458,22 +441,18 @@ def gamma_term22(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the second sum in the second set of terms of gamma_eeee
     """
-    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
-    term22 = ((Del(Ak[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
-        (Del(Aj[:,n], n) * D1(Del(E, n), omega1, units)))) * Del(Ai[n,:], n).dot(
-    Del(Ar[:,n], n) * D1(Del(E, n), omega3, units))
+    term22 = ((Del(O3[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
+        (Del(O2[:,n], n) * D1(Del(E, n), omega1, units)))) * Del(O1[n,:], n).dot(
+    Del(O4[:,n], n) * D1(Del(E, n), omega3, units))
     return term22
 
-def gamma_term23(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term23(O1, O2, O3, O4, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the third term of the second summand in sos expression
     for gamma_xxxx
 
     Input
-        X : np.array
-            transition matrix
-        L : np.array
-            angular momentum matrix
+        Oi : np.array
+            array corresponding to ith index
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
         omega1-3 : np.float
@@ -489,22 +468,18 @@ def gamma_term23(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the third sum in the second set of terms of gamma_eeee
     """
-    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
-    term23 = ((Del(Ar[n,:], n) * D3(Del(E.conjugate(), n), -omega1,-omega2, -omega3, units)).dot(
-        (Del(Ai[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units)))) * Del(Aj[n,:], n).dot(
-    Del(Ak[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
+    term23 = ((Del(O4[n,:], n) * D3(Del(E.conjugate(), n), -omega1,-omega2, -omega3, units)).dot(
+        (Del(O1[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units)))) * Del(O2[n,:], n).dot(
+    Del(O3[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
     return term23
 
-def gamma_term24(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term24(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the fourth term of the second summand in sos expression
     for gamma_xxxx
 
     Input
-        X : np.array
-            transition matrix
-        L : np.array
-            angular momentum matrix
+        Oi : np.array
+            array corresponding to ith index
         E : np.array
             complex eigenenergies (imaginary part is due to damping)
         omega1-3 : np.float
@@ -520,11 +495,9 @@ def gamma_term24(E, X, L, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the fourth sum in the second set of terms of gamma_eeee
     """
-    assert gamma_type != None, "Must specify which gamma you want: 'eeee', 'eeem', etc."
-    Ai, Aj, Ak, Ar = get_SOS_operators_summand1and2(gamma_type, X, L, units)
-    term24 = ((Del(Aj[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
-        (Del(Ak[:,n], n) * D1(Del(E, n), omega2, units)))) * Del(Ar[n,:], n).dot(
-    Del(Ai[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
+    term24 = ((Del(O2[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
+        (Del(O3[:,n], n) * D1(Del(E, n), omega2, units)))) * Del(O4[n,:], n).dot(
+    Del(O1[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
     return term24
 
 def permute_gamma_terms_123_(gamma_term, O1, O2, O3, O4, E, omega, units, gamma_type, n=0):
