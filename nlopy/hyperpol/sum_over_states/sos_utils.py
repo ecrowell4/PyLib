@@ -786,7 +786,7 @@ def gamma_term41(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
             the second sum in the third set of terms of gamma_eeee
     """
 
-    term41 = units.g**4 * (Del(OI[n,:], n) * D2(Del(E, n), omega2, omega3, units)).dot(
+    term41 = units.g**4 * (Del(O1[n,:], n) * D2(Del(E, n), omega2, omega3, units)).dot(
         Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D1(Del(E, n), omega3, units))
         ))
 
@@ -811,8 +811,8 @@ def gamma_term42(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
             the second sum in the third set of terms of gamma_eeee
     """
 
-    term42 = units.g**4 * (Del(O3[n,:], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units)).dot(
-        Del(Del(O2, n, 0), n, 1).dot((Del(Oi[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
+    term42 = units.g**4 * (Del(O1[n,:], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units)).dot(
+        Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
         ))
 
     return term42
@@ -836,11 +836,68 @@ def gamma_term43(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
             the second sum in the third set of terms of gamma_eeee
     """
 
-    term43 = units.g**4 * (Del(O2[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
-        Del(Del(Oi, n, 0), n, 1).dot((Del(O3[:,n], n) * D1(Del(E, n), omega3, units))
+    term43 = units.g**4 * (Del(O1[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
+        Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D1(Del(E, n), omega3, units))
         ))
 
     return term43
+
+    def permute_gamma_summand4_terms(gamma_term, O1, O2, O3, E, omega, units, gamma_type, n=0):
+    """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
+
+    Input
+        gamma_term : function
+            function that returns one of the terms in sos expression for 
+            gamma_eeee
+        xx : np.array
+            transition matrix
+        E : np.array
+            eigenenergies Emn
+        omega : np.array
+            incident field frequencies
+        units : class
+            fundamental constants
+        gamma_type : string
+            string specifying which gamma we are computiner ('eeee', 'meem', 'mmme', etc.)
+        n : int
+            starting state
+
+    Output
+        gamma_term : complex
+            The average of the term over all frequency permutations
+        """
+    if gamma_type=='mmmm':
+        Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, E, omega[0], omega[1], omega[2], units, n)
+            + gamma_term(O1, O2, O3, E, omega[1], omega[2], omega[0], units, n)
+            + gamma_term(O1, O2, O3, E, omega[2], omega[0], omega[1], units, n)
+            + gamma_term(O1, O2, O3, E, omega[1], omega[0], omega[2], units, n)
+            + gamma_term(O1, O2, O3, E, omega[0], omega[2], omega[1], units, n)
+            + gamma_term(O1, O2, O3, E, omega[2], omega[1], omega[0], units, n)
+            ) 
+        return Gamma_term
+    elif gamma_type=='mmme':
+        Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, E, omega[0], omega[1], omega[2], units, n)
+            + gamma_term(O1, O2, O3, E, omega[0], omega[2], omega[1], units, n)
+            + gamma_term(O1, O2, O3, E, omega[1], omega[0], omega[2], units, n)
+            + gamma_term(O1, O2, O3, E, omega[1], omega[2], omega[0], units, n)
+            ) 
+        return Gamma_term
+    elif gamma_type=='mmem':
+        Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, E, omega[0], omega[1], omega[2], units, n)
+            + gamma_term(O1, O2, O3, E, omega[], omega[0], omega[1], units, n)
+            + gamma_term(O1, O2, O3, E, omega[2], omega[0], omega[1], units, n)
+            + gamma_term(O1, O2, O3, E, omega[2], omega[1], omega[0], units, n)
+            ) 
+        return Gamma_term
+    elif gamma_type=='memm':
+        Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, E, omega[1], omega[2], omega[0], units, n)
+            + gamma_term(O1, O2, O3, E, omega[1], omega[0], omega[2], units, n)
+            + gamma_term(O1, O2, O3, E, omega[2], omega[0], omega[1], units, n)
+            + gamma_term(O1, O2, O3, E, omega[2], omega[1], omega[0], units, n)
+            ) 
+        return Gamma_term
+    else:
+        assert False, gamma_type+"Not implemented yet."
 
 def gamma_term51_m(L, I, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the third summand in sos expression
