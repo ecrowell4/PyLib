@@ -572,12 +572,8 @@ def gamma_term31(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
     for gamma_xxxx
 
     Input
-        Oi : np.array
-            operator corresponding to ith cartesian index
-        Ox : np.array
-            operator corresponding to X or L
-        OI : np.array
-            moment of intertia
+        O1-3 : np.array
+            operators
         L : np.array
             angular momentum matrix
         I : np.array
@@ -602,7 +598,7 @@ def gamma_term31(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
         ))
     return term31
 
-def gamma_term32(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term32(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the second term of the third summand in sos expression
     for gamma_xxxx
 
@@ -620,14 +616,13 @@ def gamma_term32(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the second sum in the third set of terms of gamma_eeee
     """
-    Ai, Ax, AI = get_SOS_operators_summand3(gamma_type, X, L, I, units)
-    term32 = (Del(AI[n,:], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units)).dot(
-        Del(Del(Ax, n, 0), n, 1).dot((Del(Ai[:,n], n) * D2(Del(E.conjugate(), n), -omega1, -omega2, units))
+    term32 = (Del(O1[n,:], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units)).dot(
+        Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units))
         ))
 
     return term32
 
-def gamma_term33(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term33(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the third term of the third summand in sos expression
     for gamma_xxxx
 
@@ -645,13 +640,12 @@ def gamma_term33(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the third sum in the third set of terms of gamma_eeee
     """
-    Ai, Ax, AI = get_SOS_operators_summand3(gamma_type, X, L, I, units)
-    term33 = (Del(Ai[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
-        Del(Del(AI, n, 0), n, 1).dot((Del(Ax[:,n], n) * D1(Del(E, n), omega1, units))
+    term33 = (Del(O1[n,:], n) * D3(Del(E, n), omega1, omega2, omega3, units)).dot(
+        Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D1(Del(E, n), omega1, units))
         ))
     return term33
 
-def gamma_term34(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term34(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the fourth term of the third summand in sos expression
     for gamma_xxxx
 
@@ -669,13 +663,12 @@ def gamma_term34(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the fourth sum in the third set of terms of gamma_eeee
     """
-    Ai, Ax, AI = get_SOS_operators_summand3(gamma_type, X, L, I, units)
     term34 = (Del(Ax[n,:], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units)).dot(
         Del(Del(AI, n, 0), n, 1).dot((Del(Ai[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
         ))
     return term34
 
-def gamma_term35(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term35(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the fifth term of the third summand in sos expression
     for gamma_xxxx
 
@@ -693,14 +686,13 @@ def gamma_term35(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the first sum in the third set of terms of gamma_eeee
     """
-    Ai, Ax, AI = get_SOS_operators_summand3(gamma_type, X, L, I, units)
     term35 = (Del(Ax[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
         Del(Del(Ai, n, 0), n, 1).dot((Del(AI[:,n], n) * D2(Del(E, n), omega2, omega3, units))
         ))
 
     return term35
 
-def gamma_term36(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term36(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
     """Returns the sixth term of the third summand in sos expression
     for gamma_xxxx
 
@@ -718,7 +710,6 @@ def gamma_term36(E, X, L, I, omega1, omega2, omega3, units, gamma_type, n=0):
         gamma_term : complex
             the second sum in the third set of terms of gamma_eeee
     """
-    Ai, Ax, AI = get_SOS_operators_summand3(gamma_type, X, L, I, units)
     term36 = (Del(AI[n,:], n) * D1(Del(E, n), omega1, units)).dot(
         Del(Del(Ai, n, 0), n, 1).dot((Del(Ax[:,n], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units))
         ))
@@ -759,8 +750,8 @@ def permute_gamma_summand3_terms(gamma_term, O1, O2, O3, E, omega, units, gamma_
             ) 
         return Gamma_term
     if gamma_type=='mmme':
-        Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, E, omega[2], omega[0], omega[1], units, n)
-            + gamma_term(O1, O2, O3, E, omega[2], omega[1], omega[2], units, n)
+        Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, E, omega[2], omega[1], omega[0], units, n)
+            + gamma_term(O1, O2, O3, E, omega[2], omega[0], omega[1], units, n)
             ) 
         return Gamma_term
     if gamma_type=='mmem':
