@@ -899,7 +899,7 @@ def gamma_term43(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
     else:
         assert False, gamma_type+"Not implemented yet."
 
-def gamma_term51_m(L, I, E, omega1, omega2, omega3, units, n=0):
+def gamma_term51(O1, O2, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the third summand in sos expression
     for gamma_eeee
 
@@ -918,11 +918,11 @@ def gamma_term51_m(L, I, E, omega1, omega2, omega3, units, n=0):
             the second sum in the third set of terms of gamma_eeee
     """
     
-    term51 = units.g**4 * Del(I[n,:], n).dot(Del(I[:,n], n) * D2(Del(E, n), omega2, omega3, units)) / 2
+    term51 = units.g**4 * Del(O1[n,:], n).dot(Del(O2[:,n], n) * D2(Del(E, n), omega2, omega3, units)) / 2
     
     return term51
 
-def gamma_term52_m(L, I, E, omega1, omega2, omega3, units, n=0):
+def gamma_term52(O1, O2, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the third summand in sos expression
     for gamma_eeee
 
@@ -941,7 +941,7 @@ def gamma_term52_m(L, I, E, omega1, omega2, omega3, units, n=0):
             the second sum in the third set of terms of gamma_eeee
     """
     
-    term51 = units.g**4 * Del(I[n,:], n).dot(Del(I[:,n], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units)) / 2
+    term51 = units.g**4 * Del(O1[n,:], n).dot(Del(O2[:,n], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units)) / 2
     
     return term51
 
