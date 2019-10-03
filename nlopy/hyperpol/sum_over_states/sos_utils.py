@@ -968,12 +968,13 @@ def permute_gamma_summand5_terms(gamma_term, O1, O2, E, omega, units,n=0):
             The average of the term over all frequency permutations
         """
     if gamma_term=='mmmm':
-        Gamma_term = (1 / 6) * (gamma_term(L, I, E, omega[0], omega[1], omega[2], units,n=0)
-            + gamma_term(L, I, E, omega[0], omega[2], omega[1], units,n=0)
-            + gamma_term(L, I, E, omega[1], omega[0], omega[2], units,n=0)
-            + gamma_term(L, I, E, omega[1], omega[2], omega[0], units,n=0)
-            + gamma_term(L, I, E, omega[2], omega[1], omega[0], units,n=0)
-            + gamma_term(L, I, E, omega[2], omega[0], omega[1], units,n=0)) 
+        Gamma_term = (1 / 6) * (gamma_term(O1, O2, E, omega[0], omega[1], omega[2], units,n=0)
+            + gamma_term(O1, O2, E, omega[1], omega[2], omega[0], units,n=0)
+            + gamma_term(O1, O2, E, omega[2], omega[0], omega[1], units,n=0)
+            + gamma_term(O1, O2, E, omega[0], omega[2], omega[1], units,n=0)
+            + gamma_term(O1, O2, E, omega[2], omega[1], omega[0], units,n=0)
+            + gamma_term(O1, O2, E, omega[1], omega[0], omega[2], units,n=0)
+            ) 
     else:
         assert False, "Fifth summand only enters for all magnetic susceptibility."
     return Gamma_term
