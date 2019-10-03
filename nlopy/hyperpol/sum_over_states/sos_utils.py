@@ -945,7 +945,7 @@ def gamma_term52(O1, O2, E, omega1, omega2, omega3, units, n=0):
     
     return term51
 
-def permute_gamma_summand5_terms(gamma_term, O1, O2, E, omega, units,n=0):
+def permute_gamma_summand5_terms(gamma_term, O1, O2, E, omega, units, gamma_type, n=0):
     """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
 
     Input
@@ -967,7 +967,7 @@ def permute_gamma_summand5_terms(gamma_term, O1, O2, E, omega, units,n=0):
         gamma_term : complex
             The average of the term over all frequency permutations
         """
-    if gamma_term=='mmmm':
+    if gamma_type=='mmmm':
         Gamma_term = (1 / 6) * (gamma_term(O1, O2, E, omega[0], omega[1], omega[2], units,n=0)
             + gamma_term(O1, O2, E, omega[1], omega[2], omega[0], units,n=0)
             + gamma_term(O1, O2, E, omega[2], omega[0], omega[1], units,n=0)

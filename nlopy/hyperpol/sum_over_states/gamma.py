@@ -94,26 +94,31 @@ def gamma_mmmm_(E, L, I, units, omega=np.zeros(3), n=0, includeA2=True, includeC
     
     if includeA2 == True:
         gamma -=  (sos_utils.permute_gamma_summand3_terms(
-            sos_utils.gamma_term31, L, L, I, E, omega, units, n=n) 
+            sos_utils.gamma_term31, L, L, I, E, omega, units, 'mmmm', n=n) 
         + sos_utils.permute_gamma_summand3_terms(
-            sos_utils.gamma_term32, I, L, L, E, omega, units, n=n)
+            sos_utils.gamma_term32, I, L, L, E, omega, units, 'mmmm', n=n)
         + sos_utils.permute_gamma_summand3_terms(
-            sos_utils.gamma_term33, L, I, L, E, omega, units, n=n)
+            sos_utils.gamma_term33, L, I, L, E, omega, units, 'mmmm', n=n)
         + sos_utils.permute_gamma_summand3_terms(
-            sos_utils.gamma_term34, L, I, L, E, omega, units, n=n)
+            sos_utils.gamma_term34, L, I, L, E, omega, units, 'mmmm', n=n)
         + sos_utils.permute_gamma_summand3_terms(
-            sos_utils.gamma_term35, L, L, I, E, omega, units, n=n)
+            sos_utils.gamma_term35, L, L, I, E, omega, units, 'mmmm', n=n)
         + sos_utils.permute_gamma_summand3_terms(
-            sos_utils.gamma_term36, I, L, L, E, omega, units, n=n))
+            sos_utils.gamma_term36, I, L, L, E, omega, units, 'mmmm', n=n))
     
     if includeCovar == True:
-        gamma += (sos_utils.permute_gamma_summand4_terms(sos_utils.gamma_term41, I, L, L, E, omega, units, n=n)
-        + sos_utils.permute_gamma_summand4_terms(sos_utils.gamma_term42, L, L, I, E, omega, units, n=n)
-        + sos_utils.permute_gamma_summand4_terms(sos_utils.gamma_term43, L, I, L, E, omega, units, n=n))
+        gamma += (sos_utils.permute_gamma_summand4_terms(
+            sos_utils.gamma_term41, I, L, L, E, omega, units, 'mmmm', n=n)
+        + sos_utils.permute_gamma_summand4_terms(
+            sos_utils.gamma_term42, L, L, I, E, omega, units, 'mmmm', n=n)
+        + sos_utils.permute_gamma_summand4_terms(
+            sos_utils.gamma_term43, L, I, L, E, omega, units, 'mmmm', n=n))
         
     if includeA2==True and includeCovar==True:
-        gamma += (sos_utils.permute_gamma_summand5_terms(sos_utils.gamma_term51, I, I, E, omega, units, n=n)
-        + sos_utils.permute_gamma_summand5_terms(sos_utils.gamma_term52, I, I, E, omega, units, n=n))
+        gamma += (sos_utils.permute_gamma_summand5_terms(
+            sos_utils.gamma_term51, I, I, E, omega, units, 'mmmm', n=n)
+        + sos_utils.permute_gamma_summand5_terms(
+            sos_utils.gamma_term52, I, I, E, omega, units, 'mmmm', n=n))
     
     return gamma
 
