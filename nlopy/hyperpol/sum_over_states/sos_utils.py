@@ -663,8 +663,8 @@ def gamma_term34(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
         gamma_term : complex
             the fourth sum in the third set of terms of gamma_eeee
     """
-    term34 = (Del(Ax[n,:], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units)).dot(
-        Del(Del(AI, n, 0), n, 1).dot((Del(Ai[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
+    term34 = (Del(O1[n,:], n) * D3(Del(E.conjugate(), n), -omega1, -omega2, -omega3, units)).dot(
+        Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D1(Del(E.conjugate(), n), -omega1, units))
         ))
     return term34
 
@@ -686,8 +686,8 @@ def gamma_term35(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
         gamma_term : complex
             the first sum in the third set of terms of gamma_eeee
     """
-    term35 = (Del(Ax[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
-        Del(Del(Ai, n, 0), n, 1).dot((Del(AI[:,n], n) * D2(Del(E, n), omega2, omega3, units))
+    term35 = (Del(O1[n,:], n) * D1(Del(E.conjugate(), n), -omega1, units)).dot(
+        Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D2(Del(E, n), omega2, omega3, units))
         ))
 
     return term35
@@ -710,8 +710,8 @@ def gamma_term36(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
         gamma_term : complex
             the second sum in the third set of terms of gamma_eeee
     """
-    term36 = (Del(AI[n,:], n) * D1(Del(E, n), omega1, units)).dot(
-        Del(Del(Ai, n, 0), n, 1).dot((Del(Ax[:,n], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units))
+    term36 = (Del(O1[n,:], n) * D1(Del(E, n), omega1, units)).dot(
+        Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units))
         ))
 
     return term36
@@ -786,7 +786,7 @@ def gamma_term41(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
             the second sum in the third set of terms of gamma_eeee
     """
 
-    term41 = units.g**4 * (Del(O1[n,:], n) * D2(Del(E, n), omega2, omega3, units)).dot(
+    term41 = (Del(O1[n,:], n) * D2(Del(E, n), omega2, omega3, units)).dot(
         Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D1(Del(E, n), omega3, units))
         ))
 
@@ -811,7 +811,7 @@ def gamma_term42(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
             the second sum in the third set of terms of gamma_eeee
     """
 
-    term42 = units.g**4 * (Del(O1[n,:], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units)).dot(
+    term42 = (Del(O1[n,:], n) * D2(Del(E.conjugate(), n), -omega2, -omega3, units)).dot(
         Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
         ))
 
@@ -836,7 +836,7 @@ def gamma_term43(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
             the second sum in the third set of terms of gamma_eeee
     """
 
-    term43 = units.g**4 * (Del(O1[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
+    term43 = (Del(O1[n,:], n) * D1(Del(E.conjugate(), n), -omega2, units)).dot(
         Del(Del(O2, n, 0), n, 1).dot((Del(O3[:,n], n) * D1(Del(E, n), omega3, units))
         ))
 
