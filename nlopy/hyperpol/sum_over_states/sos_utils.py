@@ -567,7 +567,7 @@ def permute_gamma_terms_123(gamma_term, E, X, L, I, omega, units, gamma_type, n=
         + gamma_term(X, L, E, omega[2], omega[0], omega[1], units, gamma_type, n)) 
     return Gamma_term
 
-def gamma_term31(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term31(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
     """Returns the first term of the third summand in sos expression
     for gamma_xxxx
 
@@ -598,7 +598,7 @@ def gamma_term31(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
         ))
     return term31
 
-def gamma_term32(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term32(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
     """Returns the second term of the third summand in sos expression
     for gamma_xxxx
 
@@ -622,7 +622,7 @@ def gamma_term32(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
 
     return term32
 
-def gamma_term33(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term33(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
     """Returns the third term of the third summand in sos expression
     for gamma_xxxx
 
@@ -645,7 +645,7 @@ def gamma_term33(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
         ))
     return term33
 
-def gamma_term34(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term34(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
     """Returns the fourth term of the third summand in sos expression
     for gamma_xxxx
 
@@ -668,7 +668,7 @@ def gamma_term34(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
         ))
     return term34
 
-def gamma_term35(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term35(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
     """Returns the fifth term of the third summand in sos expression
     for gamma_xxxx
 
@@ -692,7 +692,7 @@ def gamma_term35(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
 
     return term35
 
-def gamma_term36(O1, O2, O3, E, omega1, omega2, omega3, units, gamma_type, n=0):
+def gamma_term36(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
     """Returns the sixth term of the third summand in sos expression
     for gamma_xxxx
 
