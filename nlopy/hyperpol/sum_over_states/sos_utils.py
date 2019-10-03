@@ -163,9 +163,9 @@ def get_SOS_operators_summand1and2(gamma_type, X, L, units):
     for i in range(4):
         assert gamma_type[i] in Types, "The character '"+gamma_type[i]+"'' is not a valid type. The only types are electric (e) and magnetic (m)."
         if gamma_type[i]=='e':
-        	A[i] = units.e * X
+            A[i] = units.e * X
         elif gamma_type[i]=='m':
-        	A[i] = units.g * L
+            A[i] = units.g * L
     return A
 
 def get_SOS_operators_summand3(gamma_type, X, L, I, units):
@@ -206,13 +206,13 @@ def get_SOS_operators_summand3(gamma_type, X, L, I, units):
     for i in range(4):
         assert gamma_type[i] in Types, "The character '"+gamma_type[i]+"'' is not a valid type. The only types are electric (e) and magnetic (m)."
     if gamma_type[0]=='e':
-    	A[0] = units.e * X
+        A[0] = units.e * X
     elif gamma_type[0]=='m':
-    	A[0] = units.g * L
+        A[0] = units.g * L
     if gamma_type[1:].count('e')==0:
-    	A[1] = units.g * L
+        A[1] = units.g * L
     elif gamma_type[1:].count('e')==1:
-    	A[1] = units.e * X
+        A[1] = units.e * X
     A[2] = 0.5 * units.g**2 * I
     return A
 
@@ -500,7 +500,7 @@ def gamma_term24(O1, O2, O3, O4, E, omega1, omega2, omega3, units, n=0):
     Del(O1[:,n], n) * D1(Del(E.conjugate(), n), -omega3, units))
     return term24
 
-def permute_gamma_4op_terms(gamma_term, O1, O2, O3, O4, E, omega, units, gamma_type, n=0):
+def permute_gamma_4op_terms(gamma_term, O1, O2, O3, O4, E, omega, units, n=0):
     """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
 
     Input
@@ -842,7 +842,7 @@ def gamma_term43(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
 
     return term43
 
-    def permute_gamma_summand4_terms(gamma_term, O1, O2, O3, E, omega, units, gamma_type, n=0):
+def permute_gamma_summand4_terms(gamma_term, O1, O2, O3, E, omega, units, gamma_type, n=0):
     """Averages the function `gamma_term` over all permutations of omega1, omega2, and omega3.
 
     Input
@@ -865,7 +865,7 @@ def gamma_term43(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
     Output
         gamma_term : complex
             The average of the term over all frequency permutations
-        """
+    """
     if gamma_type=='mmmm':
         Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, E, omega[0], omega[1], omega[2], units, n)
             + gamma_term(O1, O2, O3, E, omega[1], omega[2], omega[0], units, n)
@@ -884,7 +884,7 @@ def gamma_term43(O1, O2, O3, E, omega1, omega2, omega3, units, n=0):
         return Gamma_term
     elif gamma_type=='mmem':
         Gamma_term = (1 / 6) * (gamma_term(O1, O2, O3, E, omega[0], omega[1], omega[2], units, n)
-            + gamma_term(O1, O2, O3, E, omega[], omega[0], omega[1], units, n)
+            + gamma_term(O1, O2, O3, E, omega[0], omega[2], omega[1], units, n)
             + gamma_term(O1, O2, O3, E, omega[2], omega[0], omega[1], units, n)
             + gamma_term(O1, O2, O3, E, omega[2], omega[1], omega[0], units, n)
             ) 
