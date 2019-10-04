@@ -76,49 +76,49 @@ def gamma_mmmm_(E, L, I, units, omega=np.zeros(3), n=0, includeA2=True, includeC
     
     # compute gamma term by term
     gamma = (sos_utils.permute_gamma_4op_terms(
-        sos_utils.gamma_term11, L, L, L, L, E, omega, units, n=n) 
+        sos_utils.gamma_term11, units.g*L, units.g*L, units.g*L, units.g*L, E, omega, units, n=n) 
     + sos_utils.permute_gamma_4op_terms(
-        sos_utils.gamma_term12, L, L, L, L, E, omega, units, n=n)
+        sos_utils.gamma_term12, units.g*L, units.g*L, units.g*L, units.g*L, E, omega, units, n=n)
     + sos_utils.permute_gamma_4op_terms(
-        sos_utils.gamma_term13, L, L, L, L, E, omega, units, n=n)
+        sos_utils.gamma_term13, units.g*L, units.g*L, units.g*L, units.g*L, E, omega, units, n=n)
     + sos_utils.permute_gamma_4op_terms(
-        sos_utils.gamma_term14, L, L, L, L, E, omega, units, n=n)
+        sos_utils.gamma_term14, units.g*L, units.g*L, units.g*L, units.g*L, E, omega, units, n=n)
     - sos_utils.permute_gamma_4op_terms(
-        sos_utils.gamma_term21, L, L, L, L, E, omega, units, n=n)
+        sos_utils.gamma_term21, units.g*L, units.g*L, units.g*L, units.g*L, E, omega, units, n=n)
     - sos_utils.permute_gamma_4op_terms(
-        sos_utils.gamma_term22, L, L, L, L, E, omega, units, n=n)
+        sos_utils.gamma_term22, units.g*L, units.g*L, units.g*L, units.g*L, E, omega, units, n=n)
     - sos_utils.permute_gamma_4op_terms(
-        sos_utils.gamma_term23, L, L, L, L, E, omega, units, n=n)
+        sos_utils.gamma_term23, units.g*L, units.g*L, units.g*L, units.g*L, E, omega, units, n=n)
     - sos_utils.permute_gamma_4op_terms(
-        sos_utils.gamma_term24, L, L, L, L, E, omega, units, n=n))
+        sos_utils.gamma_term24, units.g*L, units.g*L, units.g*L, units.g*L, E, omega, units, n=n))
     
     if includeA2 == True:
         gamma -=  (sos_utils.permute_gamma_summand3_terms(
-            sos_utils.gamma_term31, L, L, I, E, omega, units, 'mmmm', n=n) 
+            sos_utils.gamma_term31, units.g*L, units.g*L, 0.5*units.g**2*I, E, omega, units, 'mmmm', n=n) 
         + sos_utils.permute_gamma_summand3_terms(
-            sos_utils.gamma_term32, I, L, L, E, omega, units, 'mmmm', n=n)
+            sos_utils.gamma_term32, 0.5*units.g**2*I, units.g*L, units.g*L, E, omega, units, 'mmmm', n=n)
         + sos_utils.permute_gamma_summand3_terms(
-            sos_utils.gamma_term33, L, I, L, E, omega, units, 'mmmm', n=n)
+            sos_utils.gamma_term33, units.g*L, 0.5*units.g**2*I, units.g*L, E, omega, units, 'mmmm', n=n)
         + sos_utils.permute_gamma_summand3_terms(
-            sos_utils.gamma_term34, L, I, L, E, omega, units, 'mmmm', n=n)
+            sos_utils.gamma_term34, units.g*L, 0.5*units.g**2*I, units.g*L, E, omega, units, 'mmmm', n=n)
         + sos_utils.permute_gamma_summand3_terms(
-            sos_utils.gamma_term35, L, L, I, E, omega, units, 'mmmm', n=n)
+            sos_utils.gamma_term35, units.g*L, units.g*L, 0.5*units.g**2*I, E, omega, units, 'mmmm', n=n)
         + sos_utils.permute_gamma_summand3_terms(
-            sos_utils.gamma_term36, I, L, L, E, omega, units, 'mmmm', n=n))
+            sos_utils.gamma_term36, 0.5*units.g**2*I, units.g*L, units.g*L, E, omega, units, 'mmmm', n=n))
     
     if includeCovar == True:
         gamma += (sos_utils.permute_gamma_summand4_terms(
-            sos_utils.gamma_term41, I, L, L, E, omega, units, 'mmmm', n=n)
+            sos_utils.gamma_term41, units.g**2*I, units.g*L, units.g*L, E, omega, units, 'mmmm', n=n)
         + sos_utils.permute_gamma_summand4_terms(
-            sos_utils.gamma_term42, L, L, I, E, omega, units, 'mmmm', n=n)
+            sos_utils.gamma_term42, units.g*L, units.g*L, units.g**2*I, E, omega, units, 'mmmm', n=n)
         + sos_utils.permute_gamma_summand4_terms(
-            sos_utils.gamma_term43, L, I, L, E, omega, units, 'mmmm', n=n))
+            sos_utils.gamma_term43, units.g*L, units.g**2*I, units.g*L, E, omega, units, 'mmmm', n=n))
         
     if includeA2==True and includeCovar==True:
         gamma += (sos_utils.permute_gamma_summand5_terms(
-            sos_utils.gamma_term51, I, I, E, omega, units, 'mmmm', n=n)
+            sos_utils.gamma_term51, units.g**2*I, 0.5*units.g**2*I, E, omega, units, 'mmmm', n=n)
         + sos_utils.permute_gamma_summand5_terms(
-            sos_utils.gamma_term52, I, I, E, omega, units, 'mmmm', n=n))
+            sos_utils.gamma_term52, 0.5*units.g**2*I, units.g**2*I, E, omega, units, 'mmmm', n=n))
     
     return gamma
 
