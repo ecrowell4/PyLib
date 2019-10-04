@@ -47,7 +47,7 @@ def gamma_eeee(E, X, units, omega=np.zeros(3), n=0, damping=False):
         )
     return gamma_eeee 
 
-def gamma_mmmm_(E, L, I, units, omega=np.zeros(3), n=0, includeA2=True, includeCovar=True, damping=False):
+def gamma_mmmm(E, L, I, units, omega=np.zeros(3), n=0, includeA2=True, includeCovar=True, damping=False):
     """Compute diagonal component of gamma_mmmm with or without A^2 term. 
     
     Input
@@ -119,76 +119,6 @@ def gamma_mmmm_(E, L, I, units, omega=np.zeros(3), n=0, includeA2=True, includeC
             sos_utils.gamma_term51, units.g**2*I, 0.5*units.g**2*I, E, omega, units, 'mmmm', n=n)
         + sos_utils.permute_gamma_summand5_terms(
             sos_utils.gamma_term52, 0.5*units.g**2*I, units.g**2*I, E, omega, units, 'mmmm', n=n))
-    
-    return gamma
-
-def gamma_mmmm(E, L, I, omega, units, n=0, includeA2=True, includeCovar=True, damping=False):
-    """Compute diagonal component of gamma_mmmm with or without A^2 term. 
-    
-    Input
-        E : np.array
-            eigenenergies of unperturbed system
-        xx : np.array
-            transition matrix of unperturbed system
-        units : class
-            fundamental constants
-        sq_term : bool
-            If true, then return gamma with A^2 term included in perturbation.
-    
-    Output
-        gamma_eeee : complex
-            second hyperpolarizability
-    """
-    
-    Del = np.delete
-
-    # assert consisten dimensions
-    assert len(E) == len(L[0])
-    
-    # determine number of eigenstates fo be used in computing beta
-    num_states = len(E)
-    
-    # Take all mu -> bar{mu}
-    L = L - L[n,n]*np.eye(num_states)
-    I = I - I[n,n]*np.eye(num_states)
-    
-    # Take all Em -> Enm
-    E = E - E[0]
-    
-    # Include damping if damping is true
-    if damping == True:
-        # Define damping coeffs
-        Gamma = (units.c**3 /10)*(2 / 3 / units.hbar) * (E / units.c)**3 * units.e**2 * abs(xx[:,0])**2
-        
-        # Incorporate into energies
-        E = E - 1j * Gamma / units.hbar
-    
-    # compute gamma term by term
-    gamma = (sos_utils.permute_gamma_terms_123(sos_utils.gamma_term11_m, E, X, L, I, omega, units) 
-    + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term12_m, E, X, L, I, omega, units)
-    + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term13_m, E, X, L, I, omega, units)
-    + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term14_m, E, X, L, I, omega, units)
-    + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term21_m, E, X, L, I, omega, units)
-    + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term22_m, E, X, L, I, omega, units)
-    + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term23_m, E, X, L, I, omega, units)
-    + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term24_m, E, X, L, I, omega, units))
-    
-    if includeA2 == True:
-        gamma +=  (sos_utils.permute_gamma_terms_123(sos_utils.gamma_term31_m, E, X, L, I, omega, units) 
-        + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term32_m, E, X, L, I, omega, units)
-        + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term33_m, E, X, L, I, omega, units)
-        + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term34_m, E, X, L, I, omega, units)
-        + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term35_m, E, X, L, I, omega, units)
-        + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term36_m, E, X, L, I, omega, units))
-    
-    if includeCovar == True:
-        gamma += (sos_utils.permute_gamma_terms_123(sos_utils.gamma_term41_m, E, X, L, I, omega, units)
-        + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term42_m, E, X, L, I, omega, units)
-        + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term43_m, E, X, L, I, omega, units))
-        
-    if includeA2==True and includeCovar==True:
-        gamma += (sos_utils.permute_gamma_terms_123(sos_utils.gamma_term51_m, E, X, L, I, omega, units)
-        + sos_utils.permute_gamma_terms_123(sos_utils.gamma_term52_m, E, X, L, I, omega, units))
     
     return gamma
 
