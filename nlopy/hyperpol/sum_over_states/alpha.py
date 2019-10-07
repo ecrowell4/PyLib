@@ -50,7 +50,7 @@ def alpha_ee(E, xx, units, omega=0, intrinsic=False, n=0, damping=False):
         return alpha
 
 
-def alpha_mm(E, L, I, units, omega=0, canonical=False):
+def alpha_mm(E, L, I, units, omega=0, canonical=False, n=0):
     """Returns the canonical, linear, magnetic polarizability alpha at input frequency
     omega:
         m = alpha * B(oemga)
@@ -77,15 +77,15 @@ def alpha_mm(E, L, I, units, omega=0, canonical=False):
     g = units.e / 2 / units.m / units.c
         
     # Evaluate the SOS term in equation for alpha^{mm}
-    alpha_mag = units.g**2 * (L[0,1:].dot((L[1:,0] * sos_utils.D1(np.delete(E, 1), omega, units)))
-                       + L[0,1:].dot((L[1:,0] * sos_utils.D1(np.delete(E.conjugate(), 1), omega, units))))
+    alpha_mag = units.g**2 * (np.delete(L[n,:], n).dot((np.delete(L[:,n], n) * sos_utils.D1(np.delete(E, n), omega, units)))
+                       + np.delete(L[n,:], n).dot((np.delete(L[:,n], n) * sos_utils.D1(np.delete(E.conjugate(), n), omega, units))))
     
     # Include the diamagnetic term (i.e. Faraday term) if the user doesn't
     # specify not to
     if canonical is True:
         return alpha_mag
     else:
-        return alpha_mag - g**2 * I
+        return alpha_mag - g**2 * I[n,n]
 
 
 
