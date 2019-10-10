@@ -75,6 +75,7 @@ def alpha_mm(E, L, I, units, omega=0, canonical=False, n=0):
     """
     
     g = units.e / 2 / units.m / units.c
+    E = E - E[n]
         
     # Evaluate the SOS term in equation for alpha^{mm}
     alpha_mag = units.g**2 * (np.delete(L[n,:], n).dot((np.delete(L[:,n], n) * sos_utils.D1(np.delete(E, n), omega, units)))
