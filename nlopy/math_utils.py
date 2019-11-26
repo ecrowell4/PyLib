@@ -263,3 +263,27 @@ def smooth_func(x, n, periodic=False):
         f += m * x
 
     return f
+
+def diagblock(v, k=0):
+    """ Creates a block diagonal matrix, with the elements of v
+    as the diagonals.
+
+    Input
+        v : np.array
+            array of matrices. v[0], v[1], ... are the first, second, ...
+            diagonal elements of matrix.
+    """
+    import numpy as np
+    
+    shapes = np.array([a.shape for a in v])
+    out = np.zeros(np.sum(shapes, axis=0) + abs(k)*shapes[0], dtype=v[0].dtype)
+
+    if k >= 0:
+        r, c = 0, abs(k)*shapes[0][0]
+    else:
+        r, c = abs(k)*shapes[0][0], 0
+    for i, (rr, cc) in enumerate(shapes):
+        out[r:r + rr, c:c + cc] = v[i]
+        r += rr
+        c += cc
+    return out
