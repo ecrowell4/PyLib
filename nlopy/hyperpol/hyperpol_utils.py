@@ -18,4 +18,22 @@ def get_local_field_L1(N, alpha):
 	"""
 	return 3 / (3 - 4*np.pi*N*alpha)
 
-	
+def get_chi1(N, alpha, orient='random'):
+	"""Returns the first electric susceptibility, including
+	the orientational average.
+
+	Input
+	    N : float
+	        number density (per a0^3)
+	    alpha : complex
+	        polarizability (in atomic units)
+	    orient : string
+	        specifies orientation of atoms. Code only 
+	        implements random orientation for now.
+
+	Output
+	    chi1 : complex
+	        first susceptibility
+	"""
+	L1 = get_local_field_L1(N, alpha)
+	return (2/3) * N * L1 * alpha
