@@ -9,7 +9,7 @@ import numpy as np
 from nlopy.hyperpol.sum_over_states import sos_utils
 
 
-def beta_eee(E, xx, units, omega=[0,0], intrinsic=False, n=0):
+def beta_eee(E, xx, units, omega=[0,0], intrinsic=False, n=0, damping=False):
     """Returns the diagonal element of the first hyperpolarizability.
 
     Input
@@ -42,6 +42,9 @@ def beta_eee(E, xx, units, omega=[0,0], intrinsic=False, n=0):
 
     #Take all Em -> Emn
     E = E - E[n]
+
+    if damping == True:
+        E = E - 1j * (2 / 3 / units.hbar) * (E / units.hbar / units.c)**3 * units.e**2 * abs(xx[:,0])**2
             
     #Calculate beta: note that factor of 0.5 comes from the average over permutations.
     beta = 0.5 * units.e**3 * (

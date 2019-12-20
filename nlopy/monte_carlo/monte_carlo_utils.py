@@ -33,7 +33,7 @@ def sum_rules(E, x, normalize=False):
     return SR
 
 
-def get_S(N, normalize=False):
+def get_S(N, normalize=False, fix_E10=False, E10=None):
     """Returns a random, anti-symmetric array such that each row sums to 1.
     
     Input 
@@ -73,7 +73,7 @@ def get_S(N, normalize=False):
     T[:-1,:] *= d[:,None]
     A = T - T.T
     
-    return normalize, A
+    return normalize, A, fix_E10, E10
 
 
 def get_Enm_Xnm(S):
@@ -84,6 +84,8 @@ def get_Enm_Xnm(S):
             S[0] = normalize: if true, then dealing
             with normalized intrinsic values.
             S[1] : sum rule matrix
+            S[2] = fix_Eparam: if true, then E10 / E20 is fixed
+            S[2] : specified value for E10/E20
             
     Output
         E_ordered : np.array
@@ -105,6 +107,11 @@ def get_Enm_Xnm(S):
 
     E_ordered = (E_ordered - E_ordered[0]) / Enorm
                                     # normalize energies
+
+    if S[2] is True:
+        assert S[3] != None, "The ration E10/E20 must be specified!"
+        E_ordered[1:] = E_ordered[1:] * S[3] / E_ordered[1]
+        assert np.allclose(E_ordered[1] - E_ordered[0], S[3]), "E10 not properly fixed" 
                                     
     Enm = np.outer(E_ordered,np.ones(N)) - np.outer(np.ones(N),E_ordered)
                                     # Calculate energy matrix E_nm = E_n - E_m
