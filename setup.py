@@ -4,7 +4,10 @@ https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
 
-# TO download this package, type "python setup.py develop"
+# To install this package, open anaconda command prompt and 
+# navigate to the directory containing setup.py.
+#    * For Ethan - "python setup.py install --develop"
+#    * Anyone else - "python setup.py install --user"
 # in command line
 
 # Always prefer setuptools over distutils
