@@ -185,7 +185,7 @@ def make_position_matrix(x, psi):
     num_states = len(psi[:])
     
     # Allocate memory to store the values:
-    xx = np.zeros((num_states, num_states))
+    xx = np.zeros((num_states, num_states)) + 0j
     
     # Compute the matrix elements: 
     for i in range(num_states):
