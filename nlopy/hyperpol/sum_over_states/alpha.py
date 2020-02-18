@@ -37,10 +37,12 @@ def alpha_ee(E, xx, units, omega=0, intrinsic=False, n=0, damping=False):
     # assert consistent dimensions
     assert len(E)==len(xx[0]), "dimensions of E and xx do not match."
     # Take all Em -> Emn
-    E = E - E[n]
+    Ereal = E - E[n]
+    E = Ereal + 1j*E.imag
 
     if damping == True:
-        E = E - 1j * (2 / 3 / units.hbar) * (E / units.hbar / units.c)**3 * units.e**2 * abs(xx[:,0])**2   
+        E = E - 1j * (2 / 3 / units.hbar) * (E / units.hbar / units.c)**3 * units.e**2 * abs(xx[:,n])**2  
+         
     alpha =  units.e**2 * (np.delete(xx[n,:], n).dot(np.delete(xx[:,n], n) * sos_utils.D1(np.delete(E, n), omega, units))
                            + np.delete(xx[n,:], n).dot(np.delete(xx[:,n], n) * sos_utils.D1(np.delete(E.conjugate(), n), -omega, units))
                           )

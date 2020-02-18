@@ -23,9 +23,11 @@ def gamma_eeee(E, X, units, omega=np.zeros(3), n=0, damping=False):
     """
     num_states = len(E)
     X = X - X[n,n]*np.eye(num_states)
-    E = E - E[n]
+    Ereal = E - E[n]
+    E = Ereal + 1j*E.imag
+    
     if damping == True:
-        Gamma = (units.c**3 /10)*(2 / 3 / units.hbar) * (E / units.c)**3 * units.e**2 * abs(X[:,0])**2
+        Gamma = (units.c**3 /10)*(2 / 3 / units.hbar) * (E / units.c)**3 * units.e**2 * abs(X[:,n])**2
         E = E - 1j * Gamma / units.hbar
     gamma_eeee = (
         sos_utils.permute_gamma_4op_terms(
