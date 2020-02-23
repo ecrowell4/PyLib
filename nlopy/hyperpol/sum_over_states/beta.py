@@ -41,10 +41,11 @@ def beta_eee(E, xx, units, omega=[0,0], intrinsic=False, n=0, damping=False):
     xx = xx - xx[n,n] * np.eye(num_states)
 
     #Take all Em -> Emn
-    E = E - E[n]
+    Ereal = E - E[n]
+    E = Ereal + 1j*E.imag
 
     if damping == True:
-        E = E - 1j * (2 / 3 / units.hbar) * (E / units.hbar / units.c)**3 * units.e**2 * abs(xx[:,0])**2
+        E = E - 1j * (2 / 3 / units.hbar) * (E / units.hbar / units.c)**3 * units.e**2 * abs(xx[:,n])**2
             
     #Calculate beta: note that factor of 0.5 comes from the average over permutations.
     beta = 0.5 * units.e**3 * (
