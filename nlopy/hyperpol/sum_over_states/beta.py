@@ -8,6 +8,70 @@ Created on Wed Nov  1 11:21:17 2017
 import numpy as np
 from nlopy.hyperpol.sum_over_states import sos_utils
 
+def beta_eee_many_el(E, xx, Ne, units, omega=[0,0], correlations=True, spin=True):
+    """Returns the diagonal element of the first hyperpolarizability for a system of Ne
+    electrons. 
+
+    Input
+        E : np.array(Nstates)
+            eigenenergies
+        xx : np.array((Nstates, Nstates))
+            transition moments
+        Ne : int
+            number of electrons
+        units : Class
+            attributes are fundamental constants
+        omega : np.array(2)
+            driving frequencies
+        correlations : bool
+            If True (Default) - include correlations in virtual transitions
+            If False = Exclude correlated virtual transitions.
+        spin : bool
+            If False - only allow one electron per energy state
+            If True - allow two electrons per energy state.
+
+    Output
+        beta : np.real
+            Diagonal element of first hyperpolarizability
+    """
+    assert len(E)==len(xx[0]), "dimensions of E and xx do not match"
+    Nstates = len(E)
+
+    if spin==True:
+        assert Ne%2==0, "Funtion only supports even number of spin 1/2 electrons"
+        Nf = Ne//2
+    else:
+        Nf = Ne
+
+    # First sum the uncorrelated transitions
+    beta = 0
+    for n in range(Nf):
+        xxn = xx - xx[n,n] * np.eye(Nstates)
+        En = E - E[n]
+        beta_temp = 0.5 * units.e**3 * (
+            (xxn[n,Nf:] * sos_utils.D2(En[Nf:], omega[0], omega[1], units)).dot(xxn[Nf:,Nf:].dot(xxn[Nf:,n] * sos_utils.D1(En[Nf:], omega[0], units)))
+        + (xxn[n,Nf:] * sos_utils.D2(En[Nf:], omega[1], omega[0], units)).dot(xxn[Nf:,Nf:].dot(xxn[Nf:,n] * sos_utils.D1(En[Nf:], omega[1], units)))
+        + (xxn[n,Nf:] * sos_utils.D1(En[Nf:], omega[1], units)).dot(xxn[Nf:,Nf:].dot(xxn[Nf:,n] * sos_utils.D1(En[Nf:].conjugate(), -omega[0], units)))
+        + (xxn[n,Nf:] * sos_utils.D1(En[Nf:], omega[0], units)).dot(xxn[Nf:,Nf:].dot(xxn[Nf:,n] * sos_utils.D1(En[Nf:].conjugate(), -omega[1], units)))
+        + (xxn[n,Nf:] * sos_utils.D2(En[Nf:].conjugate(), -omega[0], -omega[1], units)).dot(xxn[Nf:,Nf:].dot(xxn[Nf:,n] * sos_utils.D1(En[Nf:].conjugate(), -omega[0], units)))
+        + (xxn[n,Nf:] * sos_utils.D2(En[Nf:].conjugate(), -omega[1], -omega[0], units)).dot(xxn[Nf:,Nf:].dot(xxn[Nf:,n] * sos_utils.D1(En[Nf:].conjugate(), -omega[1], units)))
+        )
+        beta = beta + beta_temp
+
+    #Now sum correlated transitions
+    if correlations == True:
+        for i in range(Nf):
+            for j in range(Nf):
+                if i!=j:
+                    beta += 0.5*units.e**3 * (
+                        xx[i,Nf:].dot(xx[Nf:,j] / (E[Nf:]-E[j] - omega[0])) * xx[i,j] / (E[j]-E[i] - omega[0] - omega[1])
+                        +xx[i,Nf:].dot(xx[Nf:,j] / (E[Nf:]-E[j] - omega[1])) * xx[i,j] / (E[j]-E[i] - omega[0] - omega[1])
+                        +xx[i,Nf:].dot(xx[Nf:,j] / (E[Nf:]-E[j] + omega[1])) * xx[i,j] / (E[j]-E[i] - omega[0])
+                        +xx[i,Nf:].dot(xx[Nf:,j] / (E[Nf:]-E[j] + omega[0])) * xx[i,j] / (E[j]-E[i] - omega[1])
+                        +xx[i,Nf:].dot(xx[Nf:,j] / (E[Nf:]-E[j] + omega[1] + omega[0])) * xx[i,j] / (E[j]-E[i] + omega[0])
+                        +xx[i,Nf:].dot(xx[Nf:,j] / (E[Nf:]-E[j] + omega[1] + omega[0])) * xx[i,j] / (E[j]-E[i] + omega[1])
+                        )
+    return beta
 
 def beta_eee(E, xx, units, omega=[0,0], intrinsic=False, n=0, damping=False):
     """Returns the diagonal element of the first hyperpolarizability.
