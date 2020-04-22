@@ -33,7 +33,7 @@ def sum_rules(E, x, normalize=False):
     return SR
 
 
-def get_S(N, normalize=False, fix_E10=False, E10=None):
+def get_S(N):
     """Returns a random, anti-symmetric array such that each row sums to 1.
     
     Input 
@@ -42,6 +42,9 @@ def get_S(N, normalize=False, fix_E10=False, E10=None):
         normalize : bool
             if True, then use scaled quantities xi_nm = x_nm / x_max 
             and e_nm = E_nm / E_10
+        fix_E10: bool
+            if True, then E10 is fixed
+        fix
         
     Output
         S : array
@@ -73,7 +76,7 @@ def get_S(N, normalize=False, fix_E10=False, E10=None):
     T[:-1,:] *= d[:,None]
     A = T - T.T
     
-    return normalize, A, fix_E10, E10
+    return A
 
 
 def get_Enm_Xnm(S):
@@ -81,37 +84,23 @@ def get_Enm_Xnm(S):
     
     Input
         S : np.array
-            S[0] = normalize: if true, then dealing
-            with normalized intrinsic values.
-            S[1] : sum rule matrix
-            S[2] = fix_Eparam: if true, then E10 / E20 is fixed
-            S[2] : specified value for E10/E20
+            sum rule matrix
             
     Output
         E_ordered : np.array
-            ordered array of eigenenergies (if normalize is True, then
-            these are normalize by E_10)
+            ordered array of eigenenergies normalized
+            by E10
         Xnm : np.array
-            array of transition moments
+            array of transition moments normalized by x_max
     """
     normalize = S[0]
     N = len(S[1][0])
     E = np.random.random((N))       # pick randome energies
     E_ordered = hq.nsmallest(N,E)     # order the energies
 
-    if normalize is True:
-        Enorm = E_ordered[1] - E_ordered[0]
 
-    else:
-        Enorm = 1
-
-    E_ordered = (E_ordered - E_ordered[0]) / Enorm
+    E_ordered = (E_ordered - E_ordered[0]) / (E_ordered[1] - E_ordered[0])
                                     # normalize energies
-
-    if S[2] is True:
-        assert S[3] != None, "The ration E10/E20 must be specified!"
-        E_ordered[1:] = E_ordered[1:] * S[3] / E_ordered[1]
-        assert np.allclose(E_ordered[1] - E_ordered[0], S[3]), "E10 not properly fixed" 
                                     
     Enm = np.outer(E_ordered,np.ones(N)) - np.outer(np.ones(N),E_ordered)
                                     # Calculate energy matrix E_nm = E_n - E_m
