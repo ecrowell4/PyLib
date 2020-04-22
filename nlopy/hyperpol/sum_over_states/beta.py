@@ -44,10 +44,11 @@ def beta_eee_many_el(E, xx, Ne, units, omega=[0,0], correlations=True, spin=True
         Nf = Ne
 
     # First sum the uncorrelated transitions
-    beta = 0
+    beta = 0+0j
     for n in range(Nf):
         xxn = xx - xx[n,n] * np.eye(Nstates)
-        En = E - E[n]
+        Ereal = E - E[n]
+        En = Ereal + 1j*E.imag
         beta_temp = 0.5 * units.e**3 * (
             (xxn[n,Nf:] * sos_utils.D2(En[Nf:], omega[0], omega[1], units)).dot(xxn[Nf:,Nf:].dot(xxn[Nf:,n] * sos_utils.D1(En[Nf:], omega[0], units)))
         + (xxn[n,Nf:] * sos_utils.D2(En[Nf:], omega[1], omega[0], units)).dot(xxn[Nf:,Nf:].dot(xxn[Nf:,n] * sos_utils.D1(En[Nf:], omega[1], units)))
@@ -63,13 +64,17 @@ def beta_eee_many_el(E, xx, Ne, units, omega=[0,0], correlations=True, spin=True
         for i in range(Nf):
             for j in range(Nf):
                 if i!=j:
+                    Ereal = E[j] - E[i]
+                    Eji = Ereal +1j*E.imag[0]
+                    Ereal = E - E[j]
+                    Enj = Ereal + 1j*E.imag
                     beta += 0.5*units.e**3 * (
-                        xx[i,Nf:].dot(xx[Nf:,j] / (E[Nf:]-E[j] - omega[0])) * xx[i,j] / (E[j]-E[i] - omega[0] - omega[1])
-                        +xx[i,Nf:].dot(xx[Nf:,j] / (E[Nf:]-E[j] - omega[1])) * xx[i,j] / (E[j]-E[i] - omega[0] - omega[1])
-                        +xx[i,Nf:].dot(xx[Nf:,j] / (E[Nf:]-E[j] + omega[1])) * xx[i,j] / (E[j]-E[i] - omega[0])
-                        +xx[i,Nf:].dot(xx[Nf:,j] / (E[Nf:]-E[j] + omega[0])) * xx[i,j] / (E[j]-E[i] - omega[1])
-                        +xx[i,Nf:].dot(xx[Nf:,j] / (E[Nf:]-E[j] + omega[1] + omega[0])) * xx[i,j] / (E[j]-E[i] + omega[0])
-                        +xx[i,Nf:].dot(xx[Nf:,j] / (E[Nf:]-E[j] + omega[1] + omega[0])) * xx[i,j] / (E[j]-E[i] + omega[1])
+                        xx[i,Nf:].dot(xx[Nf:,j] / (Enj[Nf:] - omega[0])) * xx[i,j] / (Eji - omega[0] - omega[1])
+                        +xx[i,Nf:].dot(xx[Nf:,j] / (Enj[Nf:] - omega[1])) * xx[i,j] / (Eji - omega[0] - omega[1])
+                        +xx[i,Nf:].dot(xx[Nf:,j] / (Enj[Nf:].conjugate() + omega[1])) * xx[i,j] / (Eji - omega[0])
+                        +xx[i,Nf:].dot(xx[Nf:,j] / (Enj[Nf:].conjugate() + omega[0])) * xx[i,j] / (Eji - omega[1])
+                        +xx[i,Nf:].dot(xx[Nf:,j] / (Enj[Nf:].conjugate() + omega[1] + omega[0])) * xx[i,j] / (Eji.conjugate() + omega[0])
+                        +xx[i,Nf:].dot(xx[Nf:,j] / (Enj[Nf:].conjugate() + omega[1] + omega[0])) * xx[i,j] / (Eji.conjugate() + omega[1])
                         )
     return beta
 

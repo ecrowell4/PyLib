@@ -2,6 +2,258 @@ import numpy as np
 from numba import jit
 from nlopy.hyperpol.sum_over_states import sos_utils
 
+
+def gamma_eeee_many_el(E, X, Ne, units, omega=np.zeros(3), correlations=True, spin=True):
+    """Returns the diagonal element of the second hyperpolarizability for a system of Ne
+    electrons. Note we divide the end results by Ne because of normalization
+
+    Input
+        E : np.array(Nstates)
+            eigenenergies
+        X : np.array((Nstates, Nstates))
+            transition moments
+        Ne : int
+            number of electrons
+        units : Class
+            attributes are fundamental constants
+        omega : np.array(3)
+            driving frequencies
+        correlations : bool
+            If True (Default) - include correlations in virtual transitions
+            If False = Exclude correlated virtual transitions.
+        spin : bool
+            If False - only allow one electron per energy state
+            If True - allow two electrons per energy state.
+
+    Output
+        gamma : np.real
+            Diagonal element of second hyperpolarizability
+    """
+    assert len(E)==len(X[0]), "dimensions of E and xx do not match"
+    Nstates = len(E)
+
+    if spin==True:
+        assert Ne%2==0, "Funtion only supports even number of spin 1/2 electrons"
+        Nf = Ne//2
+    else:
+        Nf = Ne
+
+    # Sum uncorrelated transitions
+    gamma = 0 + 0j
+    for n in range(Nf):
+        Xn = X - X[n,n] * np.eye(Nstates)
+        En = E-E[n] - 1j*E.imag
+        gamma_tmp = (1/6)*units.e**4 * ( # Type I and IV
+            (Xn[n, Nf:] / (En[Nf:]-omega[2]-omega[1]-omega[0])).dot((Xn[Nf:,Nf:]/(En[Nf:]-omega[1]-omega[0])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[0]))))
+            +(Xn[n, Nf:] / (En[Nf:]-omega[0]-omega[2]-omega[1])).dot((Xn[Nf:,Nf:]/(En[Nf:]-omega[2]-omega[1])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[1]))))
+            +(Xn[n, Nf:] / (En[Nf:]-omega[1]-omega[0]-omega[2])).dot((Xn[Nf:,Nf:]/(En[Nf:]-omega[0]-omega[2])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[2]))))
+            +(Xn[n, Nf:] / (En[Nf:]-omega[0]-omega[1]-omega[2])).dot((Xn[Nf:,Nf:]/(En[Nf:]-omega[1]-omega[2])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[2]))))
+            +(Xn[n, Nf:] / (En[Nf:]-omega[1]-omega[2]-omega[0])).dot((Xn[Nf:,Nf:]/(En[Nf:]-omega[2]-omega[0])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[0]))))
+            +(Xn[n, Nf:] / (En[Nf:]-omega[2]-omega[0]-omega[1])).dot((Xn[Nf:,Nf:]/(En[Nf:]-omega[0]-omega[1])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[1]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[2])).dot((Xn[Nf:,Nf:]/(En[Nf:]-omega[1]-omega[0])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[0]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[0])).dot((Xn[Nf:,Nf:]/(En[Nf:]-omega[2]-omega[1])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[1]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[1])).dot((Xn[Nf:,Nf:]/(En[Nf:]-omega[0]-omega[2])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[2]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[0])).dot((Xn[Nf:,Nf:]/(En[Nf:]-omega[1]-omega[2])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[2]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[1])).dot((Xn[Nf:,Nf:]/(En[Nf:]-omega[2]-omega[0])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[0]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[2])).dot((Xn[Nf:,Nf:]/(En[Nf:]-omega[0]-omega[1])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[1]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[2])).dot((Xn[Nf:,Nf:]/(En[Nf:]-omega[0]-omega[1])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[1]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[2])).dot((Xn[Nf:,Nf:]/(En[Nf:].conjugate()+omega[1]+omega[2])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[0]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[0])).dot((Xn[Nf:,Nf:]/(En[Nf:].conjugate()+omega[2]+omega[0])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[1]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[1])).dot((Xn[Nf:,Nf:]/(En[Nf:].conjugate()+omega[0]+omega[1])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[2]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[0])).dot((Xn[Nf:,Nf:]/(En[Nf:].conjugate()+omega[1]+omega[0])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[2]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[1])).dot((Xn[Nf:,Nf:]/(En[Nf:].conjugate()+omega[0]+omega[1])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[0]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[2])).dot((Xn[Nf:,Nf:]/(En[Nf:].conjugate()+omega[1]+omega[0])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:]-omega[1]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[2])).dot((Xn[Nf:,Nf:]/(En[Nf:].conjugate()+omega[1]+omega[2])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:].conjugate()+omega[0]+omega[1]+omega[2]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[0])).dot((Xn[Nf:,Nf:]/(En[Nf:].conjugate()+omega[2]+omega[0])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:].conjugate()+omega[1]+omega[2]+omega[0]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[1])).dot((Xn[Nf:,Nf:]/(En[Nf:].conjugate()+omega[0]+omega[1])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:].conjugate()+omega[2]+omega[0]+omega[1]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[0])).dot((Xn[Nf:,Nf:]/(En[Nf:].conjugate()+omega[1]+omega[0])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:].conjugate()+omega[2]+omega[1]+omega[0]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[1])).dot((Xn[Nf:,Nf:]/(En[Nf:].conjugate()+omega[2]+omega[1])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:].conjugate()+omega[0]+omega[2]+omega[1]))))
+            +(Xn[n, Nf:] / (En[Nf:].conjugate()+omega[2])).dot((Xn[Nf:,Nf:]/(En[Nf:].conjugate()+omega[0]+omega[2])).dot(Xn[Nf:,Nf:].dot(Xn[Nf:,n]/(En[Nf:].conjugate()+omega[1]+omega[0]+omega[2]))))     
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:]-omega[0])) * (X[n,Nf:]/(En[Nf:]-omega[0]-omega[1]-omega[2])).dot(X[Nf:,n]/(En[Nf:]-omega[2])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:]-omega[1])) * (X[n,Nf:]/(En[Nf:]-omega[1]-omega[2]-omega[0])).dot(X[Nf:,n]/(En[Nf:]-omega[0])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:]-omega[2])) * (X[n,Nf:]/(En[Nf:]-omega[2]-omega[0]-omega[1])).dot(X[Nf:,n]/(En[Nf:]-omega[1])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:]-omega[2])) * (X[n,Nf:]/(En[Nf:]-omega[2]-omega[1]-omega[0])).dot(X[Nf:,n]/(En[Nf:]-omega[0])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:]-omega[0])) * (X[n,Nf:]/(En[Nf:]-omega[0]-omega[2]-omega[1])).dot(X[Nf:,n]/(En[Nf:]-omega[1])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:]-omega[1])) * (X[n,Nf:]/(En[Nf:]-omega[1]-omega[0]-omega[2])).dot(X[Nf:,n]/(En[Nf:]-omega[2])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:].conjugate()+omega[0])) * (X[n,Nf:]/(En[Nf:].conjugate()+omega[0]+omega[1]+omega[2])).dot(X[Nf:,n]/(En[Nf:].conjugate()+omega[2])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:].conjugate()+omega[1])) * (X[n,Nf:]/(En[Nf:].conjugate()+omega[1]+omega[2]+omega[0])).dot(X[Nf:,n]/(En[Nf:].conjugate()+omega[0])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:].conjugate()+omega[2])) * (X[n,Nf:]/(En[Nf:].conjugate()+omega[2]+omega[0]+omega[1])).dot(X[Nf:,n]/(En[Nf:].conjugate()+omega[1])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:].conjugate()+omega[2])) * (X[n,Nf:]/(En[Nf:].conjugate()+omega[2]+omega[1]+omega[0])).dot(X[Nf:,n]/(En[Nf:].conjugate()+omega[0])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:].conjugate()+omega[0])) * (X[n,Nf:]/(En[Nf:].conjugate()+omega[0]+omega[2]+omega[1])).dot(X[Nf:,n]/(En[Nf:].conjugate()+omega[1])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:].conjugate()+omega[1])) * (X[n,Nf:]/(En[Nf:].conjugate()+omega[1]+omega[0]+omega[2])).dot(X[Nf:,n]/(En[Nf:].conjugate()+omega[2])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:]-omega[2])) * (X[n,Nf:]/(En[Nf:].conjugate()+omega[1])).dot(X[Nf:,n]/(En[Nf:]-omega[0])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:]-omega[0])) * (X[n,Nf:]/(En[Nf:].conjugate()+omega[2])).dot(X[Nf:,n]/(En[Nf:]-omega[1])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:]-omega[1])) * (X[n,Nf:]/(En[Nf:].conjugate()+omega[0])).dot(X[Nf:,n]/(En[Nf:]-omega[2])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:]-omega[0])) * (X[n,Nf:]/(En[Nf:].conjugate()+omega[1])).dot(X[Nf:,n]/(En[Nf:]-omega[2])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:]-omega[1])) * (X[n,Nf:]/(En[Nf:].conjugate()+omega[2])).dot(X[Nf:,n]/(En[Nf:]-omega[0])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:]-omega[2])) * (X[n,Nf:]/(En[Nf:].conjugate()+omega[0])).dot(X[Nf:,n]/(En[Nf:]-omega[1])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:].conjugate()+omega[2])) * (X[n,Nf:]/(En[Nf:]-omega[1])).dot(X[Nf:,n]/(En[Nf:].conjugate()+omega[0])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:].conjugate()+omega[0])) * (X[n,Nf:]/(En[Nf:]-omega[2])).dot(X[Nf:,n]/(En[Nf:].conjugate()+omega[1])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:].conjugate()+omega[1])) * (X[n,Nf:]/(En[Nf:]-omega[0])).dot(X[Nf:,n]/(En[Nf:].conjugate()+omega[2])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:].conjugate()+omega[0])) * (X[n,Nf:]/(En[Nf:]-omega[1])).dot(X[Nf:,n]/(En[Nf:].conjugate()+omega[2])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:].conjugate()+omega[1])) * (X[n,Nf:]/(En[Nf:]-omega[2])).dot(X[Nf:,n]/(En[Nf:].conjugate()+omega[0])))
+            - (Xn[n, Nf:].dot(X[Nf:,n] / (En[Nf:].conjugate()+omega[2])) * (X[n,Nf:]/(En[Nf:]-omega[0])).dot(X[Nf:,n]/(En[Nf:].conjugate()+omega[1])))
+            )
+        gamma = gamma + gamma_tmp
+ 
+    # Now we loop through the two electron correlations
+    for i in range(Nf):
+        for j in range(Nf):
+            if i!= j:
+                Xi = X - X[i,i]*np.eye(Nstates)
+                Eji = E[j]-E[i] - 1j*E.imag[0]
+                Eij = E[i]-E[j] - 1j*E.imag[0]
+                Enj = E - E[j] - 1j*E.imag
+                Eni = E-E[i] - 1j*E.imag
+
+                gamma -= (1/6)*units.e**4*(# Type II
+                    (X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:]-omega[0]-omega[1]))) * (X[j,Nf:]/(Eji-omega[0]-omega[1]-omega[2])).dot(X[Nf:,i] / (Eni[Nf:]-omega[0]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:]-omega[1]-omega[2]))) * (X[j,Nf:]/(Eji-omega[1]-omega[2]-omega[0])).dot(X[Nf:,i] / (Eni[Nf:]-omega[1]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:]-omega[2]-omega[0]))) * (X[j,Nf:]/(Eji-omega[2]-omega[0]-omega[1])).dot(X[Nf:,i] / (Eni[Nf:]-omega[2]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:]-omega[2]-omega[1]))) * (X[j,Nf:]/(Eji-omega[2]-omega[1]-omega[0])).dot(X[Nf:,i] / (Eni[Nf:]-omega[2]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:]-omega[0]-omega[2]))) * (X[j,Nf:]/(Eji-omega[0]-omega[2]-omega[1])).dot(X[Nf:,i] / (Eni[Nf:]-omega[0]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:]-omega[1]-omega[0]))) * (X[j,Nf:]/(Eji-omega[1]-omega[0]-omega[2])).dot(X[Nf:,i] / (Eni[Nf:]-omega[1]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:]-omega[0]-omega[1]))) * (X[j,Nf:]/(Eji.conjugate()+omega[2])).dot(X[Nf:,i] / (Eni[Nf:]-omega[0]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:]-omega[1]-omega[2]))) * (X[j,Nf:]/(Eji.conjugate()+omega[0])).dot(X[Nf:,i] / (Eni[Nf:]-omega[1]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:]-omega[2]-omega[0]))) * (X[j,Nf:]/(Eji.conjugate()+omega[1])).dot(X[Nf:,i] / (Eni[Nf:]-omega[2]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:]-omega[2]-omega[1]))) * (X[j,Nf:]/(Eji.conjugate()+omega[0])).dot(X[Nf:,i] / (Eni[Nf:]-omega[2]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:]-omega[0]-omega[2]))) * (X[j,Nf:]/(Eji.conjugate()+omega[1])).dot(X[Nf:,i] / (Eni[Nf:]-omega[0]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:]-omega[1]-omega[1]))) * (X[j,Nf:]/(Eji.conjugate()+omega[2])).dot(X[Nf:,i] / (Eni[Nf:]-omega[1]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[2]+omega[1]))) * (X[j,Nf:]/(Eji.conjugate()+omega[2])).dot(X[Nf:,i] / (Eni[Nf:]-omega[0]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[0]+omega[2]))) * (X[j,Nf:]/(Eji.conjugate()+omega[0])).dot(X[Nf:,i] / (Eni[Nf:]-omega[1]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[1]+omega[0]))) * (X[j,Nf:]/(Eji.conjugate()+omega[1])).dot(X[Nf:,i] / (Eni[Nf:]-omega[2]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[0]+omega[1]))) * (X[j,Nf:]/(Eji.conjugate()+omega[0])).dot(X[Nf:,i] / (Eni[Nf:]-omega[2]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[1]+omega[2]))) * (X[j,Nf:]/(Eji.conjugate()+omega[1])).dot(X[Nf:,i] / (Eni[Nf:]-omega[0]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[2]+omega[0]))) * (X[j,Nf:]/(Eji.conjugate()+omega[2])).dot(X[Nf:,i] / (Eni[Nf:]-omega[1]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[2]+omega[1]))) * (X[j,Nf:]/(Eji.conjugate()+omega[2])).dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[0]+omega[1]+omega[2]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[0]+omega[2]))) * (X[j,Nf:]/(Eji.conjugate()+omega[0])).dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[1]+omega[2]+omega[0]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[1]+omega[0]))) * (X[j,Nf:]/(Eji.conjugate()+omega[1])).dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[2]+omega[0]+omega[1]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[0]+omega[1]))) * (X[j,Nf:]/(Eji.conjugate()+omega[0])).dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[2]+omega[1]+omega[0]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[1]+omega[2]))) * (X[j,Nf:]/(Eji.conjugate()+omega[1])).dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[0]+omega[2]+omega[1]))
+                    +(X[i,Nf:].dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[2]+omega[0]))) * (X[j,Nf:]/(Eji.conjugate()+omega[2])).dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[1]+omega[0]+omega[2]))
+                    )
+
+                # gamma += 0*(1/6)*units.e**4*( # Type III 
+                #     (X[i,Nf:]/(Eij-omega[0]-omega[1]-omega[2])).dot(X[Nf:,j]/(Enj[Nf:]-omega[0]-omega[1])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[0]))
+                #     +(X[i,Nf:]/(Eij-omega[1]-omega[2]-omega[0])).dot(X[Nf:,j]/(Enj[Nf:]-omega[1]-omega[2])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[1]))
+                #     +(X[i,Nf:]/(Eij-omega[2]-omega[0]-omega[1])).dot(X[Nf:,j]/(Enj[Nf:]-omega[2]-omega[0])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[2]))
+                #     +(X[i,Nf:]/(Eij-omega[2]-omega[1]-omega[0])).dot(X[Nf:,j]/(Enj[Nf:]-omega[2]-omega[1])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[2]))
+                #     +(X[i,Nf:]/(Eij-omega[0]-omega[2]-omega[1])).dot(X[Nf:,j]/(Enj[Nf:]-omega[0]-omega[2])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[0]))
+                #     +(X[i,Nf:]/(Eij-omega[1]-omega[0]-omega[2])).dot(X[Nf:,j]/(Enj[Nf:]-omega[1]-omega[0])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[1]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[2])).dot(X[Nf:,j]/(Enj[Nf:]-omega[0]-omega[1])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[0]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[0])).dot(X[Nf:,j]/(Enj[Nf:]-omega[1]-omega[2])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[1]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[1])).dot(X[Nf:,j]/(Enj[Nf:]-omega[2]-omega[0])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[2]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[0])).dot(X[Nf:,j]/(Enj[Nf:]-omega[2]-omega[1])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[2]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[1])).dot(X[Nf:,j]/(Enj[Nf:]-omega[0]-omega[2])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[0]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[2])).dot(X[Nf:,j]/(Enj[Nf:]-omega[1]-omega[0])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[1]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[2])).dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[2]+omega[1])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[0]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[0])).dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[0]+omega[2])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[1]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[1])).dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[1]+omega[0])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[2]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[0])).dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[0]+omega[1])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[2]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[1])).dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[1]+omega[2])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[0]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[2])).dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[2]+omega[0])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:]-omega[1]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[2])).dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[2]+omega[1])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[0]+omega[1]+omega[2]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[2])).dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[0]+omega[2])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[2]+omega[0]+omega[1]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[1])).dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[1]+omega[0])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[1]+omega[2]+omega[0]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[2])).dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[0]+omega[1])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[2]+omega[1]+omega[0]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[0])).dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[1]+omega[2])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[0]+omega[2]+omega[1]))
+                #     +(X[i,Nf:]/(Eij.conjugate()+omega[1])).dot(X[Nf:,j]/(Enj[Nf:].conjugate()+omega[2]+omega[0])) * (X[j,Nf:]).dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[1]+omega[0]+omega[2]))
+                #     )
+
+                gamma += (1/6)*units.e**4*(# Type V
+                    (Xi[j,Nf:]/(Eni[Nf:]-omega[0]-omega[1]-omega[2])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[0]))) * (Xi[i,j] / (Eij-omega[0]-omega[1]))
+                    +(Xi[j,Nf:]/(Eni[Nf:]-omega[1]-omega[2]-omega[0])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[1]))) * (Xi[i,j] / (Eij-omega[1]-omega[2]))
+                    +(Xi[j,Nf:]/(Eni[Nf:]-omega[2]-omega[0]-omega[1])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[2]))) * (Xi[i,j] / (Eij-omega[2]-omega[0]))
+                    +(Xi[j,Nf:]/(Eni[Nf:]-omega[2]-omega[1]-omega[0])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[2]))) * (Xi[i,j] / (Eij-omega[2]-omega[1]))
+                    +(Xi[j,Nf:]/(Eni[Nf:]-omega[0]-omega[2]-omega[1])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[0]))) * (Xi[i,j] / (Eij-omega[0]-omega[2]))
+                    +(Xi[j,Nf:]/(Eni[Nf:]-omega[1]-omega[0]-omega[2])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[1]))) * (Xi[i,j] / (Eij-omega[1]-omega[0]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[2])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[0]))) * (Xi[i,j] / (Eij-omega[0]-omega[1]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[0])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[1]))) * (Xi[i,j] / (Eij-omega[1]-omega[2]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[1])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[2]))) * (Xi[i,j] / (Eij-omega[2]-omega[0]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[0])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[2]))) * (Xi[i,j] / (Eij-omega[2]-omega[1]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[1])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[0]))) * (Xi[i,j] / (Eij-omega[0]-omega[2]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[0])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[1]))) * (Xi[i,j] / (Eij-omega[1]-omega[0]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[2])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[0]))) * (Xi[i,j] / (Eij.conjugate()+omega[2]+omega[1]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[0])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[1]))) * (Xi[i,j] / (Eij.conjugate()+omega[0]+omega[2]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[1])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[2]))) * (Xi[i,j] / (Eij.conjugate()+omega[1]+omega[0]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[0])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[2]))) * (Xi[i,j] / (Eij.conjugate()+omega[0]+omega[1]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[1])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[0]))) * (Xi[i,j] / (Eij.conjugate()+omega[1]+omega[2]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[2])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:]-omega[1]))) * (Xi[i,j] / (Eij.conjugate()+omega[2]+omega[0]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[2])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:].conjugate()+omega[0]+omega[1]+omega[2]))) * (Xi[i,j] / (Eij.conjugate()+omega[2]+omega[1]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[0])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:].conjugate()+omega[1]+omega[2]+omega[0]))) * (Xi[i,j] / (Eij.conjugate()+omega[0]+omega[2]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[1])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:].conjugate()+omega[2]+omega[0]+omega[1]))) * (Xi[i,j] / (Eij.conjugate()+omega[1]+omega[0]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[0])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:].conjugate()+omega[2]+omega[1]+omega[0]))) * (Xi[i,j] / (Eij.conjugate()+omega[0]+omega[1]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[1])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:].conjugate()+omega[0]+omega[2]+omega[1]))) * (Xi[i,j] / (Eij.conjugate()+omega[1]+omega[2]))
+                    +(Xi[j,Nf:]/(Eni[Nf:].conjugate()+omega[2])).dot(Xi[Nf:,Nf:].dot(Xi[Nf:,i]/(Eni[Nf:].conjugate()+omega[1]+omega[0]+omega[2]))) * (Xi[i,j] / (Eij.conjugate()+omega[2]+omega[0]))
+                    )
+
+                # gamma += (1/6)*units.e**4*(# Type VI
+                #     (X[i,j]/(Eij-omega[0]-omega[1]-omega[2])) * (X[j,Nf:]/(Eni[Nf:]-omega[0]-omega[1])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[0])))
+                #     +(X[i,j]/(Eij-omega[1]-omega[2]-omega[0])) * (X[j,Nf:]/(Eni[Nf:]-omega[1]-omega[2])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[1])))
+                #     +(X[i,j]/(Eij-omega[2]-omega[0]-omega[1])) * (X[j,Nf:]/(Eni[Nf:]-omega[2]-omega[0])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[2])))
+                #     +(X[i,j]/(Eij-omega[2]-omega[1]-omega[0])) * (X[j,Nf:]/(Eni[Nf:]-omega[2]-omega[1])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[2])))
+                #     +(X[i,j]/(Eij-omega[0]-omega[2]-omega[1])) * (X[j,Nf:]/(Eni[Nf:]-omega[0]-omega[2])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[0])))
+                #     +(X[i,j]/(Eij-omega[1]-omega[0]-omega[2])) * (X[j,Nf:]/(Eni[Nf:]-omega[1]-omega[0])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[1])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[2])) * (X[j,Nf:]/(Eni[Nf:]-omega[0]-omega[1])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[0])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[0])) * (X[j,Nf:]/(Eni[Nf:]-omega[1]-omega[2])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[1])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[1])) * (X[j,Nf:]/(Eni[Nf:]-omega[2]-omega[0])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[2])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[0])) * (X[j,Nf:]/(Eni[Nf:]-omega[2]-omega[1])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[2])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[1])) * (X[j,Nf:]/(Eni[Nf:]-omega[0]-omega[2])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[0])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[2])) * (X[j,Nf:]/(Eni[Nf:]-omega[1]-omega[0])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[1])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[2])) * (X[j,Nf:]/(Eni[Nf:].conjugate()+omega[2]+omega[1])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[0])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[0])) * (X[j,Nf:]/(Eni[Nf:].conjugate()+omega[0]+omega[2])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[1])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[1])) * (X[j,Nf:]/(Eni[Nf:].conjugate()+omega[1]+omega[0])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[2])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[0])) * (X[j,Nf:]/(Eni[Nf:].conjugate()+omega[0]+omega[1])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[2])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[1])) * (X[j,Nf:]/(Eni[Nf:].conjugate()+omega[1]+omega[2])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[0])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[2])) * (X[j,Nf:]/(Eni[Nf:].conjugate()+omega[2]+omega[0])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:]-omega[1])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[2])) * (X[j,Nf:]/(Eni[Nf:].conjugate()+omega[2]+omega[1])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:].conjugate()+omega[0]+omega[1]+omega[2])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[0])) * (X[j,Nf:]/(Eni[Nf:].conjugate()+omega[0]+omega[2])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:].conjugate()+omega[1]+omega[2]+omega[0])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[1])) * (X[j,Nf:]/(Eni[Nf:].conjugate()+omega[1]+omega[0])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:].conjugate()+omega[2]+omega[0]+omega[1])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[0])) * (X[j,Nf:]/(Eni[Nf:].conjugate()+omega[0]+omega[1])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:].conjugate()+omega[2]+omega[1]+omega[0])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[1])) * (X[j,Nf:]/(Eni[Nf:].conjugate()+omega[1]+omega[2])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:].conjugate()+omega[0]+omega[2]+omega[1])))
+                #     +(X[i,j]/(Eij.conjugate()+omega[2])) * (X[j,Nf:]/(Eni[Nf:].conjugate()+omega[2]+omega[0])).dot(X[Nf:,Nf:].dot(X[Nf:,i]/(Eni[Nf:].conjugate()+omega[1]+omega[0]+omega[2])))
+                #     )
+        
+
+        # Finally, we loop through the three electron correlations
+        for i in range(Nf):
+            for j in range(Nf):
+                for k in range(Nf):
+                    if i!=j and j!=k and k!=i:
+                        Eij = E[i] - E[j] - 1j*E.imag[0]
+                        Ejk = E[j] - E[k] - 1j*E.imag[0]
+                        Ereal = E - E[j]
+                        Eni = E - E[i] - 1j*E.imag
+                        gamma += (1/6)*units.e**4*( # Type VII
+                            X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[0])) * (X[i,j] / (Eij-omega[0]-omega[1])) * (X[j,k]/(Ejk-omega[0]-omega[1]-omega[2]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[1])) * (X[i,j] / (Eij-omega[1]-omega[2])) * (X[j,k]/(Ejk-omega[1]-omega[2]-omega[0]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[2])) * (X[i,j] / (Eij-omega[2]-omega[0])) * (X[j,k]/(Ejk-omega[2]-omega[0]-omega[1]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[2])) * (X[i,j] / (Eij-omega[2]-omega[1])) * (X[j,k]/(Ejk-omega[2]-omega[1]-omega[0]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[0])) * (X[i,j] / (Eij-omega[0]-omega[2])) * (X[j,k]/(Ejk-omega[0]-omega[2]-omega[1]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[1])) * (X[i,j] / (Eij-omega[1]-omega[0])) * (X[j,k]/(Ejk-omega[1]-omega[0]-omega[2]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[0])) * (X[i,j] / (Eij-omega[0]-omega[1])) * (X[j,k]/(Ejk.conjugate()+omega[2]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[1])) * (X[i,j] / (Eij-omega[1]-omega[2])) * (X[j,k]/(Ejk.conjugate()+omega[0]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[2])) * (X[i,j] / (Eij-omega[2]-omega[0])) * (X[j,k]/(Ejk.conjugate()+omega[1]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[2])) * (X[i,j] / (Eij-omega[2]-omega[1])) * (X[j,k]/(Ejk.conjugate()+omega[0]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[0])) * (X[i,j] / (Eij-omega[0]-omega[2])) * (X[j,k]/(Ejk.conjugate()+omega[1]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[1])) * (X[i,j] / (Eij-omega[1]-omega[0])) * (X[j,k]/(Ejk.conjugate()+omega[2]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[0])) * (X[i,j] / (Eij.conjugate()+omega[1]+omega[2])) * (X[j,k]/(Ejk.conjugate()+omega[2]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[1])) * (X[i,j] / (Eij.conjugate()+omega[2]+omega[0])) * (X[j,k]/(Ejk.conjugate()+omega[0]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[2])) * (X[i,j] / (Eij.conjugate()+omega[0]+omega[1])) * (X[j,k]/(Ejk.conjugate()+omega[1]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[2])) * (X[i,j] / (Eij.conjugate()+omega[1]+omega[0])) * (X[j,k]/(Ejk.conjugate()+omega[0]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[0])) * (X[i,j] / (Eij.conjugate()+omega[2]+omega[1])) * (X[j,k]/(Ejk.conjugate()+omega[1]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:]-omega[1])) * (X[i,j] / (Eij.conjugate()+omega[0]+omega[2])) * (X[j,k]/(Ejk.conjugate()+omega[2]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[0]+omega[1]+omega[2])) * (X[i,j] / (Eij.conjugate()+omega[1]+omega[2])) * (X[j,k]/(Ejk.conjugate()+omega[2]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[1]+omega[2]+omega[0])) * (X[i,j] / (Eij.conjugate()+omega[2]+omega[0])) * (X[j,k]/(Ejk.conjugate()+omega[0]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[2]+omega[0]+omega[1])) * (X[i,j] / (Eij.conjugate()+omega[0]+omega[1])) * (X[j,k]/(Ejk.conjugate()+omega[1]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[2]+omega[1]+omega[0])) * (X[i,j] / (Eij.conjugate()+omega[1]+omega[0])) * (X[j,k]/(Ejk.conjugate()+omega[0]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[0]+omega[2]+omega[1])) * (X[i,j] / (Eij.conjugate()+omega[2]+omega[1])) * (X[j,k]/(Ejk.conjugate()+omega[1]))
+                            +X[k,Nf:].dot(X[Nf:,i] / (Eni[Nf:].conjugate()+omega[1]+omega[0]+omega[2])) * (X[i,j] / (Eij.conjugate()+omega[0]+omega[2])) * (X[j,k]/(Ejk.conjugate()+omega[2]))
+                            )
+    return gamma
+
+
+
 def gamma_eeee(E, X, units, omega=np.zeros(3), n=0, damping=False):
     """Compute the all electric second order hyperpolarizability for
     a system "in nth state".

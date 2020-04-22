@@ -68,7 +68,7 @@ def solver_1D(x, V, units, num_states=15):
     
     return psi, E
 
-def solver_fft(x, V, units):
+def solver_fft(x, V, units, Nstates=21):
     """Returns eigenstates and eigenenergies of one dimensional potentials
     define on grid using fourier methods to approximate the kinetic energy. 
     
@@ -113,11 +113,11 @@ def solver_fft(x, V, units):
     # Compute eigenvalues and eigenfunctions:
     E, psi = linalg.eigh(H)
     
-    # Normalize to unity:
-    for i in range(len(x)):
-        psi[:,i] = psi[:,i] / sp.sqrt(sp.trapz( psi[:,i]*psi[:,i], x))
-    
-    # Take the transpose so that psi[i] is the ith eigenfunction:
+    E = E[:Nstates]
     psi = psi.transpose()
+    psi = psi[:Nstates]
+    # Normalize to unity:
+    for i in range(Nstates):
+        psi[i] = psi[i] / sp.sqrt(sp.trapz( psi[i]*psi[i], x))
     
     return psi, E
