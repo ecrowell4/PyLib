@@ -79,12 +79,19 @@ def get_S(N):
     return A
 
 
-def get_Enm_Xnm(S):
+def get_Enm_Xnm(S, spectrum=None):
     """Returns  transition moments.
     
     Input
         S : np.array
             sum rule matrix
+        spectrum : np.array
+            Normalized spectrum of energies:
+            E[n] = f(n) where 
+            If None, then a random spectrum is chosen
+            Example : quadratic spectrum f(n) = n**2: [0,1,4,9,...]
+                      HO spectrum f(n) = n: [0,1,2,3,...]
+                      sub linear f(n) = sqrt{n}: [0,1,sqrt{2},sqrt{3},...] 
             
     Output
         E_ordered : np.array
@@ -95,10 +102,14 @@ def get_Enm_Xnm(S):
     """
     normalize = S[0]
     N = len(S[1][0])
-    E = np.random.random((N))       # pick randome energies
-    E_ordered = hq.nsmallest(N,E)     # order the energies
+    if spectrum is None:
+        E = np.random.random((N))       # pick random energies
+        E_ordered = hq.nsmallest(N,E)     # order the energies
+        E_ordered = E_ordered - E_ordered[0] # grnd state is zero energy
+    else:
+    	E = spectrum    # Assume input spectrum is properly formatted
 
-
+    # Normalized spectrum by E10 by E10
     E_ordered = (E_ordered - E_ordered[0]) / (E_ordered[1] - E_ordered[0])
                                     # normalize energies
                                     
