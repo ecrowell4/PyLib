@@ -33,7 +33,7 @@ def sum_rules(E, x, normalize=False):
     return SR
 
 
-def get_S(N):
+def get_S(N,normalize=True):
     """Returns a random, anti-symmetric array such that each row sums to 1.
     
     Input 
@@ -100,8 +100,7 @@ def get_Enm_Xnm(S, spectrum=None):
         Xnm : np.array
             array of transition moments normalized by x_max
     """
-    normalize = S[0]
-    N = len(S[1][0])
+    N = len(S[0])
     if spectrum is None:
         E = np.random.random((N))       # pick random energies
         E_ordered = hq.nsmallest(N,E)     # order the energies
@@ -126,7 +125,7 @@ def get_Enm_Xnm(S, spectrum=None):
     + np.transpose(sp.linalg.triu(RandomSign, k=1)) )                        
                                     # Enforce symmetry
     
-    x =  RandomSign*np.sqrt(abs(S[1] / Enm))
+    x =  RandomSign*np.sqrt(abs(S / Enm))
                                     # Determine trasition moment matrix
     
     H = np.diag(E_ordered)              # Hamltonian matrix is diagonal
