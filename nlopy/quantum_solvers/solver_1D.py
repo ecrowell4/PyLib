@@ -68,7 +68,15 @@ def solver_1D(x, V, units, num_states=15):
     
     return psi, E
 
-def solver_fft(x, V, units, Nstates=21):
+def apply_H_fft(f, x, V, units, q=0):
+	"""Applies Hamiltonain to state using FFT methods."""
+	N = len(x)
+	dx = x[1]-x[0]
+	k = 2*np.pi*np.fft.fftfreq(N, d=dx)
+	K = np.fft.ifft((k+q)**2/2/units.m*np.fft.fft(f))
+	return K + V*f
+
+def solver_fft(x, V, units, Nstates=21, q=0):
     """Returns eigenstates and eigenenergies of one dimensional potentials
     define on grid using fourier methods to approximate the kinetic energy. 
     
@@ -81,8 +89,10 @@ def solver_fft(x, V, units, Nstates=21):
             The potential function defined on the grid
         units : class
             Class whose attributes are the fundamental constants hbar, e, m, c, etc.
-        num_states : int
+        Nstates : int
             number of states to be returns
+        q : np.float
+            quasimomentum
         
     Output
         psi : np.array([psi_0(x), ..., psi_N(x)]) where N = NumStates
@@ -97,18 +107,18 @@ def solver_fft(x, V, units, Nstates=21):
     L = N * dx
 
     # Determine k space parameters
-    n = np.fft.fftshift(np.fft.fftfreq(N, d=dx)) * L
-    k = 2 * np.pi * n / L
+    k = 2 * np.pi * np.fft.fftshift(np.fft.fftfreq(N, d=dx))
 
     # Kinetic energy in k space
-    Tk = units.hbar**2 * k**2 / 2 / units.m
+    Tk = units.hbar**2 * (k+q)**2 / 2 / units.m
 
     # Transform to position space
     M_kn = np.exp(-1j * k[:, None] * x[None, :]) / np.sqrt(N)
-    Tx = M_kn.conj().dot((k**2 / 2)[:, None] * M_kn)
+    Tx = M_kn.conj().dot(Tk[:, None] * M_kn)
 
     # Construct the Hamiltonian in position space
     H = Tx + np.diag(V)
+    assert np.allclose(H.transpose().conj(), H), "not Hermitian"
     
     # Compute eigenvalues and eigenfunctions:
     E, psi = linalg.eigh(H)
