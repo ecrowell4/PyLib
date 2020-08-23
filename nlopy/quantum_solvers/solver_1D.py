@@ -100,24 +100,8 @@ def solver_fft(x, V, units, Nstates=21, q=0):
         E : np.array([E_0, ..., E_N]) 
             Eigenvalues of Hamiltonian
     """
-        
-    # Determine parameters from spacial grid
     N = len(x)
-    dx = x[1]-x[0]
-    L = N * dx
-
-    # Determine k space parameters
-    k = 2 * np.pi * np.fft.fftshift(np.fft.fftfreq(N, d=dx))
-
-    # Kinetic energy in k space
-    Tk = units.hbar**2 * (k+q)**2 / 2 / units.m
-
-    # Transform to position space
-    M_kn = np.exp(-1j * k[:, None] * x[None, :]) / np.sqrt(N)
-    Tx = M_kn.conj().dot(Tk[:, None] * M_kn)
-
-    # Construct the Hamiltonian in position space
-    H = Tx + np.diag(V)
+    H = apply_H_fft(np.eye(N), x, V, units, q=q).T
     assert np.allclose(H.transpose().conj(), H), "not Hermitian"
     
     # Compute eigenvalues and eigenfunctions:
@@ -128,6 +112,6 @@ def solver_fft(x, V, units, Nstates=21, q=0):
     psi = psi[:Nstates]
     # Normalize to unity:
     for i in range(Nstates):
-        psi[i] = psi[i] / sp.sqrt(sp.trapz( psi[i]*psi[i], x))
+        psi[i] = psi[i] / sp.sqrt(sp.trapz( abs(psi[i])**2, x))
     
     return psi, E
