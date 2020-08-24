@@ -8,13 +8,13 @@ Created on Mon Jul 31 12:38:46 2017
 import numpy as np
 from nlopy.hyperpol.sum_over_states import sos_utils
 
-def alpha_ee(E, xx, units, omega=0, intrinsic=False, n=0, damping=False):
+def alpha_ee(E, X, units, omega=0, intrinsic=False, n=0, damping=False):
     """Calculates the polarizability alpha for a system in the ground
     
     Input
         E : np.array(N)
             energy spectrum
-        xx : np.array((N,N))
+        X : np.array((N,N))
             transition matrix
         units : class
             class object containing fundamental constants
@@ -22,7 +22,7 @@ def alpha_ee(E, xx, units, omega=0, intrinsic=False, n=0, damping=False):
             frequency of incident electric field
         intrinsic : bool
             if True, then intrinsic alpha is returned. In this case
-            it is assumed the scaled xx and E are given as input
+            it is assumed the scaled X and E are given as input
         n : int
             state system is assumes to be in (i.e. n=0 -> ground state)
         damping : bool
@@ -35,16 +35,16 @@ def alpha_ee(E, xx, units, omega=0, intrinsic=False, n=0, damping=False):
     """
 
     # assert consistent dimensions
-    assert len(E)==len(xx[0]), "dimensions of E and xx do not match."
+    assert len(E)==len(X[0]), "dimensions of E and X do not match."
     # Take all Em -> Emn
     Ereal = E - E[n]
     E = Ereal + 1j*E.imag
 
     if damping == True:
-        E = E - 1j * (2 / 3 / units.hbar) * (E / units.hbar / units.c)**3 * units.e**2 * abs(xx[:,n])**2  
+        E = E - 1j * (2 / 3 / units.hbar) * (E / units.hbar / units.c)**3 * units.e**2 * abs(X[:,n])**2  
          
-    alpha =  units.e**2 * (np.delete(xx[n,:], n).dot(np.delete(xx[:,n], n) * sos_utils.D1(np.delete(E, n), omega, units))
-                           + np.delete(xx[n,:], n).dot(np.delete(xx[:,n], n) * sos_utils.D1(np.delete(E.conjugate(), n), -omega, units))
+    alpha =  units.e**2 * (np.delete(X[n,:], n).dot(np.delete(X[:,n], n) * sos_utils.D1(np.delete(E, n), omega, units))
+                           + np.delete(X[n,:], n).dot(np.delete(X[:,n], n) * sos_utils.D1(np.delete(E.conjugate(), n), -omega, units))
                           )
     if intrinsic is True:
         return alpha / 2
