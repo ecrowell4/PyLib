@@ -69,7 +69,22 @@ def solver_1D(x, V, units, num_states=15):
     return psi, E
 
 def apply_H_fft(f, x, V, units, q=0):
-	"""Applies Hamiltonain to state using FFT methods."""
+	"""Applies Hamiltonain to state using FFT methods.
+    Input
+        f : np.array
+            wavefunction
+        x : np.array
+            spatial domain
+        V : np.array
+            external potential
+        units : object
+            fundamental constants
+        q : float
+            quasimomentum
+    Output
+        Hf : np.array
+            action of Hamiltonian on f.
+    """
 	N = len(x)
 	dx = x[1]-x[0]
 	k = 2*np.pi*np.fft.fftfreq(N, d=dx)
